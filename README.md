@@ -20,7 +20,7 @@ mvn spring-boot:run
 前端为原生微信小程序（TypeScript），目录 `apps/mp`。项目 AppID 已在 `apps/mp/project.config.json` 中配置（勿在仓库中提交 AppSecret）。
 
 1. 安装 [微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)。
-2. 打开项目：选择目录 **`apps/mp`**（内含 `project.config.json` 与 `miniprogram/`）。
+2. 打开项目：选择目录 **`apps/mp`**（内含 `project.config.json` 与 `miniprogram/`；勿只打开 `miniprogram/` 子目录）。源码为纯 `.ts`，`project.config.json` 的 `setting.useCompilerPlugins` 需包含 **`typescript`**，否则开发者工具会报无法解析 `app.js`。
 3. 本地调试：
    - 默认走本地 API **`http://127.0.0.1:8082/api/v1`**（先按上文启动 `apps/api`）；无后端时可在顾客端「我的」打开 **Mock** 离线点通（见 `miniprogram/services/mock.ts`）。
    - 可用存储键 `API_BASE_URL` 覆盖 API 基址。
