@@ -12,6 +12,7 @@
       </view>
       <view class="row"><text>{{item.realName}}</text><text>{{item.phone}}</text></view>
       <view class="muted">{{item.summary}} · ¥{{item.totalYuan}}</view>
+      <view class="muted" wx:if="{{item.remark}}" style="margin-top:8rpx">备注：{{item.remark}}</view>
     </view>
     <view class="tiny" style="text-align:center;padding:32rpx" wx:if="{{!preorderList.length}}">暂无预定订单</view>
   </view>
@@ -26,7 +27,8 @@
         <text class="badge">{{item.statusText}}</text>
       </view>
       <view class="row"><text>{{item.realName}}</text><text>{{item.phone}}</text></view>
-      <view class="muted">码 {{item.pickupCode}} · ¥{{item.totalYuan}}</view>
+      <view class="muted">{{item.summary}} · ¥{{item.totalYuan}}</view>
+      <view class="muted" wx:if="{{item.remark}}" style="margin-top:8rpx">备注：{{item.remark}}</view>
     </view>
     <view class="tiny" style="text-align:center;padding:32rpx" wx:if="{{!manualList.length}}">暂无代录订单</view>
   </view>

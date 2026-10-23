@@ -56,12 +56,16 @@ export function mockResetRole(role: UserRole) {
 }
 
 export const mockApi = {
-  async wxLogin(_code: string) {
+  async wxLogin(_code: string, devKey?: string) {
+    if (!devKey || !String(devKey).trim()) {
+      throw new Error('devKey 必填（40001）')
+    }
+    void _code
     return {
       accessToken,
       expiresIn: 7200,
       profileCompleted,
-      user: { ...mockUser },
+      user: { ...mockUser, id: `u_mock_dev_${String(devKey).slice(0, 32)}` },
     }
   },
 
@@ -73,7 +77,13 @@ export const mockApi = {
       nickname: `${realName}${phone}`,
     }
     profileCompleted = true
-    return { user: { ...mockUser }, profileCompleted: true }
+    accessToken = `mock_token_${mockUser.role.toLowerCase()}_profile`
+    return {
+      accessToken,
+      expiresIn: 7200,
+      user: { ...mockUser },
+      profileCompleted: true,
+    }
   },
 
   async me() {
@@ -122,7 +132,7 @@ export const mockApi = {
         lineFen,
       }
     })
-    const totalFen = lines.reduce((s, l) => s + l.lineFen, 0)
+    const totalFen = lines.reduce((s, l) => s + (l.lineFen ?? 0), 0)
     const depositRequired = totalFen > cfg.depositThresholdFen
     const depositFen = depositRequired
       ? Math.round((totalFen * cfg.depositRateBps) / 10000)
@@ -201,7 +211,7 @@ export const mockApi = {
         lineFen: Math.round(p.priceFen * q),
       }
     })
-    const totalFen = lines.reduce((s, l) => s + l.lineFen, 0)
+    const totalFen = lines.reduce((s, l) => s + (l.lineFen ?? 0), 0)
     const order: Order = {
       id: `ord_manual_${Date.now()}`,
       source: 'MANUAL',
@@ -255,6 +265,52 @@ export const mockApi = {
     const p = PRODUCTS.find((x) => x.id === id)
     if (!p) throw new Error('商品不存在')
     p.status = status
+    return { ...p }
+  },
+
+  async createProduct(body: {
+    skuCode: string
+    name: string
+    unit: string
+    priceFen: number
+    remark?: string
+    sort?: number
+    status?: 'ON_SHELF' | 'OFF_SHELF'
+  }): Promise<Product> {
+    const id = `prod_${body.skuCode.toLowerCase()}_${Date.now()}`
+    const p: Product = {
+      id,
+      skuCode: body.skuCode,
+      name: body.name,
+      unit: body.unit,
+      priceFen: body.priceFen,
+      status: body.status || 'ON_SHELF',
+      remark: body.remark || '',
+      sort: body.sort ?? PRODUCTS.length * 10 + 10,
+    }
+    PRODUCTS.push(p)
+    return { ...p }
+  },
+
+  async updateProduct(
+    id: string,
+    body: Partial<{
+      name: string
+      unit: string
+      priceFen: number
+      remark: string
+      sort: number
+      status: 'ON_SHELF' | 'OFF_SHELF'
+    }>
+  ): Promise<Product> {
+    const p = PRODUCTS.find((x) => x.id === id)
+    if (!p) throw new Error('商品不存在')
+    if (body.name != null) p.name = body.name
+    if (body.unit != null) p.unit = body.unit
+    if (body.priceFen != null) p.priceFen = body.priceFen
+    if (body.remark != null) p.remark = body.remark
+    if (body.sort != null) p.sort = body.sort
+    if (body.status != null) p.status = body.status
     return { ...p }
   },
 }

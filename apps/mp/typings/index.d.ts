@@ -10,6 +10,11 @@ interface IAppOption {
   }
   ensureSession: () => Promise<void>
   setSession: (token: string, user: UserInfo, profileCompleted: boolean) => void
+  applyAuthResponse: (data: {
+    accessToken?: string
+    user: UserInfo
+    profileCompleted: boolean
+  }) => void
   clearSession: () => void
   routeByRole: () => void
 }
@@ -62,7 +67,8 @@ interface OrderItem {
   unit: string
   quantity: string
   priceFen: number
-  lineFen: number
+  lineFen?: number
+  lineTotalFen?: number
 }
 
 interface Order {

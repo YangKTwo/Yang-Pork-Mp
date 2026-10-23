@@ -1,4 +1,6 @@
 import { api } from './services/api'
+import { applyAuthResponse } from './utils/authSession'
+import { getStableDevKey } from './utils/devKey'
 
 App<IAppOption>({
   globalData: {
@@ -10,6 +12,7 @@ App<IAppOption>({
   },
 
   onLaunch() {
+    getStableDevKey()
     try {
       const token = wx.getStorageSync('ACCESS_TOKEN') || ''
       const user = wx.getStorageSync('USER_INFO') || null
@@ -36,6 +39,14 @@ App<IAppOption>({
     wx.setStorageSync('PROFILE_COMPLETED', profileCompleted)
   },
 
+  applyAuthResponse(data: {
+    accessToken?: string
+    user: UserInfo
+    profileCompleted: boolean
+  }) {
+    applyAuthResponse(this, data)
+  },
+
   clearSession() {
     this.globalData.accessToken = ''
     this.globalData.userInfo = null
@@ -52,8 +63,8 @@ App<IAppOption>({
       wx.login({
         success: async (res) => {
           try {
-            const data = await api.wxLogin(res.code || 'mock_code')
-            this.setSession(data.accessToken, data.user, data.profileCompleted)
+            const data = await api.wxLogin(res.code || '')
+            this.applyAuthResponse(data)
             resolve()
           } catch (e) {
             reject(e)

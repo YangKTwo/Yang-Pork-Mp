@@ -11,8 +11,8 @@ Page({
         wx.login({
           success: async (res) => {
             try {
-              const data = await api.wxLogin(res.code || 'mock_code')
-              app.setSession(data.accessToken, data.user, data.profileCompleted)
+              const data = await api.wxLogin(res.code || '')
+              app.applyAuthResponse(data)
               track(TrackEvents.LOGIN_WX, {
                 result: 'success',
                 profile_completed: data.profileCompleted,

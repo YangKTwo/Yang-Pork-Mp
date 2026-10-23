@@ -16,7 +16,7 @@ Page({
     app.clearSession()
     try {
       const data = await api.wxLogin('dev_switch')
-      app.setSession(data.accessToken, data.user, data.profileCompleted)
+      app.applyAuthResponse(data)
       app.routeByRole()
     } catch (err: any) {
       wx.showToast({ title: err.message || '进入失败', icon: 'none' })
