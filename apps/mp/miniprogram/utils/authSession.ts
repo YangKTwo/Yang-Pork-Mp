@@ -1,15 +1,17 @@
 /** 登录 / 完善资料成功后统一落库 accessToken（A-AUTH-02） */
+import { coerceAuthPayload, formatMissingAccessTokenDiagnostic } from './apiEnvelope'
+
 export type AuthPayload = {
   accessToken?: string
   user: UserInfo
   profileCompleted: boolean
 }
 
-export function applyAuthResponse(app: IAppOption, data: AuthPayload): void {
-  const token = data.accessToken
+export function applyAuthResponse(app: IAppOption, data: AuthPayload | Record<string, unknown>): void {
+  const payload = coerceAuthPayload(data)
+  const token = payload.accessToken
   if (!token) {
-    const keys = Object.keys((data as object) || {}).join(',') || '无'
-    throw new Error(`响应缺少 accessToken（顶层字段: ${keys}）`)
+    throw new Error(formatMissingAccessTokenDiagnostic(data))
   }
-  app.setSession(token, data.user, data.profileCompleted)
+  app.setSession(token, payload.user, payload.profileCompleted)
 }
