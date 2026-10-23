@@ -10,11 +10,15 @@ interface IAppOption {
   }
   ensureSession: () => Promise<void>
   setSession: (token: string, user: UserInfo, profileCompleted: boolean) => void
-  applyAuthResponse: (data: {
-    accessToken?: string
-    user: UserInfo
-    profileCompleted: boolean
-  }) => void
+  applyAuthResponse: (
+    data:
+      | {
+          accessToken?: string
+          user: UserInfo
+          profileCompleted?: boolean
+        }
+      | Record<string, unknown>
+  ) => void
   clearSession: () => void
   routeByRole: () => void
 }
