@@ -1,1 +1,13 @@
-/* common */
+.tag-gap {
+  margin-left: 8rpx;
+}
+.cell-strong {
+  font-weight: 600 !important;
+}
+.cell-phone {
+  font-size: 34rpx !important;
+  letter-spacing: 1rpx;
+}
+.sheet-inner {
+  padding: 32rpx 0 0;
+}

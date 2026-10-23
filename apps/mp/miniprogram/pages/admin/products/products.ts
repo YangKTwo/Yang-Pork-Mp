@@ -84,7 +84,7 @@ Page({
   },
   onFormField(e: any) {
     const k = e.currentTarget.dataset.k as keyof ProductForm
-    const form = { ...this.data.form, [k]: e.detail.value }
+    const form = { ...this.data.form, [k]: String(e.detail || '') }
     this.setData({ form })
     this.refreshFormValid(form)
   },

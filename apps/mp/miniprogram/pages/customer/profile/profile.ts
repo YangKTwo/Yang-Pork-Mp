@@ -4,11 +4,11 @@ import { track, TrackEvents } from '../../../utils/tracking/index'
 Page({
   data: { realName: '', phone: '', canSubmit: false, loading: false },
   onName(e: any) {
-    this.setData({ realName: e.detail.value })
+    this.setData({ realName: String(e.detail || '') })
     this.refresh()
   },
   onPhone(e: any) {
-    this.setData({ phone: e.detail.value })
+    this.setData({ phone: String(e.detail || '') })
     this.refresh()
   },
   refresh() {

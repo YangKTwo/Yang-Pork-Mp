@@ -1,72 +1,68 @@
 <view class="page" wx:if="{{order}}" style="padding-bottom:48rpx">
   <view class="card" style="text-align:center">
-    <view class="badge">{{statusText}}</view>
-    <view class="badge muted" style="margin-left:8rpx">{{order.source === 'MANUAL' ? '代录' : '预定'}}</view>
+    <van-tag type="primary" plain>{{statusText}}</van-tag>
+    <van-tag plain custom-class="tag-gap">{{order.source === 'MANUAL' ? '代录' : '预定'}}</van-tag>
+    <!-- P0：取货码大号自定义块 -->
     <view class="pickup-code" wx:if="{{order.pickupCode}}">
       <view class="lbl">取货码</view>
       <view class="code">{{order.pickupCode}}</view>
     </view>
   </view>
-  <view class="card">
-    <view class="row"><text class="muted">姓名</text><text style="font-weight:600">{{order.realName}}</text></view>
-    <view class="row"><text class="muted">手机</text><text style="font-size:34rpx;letter-spacing:1rpx">{{order.phone}}</text></view>
-    <view class="row"><text class="muted">取货日</text><text>{{order.pickupDate}}</text></view>
-    <view class="row"><text class="muted">定金</text><text>{{depositText}}</text></view>
-    <view class="row" wx:if="{{order.remark}}">
-      <text class="muted">备注</text>
-      <text style="max-width:420rpx;text-align:right">{{order.remark}}</text>
+  <van-cell-group inset>
+    <van-cell title="姓名" value="{{order.realName}}" value-class="cell-strong" />
+    <van-cell title="手机" value="{{order.phone}}" value-class="cell-phone" />
+    <van-cell title="取货日" value="{{order.pickupDate}}" />
+    <van-cell title="定金" value="{{depositText}}" />
+    <van-cell wx:if="{{order.remark}}" title="备注" value="{{order.remark}}" />
+  </van-cell-group>
+  <van-cell-group inset title="明细">
+    <van-cell
+      wx:for="{{order.items}}"
+      wx:key="productId"
+      title="{{item.name}} ×{{item.quantity}} {{item.unit}}"
+      value="¥{{item.lineYuan}}"
+    />
+  </van-cell-group>
+  <view class="mp-page-foot" wx:if="{{order.status === 'PENDING_PREPARE'}}">
+    <van-button type="primary" block round loading="{{acting}}" bind:click="onPrepare">标记已备货</van-button>
+  </view>
+  <view class="mp-page-foot" wx:if="{{order.status === 'PREPARED'}}">
+    <van-button type="primary" block round loading="{{acting}}" bind:click="onPickup">确认核销（已取货）</van-button>
+  </view>
+  <view style="padding:0 32rpx">
+    <van-button wx:if="{{canShopCancel}}" type="danger" plain block bind:click="openCancel">取消订单</van-button>
+    <view class="tiny" style="text-align:center;padding:16rpx 0" wx:if="{{canShopCancel}}">
+      店家代取消 · 不受顾客 22:00 窗限制 · 仅待备货/已备货
     </view>
-  </view>
-  <view class="card">
-    <view style="font-weight:500;margin-bottom:12rpx">明细</view>
-    <view class="row" wx:for="{{order.items}}" wx:key="productId">
-      <text>{{item.name}} ×{{item.quantity}} {{item.unit}}</text>
-      <text>¥{{item.lineYuan}}</text>
-    </view>
-  </view>
-  <view style="padding:0 32rpx 16rpx" wx:if="{{order.status === 'PENDING_PREPARE'}}">
-    <button class="btn-primary" bindtap="onPrepare" loading="{{acting}}">标记已备货</button>
-  </view>
-  <view style="padding:0 32rpx 16rpx" wx:if="{{order.status === 'PREPARED'}}">
-    <button class="btn-primary" bindtap="onPickup" loading="{{acting}}">确认核销（已取货）</button>
-  </view>
-  <button
-    class="btn-ghost-danger"
-    wx:if="{{canShopCancel}}"
-    bindtap="openCancel"
-  >取消订单</button>
-  <view class="tiny" style="text-align:center;padding:0 32rpx" wx:if="{{canShopCancel}}">
-    店家代取消 · 不受顾客 22:00 窗限制 · 仅待备货/已备货
   </view>
 </view>
 
-<!-- 代取消：原因必填 -->
-<view class="mask" wx:if="{{showCancel}}" catchtouchmove="noop">
-  <view class="sheet">
-    <view class="handle"></view>
+<van-popup show="{{showCancel}}" position="bottom" round bind:close="closeCancel" closeable>
+  <view class="sheet-inner">
     <view style="text-align:center;font-size:34rpx;font-weight:600;margin-bottom:16rpx">取消订单</view>
-    <view class="muted" style="text-align:center;margin-bottom:24rpx">
+    <view class="muted" style="text-align:center;margin-bottom:24rpx;padding:0 16rpx">
       店家代取消，<text style="font-weight:600">不受</text>顾客 22:00 自助取消限制。
       取消后不可恢复；已付定金将原路退回。
     </view>
-    <view class="field">
-      <label>取消原因 <text class="req">*</text>（必填）</label>
-      <textarea
-        placeholder="请填写取消原因，例如：顾客电话要求取消 / 缺货无法履约"
-        value="{{cancelReason}}"
-        bindinput="onReason"
-        maxlength="100"
-      />
-      <view class="tiny" style="color:#D32F2F;margin-top:8rpx" wx:if="{{reasonError}}">请填写取消原因后再确认</view>
-    </view>
-    <view class="btn-row">
-      <button class="btn-secondary" bindtap="closeCancel">再想想</button>
-      <button
-        class="btn-primary {{canConfirmCancel ? '' : 'disabled'}}"
+    <van-field
+      label="取消原因"
+      type="textarea"
+      required
+      placeholder="请填写取消原因，例如：顾客电话要求取消 / 缺货无法履约"
+      value="{{cancelReason}}"
+      maxlength="100"
+      error-message="{{reasonError ? '请填写取消原因后再确认' : ''}}"
+      bind:change="onReason"
+    />
+    <view class="btn-row mp-popup-foot">
+      <van-button type="default" plain hairline custom-style="flex:1" bind:click="closeCancel">再想想</van-button>
+      <van-button
+        type="primary"
+        custom-style="flex:1;margin-left:20rpx"
         disabled="{{!canConfirmCancel}}"
-        bindtap="confirmCancel"
         loading="{{cancelling}}"
-      >确认取消</button>
+        bind:click="confirmCancel"
+      >确认取消</van-button>
     </view>
   </view>
-</view>
+</van-popup>

@@ -106,7 +106,7 @@ Page({
     this.setData({ showCancel: false })
   },
   onReason(e: any) {
-    const cancelReason = e.detail.value || ''
+    const cancelReason = String(e.detail || '')
     const ok = !!cancelReason.trim()
     this.setData({
       cancelReason,
