@@ -17,7 +17,7 @@
   <view class="card">
     <view class="field">
       <label>备注（选填）</label>
-      <input placeholder="口味偏好等" value="{{remark}}" bindinput="onRemark" />
+      <input placeholder="口味/切法偏好，选填" value="{{remark}}" bindinput="onRemark" />
     </view>
   </view>
 </view>

@@ -1,8 +1,9 @@
 import { api } from '../../../services/api'
 import { fenToYuan, yuanToFen } from '../../../utils/money'
 
+const UNIT_OPTIONS = ['斤', '条', '只', '份']
+
 type ProductForm = {
-  skuCode: string
   name: string
   unit: string
   priceYuan: string
@@ -10,20 +11,31 @@ type ProductForm = {
 }
 
 const emptyForm = (): ProductForm => ({
-  skuCode: '',
   name: '',
   unit: '斤',
   priceYuan: '',
   remark: '',
 })
 
+function unitIndexOf(unit: string): number {
+  const i = UNIT_OPTIONS.indexOf(unit)
+  return i >= 0 ? i : 0
+}
+
+function genSkuCode(): string {
+  return `N${Date.now().toString(36).toUpperCase().slice(-8)}`
+}
+
 Page({
   data: {
     list: [] as any[],
+    unitOptions: UNIT_OPTIONS,
     showForm: false,
     formMode: 'create' as 'create' | 'edit',
     editingId: '',
     form: emptyForm(),
+    unitIndex: 0,
+    onShelf: false,
     formLoading: false,
     canSubmitForm: false,
   },
@@ -42,6 +54,8 @@ Page({
       formMode: 'create',
       editingId: '',
       form: emptyForm(),
+      unitIndex: 0,
+      onShelf: false,
       canSubmitForm: false,
     })
   },
@@ -49,17 +63,19 @@ Page({
     const { id } = e.currentTarget.dataset
     const item = this.data.list.find((x) => x.id === id)
     if (!item) return
+    const unit = item.unit || '斤'
     this.setData({
       showForm: true,
       formMode: 'edit',
       editingId: id,
       form: {
-        skuCode: item.skuCode,
         name: item.name,
-        unit: item.unit,
+        unit,
         priceYuan: fenToYuan(item.priceFen),
         remark: item.remark || '',
       },
+      unitIndex: unitIndexOf(unit),
+      onShelf: item.status === 'ON_SHELF',
     })
     this.refreshFormValid()
   },
@@ -72,46 +88,78 @@ Page({
     this.setData({ form })
     this.refreshFormValid(form)
   },
+  onUnitPick(e: any) {
+    const idx = Number(e.detail.value)
+    const unit = UNIT_OPTIONS[idx] || '斤'
+    const form = { ...this.data.form, unit }
+    this.setData({ unitIndex: idx, form })
+    this.refreshFormValid(form)
+  },
+  onShelfSwitch(e: any) {
+    this.setData({ onShelf: !!e.detail.value })
+  },
   refreshFormValid(form?: ProductForm) {
     const f = form || this.data.form
-    const { formMode } = this.data
     const priceOk = yuanToFen(f.priceYuan) > 0
-    const baseOk = !!f.name.trim() && !!f.unit.trim() && priceOk
-    const canSubmit =
-      formMode === 'create'
-        ? baseOk && !!f.skuCode.trim()
-        : baseOk
+    const canSubmit = !!f.name.trim() && !!f.unit.trim() && priceOk
     this.setData({ canSubmitForm: canSubmit })
   },
-  async submitForm() {
-    if (!this.data.canSubmitForm || this.data.formLoading) return
+  shelfStatus(): 'ON_SHELF' | 'OFF_SHELF' {
+    return this.data.onShelf ? 'ON_SHELF' : 'OFF_SHELF'
+  },
+  async persistForm(forceOffShelf = false) {
     const { formMode, editingId, form } = this.data
     const priceFen = yuanToFen(form.priceYuan)
     if (priceFen <= 0) {
       wx.showToast({ title: '请输入有效价格', icon: 'none' })
-      return
+      return false
     }
+    const status: 'ON_SHELF' | 'OFF_SHELF' = forceOffShelf
+      ? 'OFF_SHELF'
+      : this.shelfStatus()
+    if (formMode === 'create') {
+      await api.createProduct({
+        skuCode: genSkuCode(),
+        name: form.name.trim(),
+        unit: form.unit.trim(),
+        priceFen,
+        remark: form.remark.trim() || undefined,
+        status,
+      })
+    } else {
+      await api.updateProduct(editingId, {
+        name: form.name.trim(),
+        unit: form.unit.trim(),
+        priceFen,
+        remark: form.remark.trim(),
+        status,
+      })
+    }
+    return true
+  },
+  async submitForm() {
+    if (!this.data.canSubmitForm || this.data.formLoading) return
     this.setData({ formLoading: true })
     try {
-      if (formMode === 'create') {
-        await api.createProduct({
-          skuCode: form.skuCode.trim(),
-          name: form.name.trim(),
-          unit: form.unit.trim(),
-          priceFen,
-          remark: form.remark.trim() || undefined,
-          status: 'ON_SHELF',
-        })
-        wx.showToast({ title: '已创建', icon: 'success' })
-      } else {
-        await api.updateProduct(editingId, {
-          name: form.name.trim(),
-          unit: form.unit.trim(),
-          priceFen,
-          remark: form.remark.trim(),
-        })
-        wx.showToast({ title: '已保存', icon: 'success' })
-      }
+      const ok = await this.persistForm(false)
+      if (!ok) return
+      wx.showToast({ title: '已保存', icon: 'success' })
+      this.setData({ showForm: false })
+      await this.reload()
+    } catch (err: any) {
+      wx.showToast({ title: err.message || '失败', icon: 'none' })
+    } finally {
+      this.setData({ formLoading: false })
+    }
+  },
+  async shelfOffAndSave() {
+    if (!this.data.canSubmitForm || this.data.formLoading) return
+    if (this.data.formMode !== 'edit') return
+    this.setData({ formLoading: true })
+    try {
+      const ok = await this.persistForm(true)
+      if (!ok) return
+      wx.showToast({ title: '已下架并保存', icon: 'success' })
       this.setData({ showForm: false })
       await this.reload()
     } catch (err: any) {
@@ -129,19 +177,6 @@ Page({
     } catch (err: any) {
       wx.showToast({ title: err.message || '失败', icon: 'none' })
     }
-  },
-  confirmShelfOff(e: any) {
-    const { id, name } = e.currentTarget.dataset
-    wx.showModal({
-      title: '下架商品',
-      content: `确定下架「${name}」？顾客端将不再展示（可稍后重新上架）。`,
-      confirmText: '下架',
-      success: (res) => {
-        if (res.confirm) {
-          this.toggleShelf({ currentTarget: { dataset: { id, status: 'OFF_SHELF' } } })
-        }
-      },
-    })
   },
   noop() {},
 })

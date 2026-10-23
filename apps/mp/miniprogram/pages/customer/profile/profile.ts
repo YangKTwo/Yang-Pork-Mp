@@ -21,8 +21,11 @@ Page({
     const app = getApp<IAppOption>()
     try {
       const data = await api.completeProfile(this.data.realName.trim(), this.data.phone)
-      const token = data.accessToken || app.globalData.accessToken
-      app.setSession(token, data.user, data.profileCompleted ?? true)
+      app.applyAuthResponse({
+        accessToken: data.accessToken,
+        user: data.user,
+        profileCompleted: data.profileCompleted ?? true,
+      })
       track(TrackEvents.PROFILE_SUBMIT, { result: 'success' }, 'C-AUTH-02')
       app.routeByRole()
     } catch (e: any) {

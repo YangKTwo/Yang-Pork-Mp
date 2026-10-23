@@ -56,12 +56,16 @@ export function mockResetRole(role: UserRole) {
 }
 
 export const mockApi = {
-  async wxLogin(_code: string) {
+  async wxLogin(_code: string, devKey?: string) {
+    if (!devKey || !String(devKey).trim()) {
+      throw new Error('devKey 必填（40001）')
+    }
+    void _code
     return {
       accessToken,
       expiresIn: 7200,
       profileCompleted,
-      user: { ...mockUser },
+      user: { ...mockUser, id: `u_mock_dev_${String(devKey).slice(0, 32)}` },
     }
   },
 

@@ -5,6 +5,7 @@
  * - 金额单位：分
  * - App.globalData.useMock=true 时走 mock（默认 false，联调本地 8082；可在「我的」开启 Mock）
  */
+import { getStableDevKey } from '../utils/devKey'
 import { mockApi, mockResetRole } from './mock'
 
 const DEFAULT_BASE = 'http://127.0.0.1:8082/api/v1'
@@ -41,7 +42,12 @@ function useMock(): boolean {
   return false
 }
 
-function request<T>(method: string, path: string, data?: unknown): Promise<T> {
+function request<T>(
+  method: string,
+  path: string,
+  data?: unknown,
+  extraHeaders?: Record<string, string>
+): Promise<T> {
   const url = `${getBaseURL()}${path.startsWith('/') ? path : '/' + path}`
   const token = getToken()
   return new Promise((resolve, reject) => {
@@ -52,6 +58,7 @@ function request<T>(method: string, path: string, data?: unknown): Promise<T> {
       header: {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(extraHeaders || {}),
       },
       success(res) {
         const body = res.data as ApiResponse<T>
@@ -94,14 +101,23 @@ export const api = {
     mockResetRole(role)
   },
 
+  /**
+   * wx-login：身份由 devKey 决定（BE openid=mock_dev_<key>），code 仅占位。
+   * Key 解析优先级（服务端）：body devKey → body mockOpenid → Header X-Dev-Key
+   */
   async wxLogin(code: string) {
-    if (useMock()) return mockApi.wxLogin(code)
+    const devKey = getStableDevKey()
+    if (!devKey) {
+      throw new Error('devKey 未初始化')
+    }
+    const loginCode = code || 'placeholder'
+    if (useMock()) return mockApi.wxLogin(loginCode, devKey)
     return request<{
       accessToken: string
       expiresIn: number
       profileCompleted: boolean
       user: UserInfo
-    }>('POST', '/auth/wx-login', { code })
+    }>('POST', '/auth/wx-login', { code: loginCode, devKey }, { 'X-Dev-Key': devKey })
   },
 
   async completeProfile(realName: string, phone: string) {
