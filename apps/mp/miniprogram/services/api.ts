@@ -3,7 +3,7 @@
  * - baseURL 默认本地后端 http://127.0.0.1:8082/api/v1
  * - Authorization: Bearer <token>
  * - 金额单位：分
- * - App.globalData.useMock=true 时走 mock（默认 true，便于无后端点通）
+ * - App.globalData.useMock=true 时走 mock（默认 false，联调本地 8082；可在「我的」开启 Mock）
  */
 import { mockApi, mockResetRole } from './mock'
 
@@ -34,11 +34,11 @@ function useMock(): boolean {
   }
   try {
     const v = wx.getStorageSync('USE_MOCK')
-    if (v === false || v === '0' || v === 0) return false
+    if (v === true || v === '1' || v === 1) return true
   } catch (_e) {
     /* ignore */
   }
-  return true
+  return false
 }
 
 function request<T>(method: string, path: string, data?: unknown): Promise<T> {

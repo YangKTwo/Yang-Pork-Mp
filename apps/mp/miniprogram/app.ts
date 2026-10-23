@@ -6,7 +6,7 @@ App<IAppOption>({
     accessToken: '',
     role: null,
     profileCompleted: false,
-    useMock: true,
+    useMock: false,
   },
 
   onLaunch() {
@@ -19,7 +19,8 @@ App<IAppOption>({
       this.globalData.userInfo = user
       this.globalData.role = user ? user.role : null
       this.globalData.profileCompleted = profileCompleted
-      this.globalData.useMock = useMock === false || useMock === '0' ? false : true
+      this.globalData.useMock =
+        useMock === true || useMock === '1' || useMock === 1 ? true : false
     } catch (_e) {
       /* ignore */
     }

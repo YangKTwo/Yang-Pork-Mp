@@ -4,7 +4,7 @@ Page({
   data: {
     user: {} as any,
     baseURL: '',
-    useMock: true,
+    useMock: false,
   },
   onShow() {
     const app = getApp<IAppOption>()

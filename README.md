@@ -22,6 +22,6 @@ mvn spring-boot:run
 1. 安装 [微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)。
 2. 打开项目：选择目录 **`apps/mp`**（内含 `project.config.json` 与 `miniprogram/`）。
 3. 本地调试：
-   - 默认 **`useMock=true`**，可不启动后端即可浏览主要流程（见 `miniprogram/services/mock.ts`）。
-   - 联调后端时先按上文启动 `apps/api`（8082），在开发者工具或代码中将 mock 关闭，并确认 API 基址为 `http://127.0.0.1:8082/api/v1`（可在存储键 `API_BASE_URL` 覆盖）。
+   - 默认走本地 API **`http://127.0.0.1:8082/api/v1`**（先按上文启动 `apps/api`）；无后端时可在顾客端「我的」打开 **Mock** 离线点通（见 `miniprogram/services/mock.ts`）。
+   - 可用存储键 `API_BASE_URL` 覆盖 API 基址。
 4. 可选类型检查：`cd apps/mp && npm install && npm run tsc`。
