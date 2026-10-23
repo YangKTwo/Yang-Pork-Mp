@@ -4,10 +4,15 @@
   "private": true,
   "description": "提前一天预定猪肉 · 微信小程序",
   "scripts": {
-    "tsc": "tsc --noEmit"
+    "tsc": "tsc --noEmit",
+    "build:npm": "node scripts/build-npm.js"
   },
   "devDependencies": {
     "miniprogram-api-typings": "^3.12.2",
+    "miniprogram-ci": "^2.1.31",
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@vant/weapp": "^1.11.7"
   }
 }

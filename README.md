@@ -24,4 +24,6 @@ mvn spring-boot:run
 3. 本地调试：
    - 默认走本地 API **`http://127.0.0.1:8082/api/v1`**（先按上文启动 `apps/api`）；无后端时可在顾客端「我的」打开 **Mock** 离线点通（见 `miniprogram/services/mock.ts`）。
    - 可用存储键 `API_BASE_URL` 覆盖 API 基址。
-4. 可选类型检查：`cd apps/mp && npm install && npm run tsc`。
+4. 安装依赖后需 **构建 npm**：`cd apps/mp && npm install && npm run build:npm`（或开发者工具 **工具 → 构建 npm**）。详见 [apps/mp/README.md](apps/mp/README.md)。
+5. 可选类型检查：`cd apps/mp && npm run tsc`。
+6. Vant 主题与 P0 自定义块说明：[docs/design/11_vant_weapp_design_align.md](docs/design/11_vant_weapp_design_align.md)。

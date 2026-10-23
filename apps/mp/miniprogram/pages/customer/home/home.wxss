@@ -20,19 +20,18 @@
 .info { flex: 1; min-width: 0; }
 .name { font-size: 32rpx; font-weight: 500; }
 .meta { font-size: 24rpx; color: #999; margin-top: 4rpx; }
-.add {
-  width: 72rpx !important; height: 72rpx; border-radius: 50%; border: none;
-  background: #C62828; color: #fff; font-size: 44rpx; line-height: 72rpx; padding: 0;
+.add-btn {
+  min-width: 72rpx !important;
+  width: 72rpx !important;
+  padding: 0 !important;
+}
+.sheet-inner {
+  padding: 32rpx 32rpx 48rpx;
 }
 .sheet-head { display: flex; justify-content: space-between; align-items: flex-start; }
-.qty { display: flex; align-items: center; gap: 28rpx; margin: 32rpx 0; }
-.qty-val { font-size: 36rpx; font-weight: 600; min-width: 80rpx; text-align: center; }
-.cartbar {
-  position: fixed; left: 24rpx; right: 24rpx; bottom: 130rpx; z-index: 60;
-  background: #2a2422; color: #fff; border-radius: 56rpx;
-  padding: 16rpx 16rpx 16rpx 36rpx; display: flex; align-items: center; justify-content: space-between;
-}
-.cartbar .go {
-  background: #C62828; border: none; color: #fff; border-radius: 44rpx;
-  height: 80rpx; line-height: 80rpx; padding: 0 36rpx; font-size: 28rpx; margin: 0;
+.qty-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 32rpx 0 16rpx;
 }

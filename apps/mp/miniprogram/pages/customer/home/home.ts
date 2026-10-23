@@ -10,9 +10,13 @@ Page({
     drawerOpen: false,
     drawerProduct: null as any,
     qty: 1,
+    drawerStep: 1,
+    drawerMin: 1,
+    drawerDecimal: 0,
     lineYuan: '0.00',
     cartCount: 0,
     cartYuan: '0.00',
+    cartPriceFen: 0,
   },
   _viewed: false,
   async onShow() {
@@ -36,6 +40,7 @@ Page({
         config,
         cartCount: cart.length,
         cartYuan: fenToYuan(cartTotalFen(cart)),
+        cartPriceFen: cartTotalFen(cart),
       })
     } catch (e: any) {
       wx.showToast({ title: e.message || '加载失败', icon: 'none' })
@@ -63,26 +68,19 @@ Page({
       drawerOpen: true,
       drawerProduct: p,
       qty,
+      drawerStep: step,
+      drawerMin: step,
+      drawerDecimal: p.unit === '斤' ? 1 : 0,
       lineYuan: fenToYuan(Math.round(p.priceFen * qty)),
     })
   },
   closeDrawer() {
     this.setData({ drawerOpen: false })
   },
-  noop() {},
-  incQty() {
+  onQtyChange(e: any) {
     const p = this.data.drawerProduct
     if (!p) return
-    const step = p.unit === '斤' ? 0.5 : 1
-    const qty = Number((this.data.qty + step).toFixed(1))
-    this.setData({ qty, lineYuan: fenToYuan(Math.round(p.priceFen * qty)) })
-  },
-  decQty() {
-    const p = this.data.drawerProduct
-    if (!p) return
-    const step = p.unit === '斤' ? 0.5 : 1
-    const min = step
-    const qty = Math.max(min, Number((this.data.qty - step).toFixed(1)))
+    const qty = Number(e.detail)
     this.setData({ qty, lineYuan: fenToYuan(Math.round(p.priceFen * qty)) })
   },
   addCart() {
@@ -103,6 +101,7 @@ Page({
       drawerOpen: false,
       cartCount: cart.length,
       cartYuan: fenToYuan(cartTotalFen(cart)),
+      cartPriceFen: cartTotalFen(cart),
     })
     wx.showToast({ title: '已加入', icon: 'success' })
   },

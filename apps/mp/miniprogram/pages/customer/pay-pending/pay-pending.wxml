@@ -1,13 +1,10 @@
-<view class="page">
-  <view class="card" style="text-align:center;margin-top:24rpx">
-    <view class="badge warn">待支付定金</view>
-    <view class="price" style="font-size:56rpx;margin:24rpx 0">¥{{depositYuan}}</view>
-    <view class="muted">订单金额 ¥{{totalYuan}}</view>
-    <view class="formula-hint">{{formulaText}}</view>
-    <view class="tiny" style="margin-top:16rpx">请在 {{remainText}} 内完成支付，超时订单关闭</view>
+<view class="page" style="padding:32rpx">
+  <view class="card" style="text-align:center">
+    <view class="h3">待支付定金</view>
+    <view class="price" style="font-size:48rpx;margin:24rpx 0">¥{{depositYuan}}</view>
+    <view class="muted">Mock 环境可点击下方按钮模拟支付成功</view>
   </view>
-  <view style="padding:32rpx">
-    <button class="btn-primary" bindtap="onMockPay" loading="{{loading}}">模拟支付成功</button>
-    <view class="tiny" style="text-align:center;margin-top:16rpx">本地 PAY_MODE=mock · 不走真实微信支付</view>
+  <view class="mp-page-foot">
+    <van-button type="primary" block round loading="{{loading}}" bind:click="onMockPay">模拟支付成功</van-button>
   </view>
 </view>

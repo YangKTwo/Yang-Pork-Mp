@@ -59,7 +59,7 @@ Page({
     }, 'C-ORDER-01')
   },
   onRemark(e: any) {
-    this.setData({ remark: e.detail.value })
+    this.setData({ remark: String(e.detail || '') })
   },
   async onSubmit() {
     if (!this.data.canOrder) {

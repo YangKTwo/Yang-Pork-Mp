@@ -1,6 +1,7 @@
 <view class="page" wx:if="{{order}}">
   <view class="card" style="text-align:center">
-    <view class="badge">{{statusText}}</view>
+    <van-tag type="primary" plain>{{statusText}}</van-tag>
+    <!-- P0：取货码大号自定义块 -->
     <view class="pickup-code" wx:if="{{order.pickupCode}}">
       <view class="lbl">取货码</view>
       <view class="code">{{order.pickupCode}}</view>
@@ -8,42 +9,39 @@
     </view>
     <view class="muted" wx:elif="{{order.status === 'PENDING_PAY'}}" style="margin-top:24rpx">支付成功后生成取货码</view>
   </view>
-  <view class="card">
-    <view class="row"><text class="muted">取货日</text><text>{{order.pickupDate}}</text></view>
-    <view class="row"><text class="muted">取货方式</text><text>到店自取</text></view>
-    <view class="row"><text class="muted">定金</text><text>{{depositText}}</text></view>
-    <view class="formula-hint">{{order.depositFormulaText}}</view>
-    <view class="row" wx:if="{{order.remark}}">
-      <text class="muted">备注</text>
-      <text style="max-width:420rpx;text-align:right">{{order.remark}}</text>
+  <van-cell-group inset>
+    <van-cell title="取货日" value="{{order.pickupDate}}" />
+    <van-cell title="取货方式" value="到店自取" />
+    <van-cell title="定金" value="{{depositText}}" />
+    <van-cell wx:if="{{order.remark}}" title="备注" value="{{order.remark}}" />
+  </van-cell-group>
+  <view class="formula-hint" style="margin:0 32rpx 16rpx">{{order.depositFormulaText}}</view>
+  <van-cell-group inset title="明细">
+    <van-cell
+      wx:for="{{order.items}}"
+      wx:key="productId"
+      title="{{item.name}} ×{{item.quantity}} {{item.unit}}"
+      value="¥{{item.lineYuan}}"
+    />
+    <van-cell title="订单金额" value="¥{{totalYuan}}" value-class="price" />
+  </van-cell-group>
+  <view style="padding:0 32rpx">
+    <van-button wx:if="{{canCancel}}" type="danger" plain block bind:click="openCancel">取消订单</van-button>
+    <view class="tiny" style="text-align:center;padding:16rpx 0 32rpx" wx:if="{{canCancel}}">
+      仅下单当日 22:00（含）前可自助取消
     </view>
-  </view>
-  <view class="card">
-    <view style="font-weight:500;margin-bottom:12rpx">明细</view>
-    <view class="row" wx:for="{{order.items}}" wx:key="productId">
-      <text>{{item.name}} ×{{item.quantity}} {{item.unit}}</text>
-      <text>¥{{item.lineYuan}}</text>
-    </view>
-    <view class="row"><text>订单金额</text><text class="price">¥{{totalYuan}}</text></view>
-  </view>
-  <button
-    class="btn-ghost-danger"
-    wx:if="{{canCancel}}"
-    bindtap="openCancel"
-  >取消订单</button>
-  <view class="tiny" style="text-align:center;padding:0 48rpx 32rpx" wx:if="{{canCancel}}">
-    仅下单当日 22:00（含）前可自助取消
   </view>
 </view>
 
-<view class="mask center" wx:if="{{showCancel}}" catchtouchmove="noop">
-  <view class="dialog">
-    <view class="h3">确认取消订单</view>
-    <view class="p"><text style="font-weight:600">今日 22:00 前可取消。</text></view>
-    <view class="p">取消后已付定金将原路退回。取消后不可恢复，如需请重新下单。</view>
-    <view class="btn-row" style="margin-top:32rpx">
-      <button class="btn-secondary" bindtap="closeCancel">再想想</button>
-      <button class="btn-primary danger" bindtap="confirmCancel" loading="{{cancelling}}">确认取消</button>
-    </view>
-  </view>
-</view>
+<van-dialog
+  show="{{showCancel}}"
+  title="确认取消订单"
+  message="今日 22:00 前可取消。取消后已付定金将原路退回。取消后不可恢复，如需请重新下单。"
+  show-cancel-button
+  async-close
+  confirm-button-text="确认取消"
+  cancel-button-text="再想想"
+  confirm-button-color="#D32F2F"
+  bind:cancel="closeCancel"
+  bind:confirm="confirmCancel"
+/>

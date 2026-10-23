@@ -1,36 +1,37 @@
 <view class="page" style="padding-bottom:140rpx">
+  <!-- P0：预定 / 代录双分区自定义 seg -->
   <view class="seg">
     <view class="seg-item {{tab==='preorder'?'on':''}}" data-tab="preorder" bindtap="switchTab">预定</view>
     <view class="seg-item {{tab==='manual'?'on':''}}" data-tab="manual" bindtap="switchTab">代录</view>
   </view>
 
-  <view wx:if="{{tab==='preorder'}}">
+  <view wx:if="{{tab==='preorder'}}" class="work-zone preorder-zone">
     <view class="card" wx:for="{{preorderList}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
       <view class="row">
-        <text class="badge">{{item.statusText}}</text>
+        <van-tag type="primary" plain size="medium">{{item.statusText}}</van-tag>
         <text class="tiny">码 {{item.pickupCode || '—'}}</text>
       </view>
       <view class="row"><text>{{item.realName}}</text><text>{{item.phone}}</text></view>
       <view class="muted">{{item.summary}} · ¥{{item.totalYuan}}</view>
       <view class="muted" wx:if="{{item.remark}}" style="margin-top:8rpx">备注：{{item.remark}}</view>
     </view>
-    <view class="tiny" style="text-align:center;padding:32rpx" wx:if="{{!preorderList.length}}">暂无预定订单</view>
+    <van-empty wx:if="{{!preorderList.length}}" description="暂无预定订单" />
   </view>
 
-  <view wx:else>
+  <view wx:else class="work-zone manual-zone">
     <view style="padding:0 32rpx 16rpx">
-      <button class="btn-primary" bindtap="goManualCreate">新建代录</button>
+      <van-button type="primary" plain hairline block round bind:click="goManualCreate">新建代录</van-button>
     </view>
     <view class="card" wx:for="{{manualList}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
       <view class="row">
-        <text class="badge muted">代录</text>
-        <text class="badge">{{item.statusText}}</text>
+        <van-tag plain size="medium">代录</van-tag>
+        <van-tag type="primary" plain size="medium" custom-class="tag-gap">{{item.statusText}}</van-tag>
       </view>
       <view class="row"><text>{{item.realName}}</text><text>{{item.phone}}</text></view>
       <view class="muted">{{item.summary}} · ¥{{item.totalYuan}}</view>
       <view class="muted" wx:if="{{item.remark}}" style="margin-top:8rpx">备注：{{item.remark}}</view>
     </view>
-    <view class="tiny" style="text-align:center;padding:32rpx" wx:if="{{!manualList.length}}">暂无代录订单</view>
+    <van-empty wx:if="{{!manualList.length}}" description="暂无代录订单" />
   </view>
 </view>
 

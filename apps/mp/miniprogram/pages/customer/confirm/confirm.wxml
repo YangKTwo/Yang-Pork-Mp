@@ -1,26 +1,31 @@
 <view class="page" style="padding-bottom:160rpx">
-  <view class="card">
-    <view class="row"><text class="muted">取货日</text><text>{{pickupDate}}</text></view>
-    <view class="row"><text class="muted">取货方式</text><text>到店自取</text></view>
-  </view>
-  <view class="card">
-    <view style="font-weight:500;margin-bottom:12rpx">明细</view>
-    <view class="row" wx:for="{{lines}}" wx:key="id">
-      <text>{{item.name}} ×{{item.quantity}} {{item.unit}}</text>
-      <text>¥{{item.lineYuan}}</text>
-    </view>
-    <view class="row"><text>订单金额</text><text class="price">¥{{totalYuan}}</text></view>
-    <view class="row" wx:if="{{needDeposit}}"><text>预计定金</text><text class="price">¥{{depositYuan}}</text></view>
-    <view class="row" wx:else><text>定金</text><text>免定金（≤门槛）</text></view>
-    <view class="formula-hint">{{formulaText}}</view>
-  </view>
-  <view class="card">
-    <view class="field">
-      <label>备注（选填）</label>
-      <input placeholder="口味/切法偏好，选填" value="{{remark}}" bindinput="onRemark" />
-    </view>
-  </view>
+  <van-cell-group inset title="取货信息">
+    <van-cell title="取货日" value="{{pickupDate}}" />
+    <van-cell title="取货方式" value="到店自取" />
+  </van-cell-group>
+  <van-cell-group inset title="明细">
+    <van-cell
+      wx:for="{{lines}}"
+      wx:key="id"
+      title="{{item.name}} ×{{item.quantity}} {{item.unit}}"
+      value="¥{{item.lineYuan}}"
+    />
+    <van-cell title="订单金额" value="¥{{totalYuan}}" value-class="price" />
+    <van-cell wx:if="{{needDeposit}}" title="预计定金" value="¥{{depositYuan}}" value-class="price" />
+    <van-cell wx:else title="定金" value="免定金（≤门槛）" />
+  </van-cell-group>
+  <view class="formula-hint" style="margin:0 32rpx 16rpx">{{formulaText}}</view>
+  <van-cell-group inset>
+    <van-field
+      label="备注"
+      type="textarea"
+      placeholder="口味/切法偏好，选填"
+      value="{{remark}}"
+      autosize
+      bind:change="onRemark"
+    />
+  </van-cell-group>
 </view>
 <view class="foot-safe">
-  <button class="btn-primary" bindtap="onSubmit" loading="{{loading}}" disabled="{{!canOrder}}">提交订单</button>
+  <van-button type="primary" block round loading="{{loading}}" disabled="{{!canOrder}}" bind:click="onSubmit">提交订单</van-button>
 </view>

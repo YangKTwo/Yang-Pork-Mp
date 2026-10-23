@@ -16,39 +16,51 @@
       <view class="meta">{{item.remark || ('按' + item.unit)}}</view>
       <view class="price">¥{{item.priceYuan}}<text class="tiny"> /{{item.unit}}</text></view>
     </view>
-    <button class="add" size="mini" data-id="{{item.id}}" bindtap="openDrawer" disabled="{{!config.canOrderNow}}">+</button>
+    <van-button
+      type="primary"
+      size="small"
+      round
+      icon="plus"
+      custom-class="add-btn"
+      data-id="{{item.id}}"
+      disabled="{{!config.canOrderNow}}"
+      bind:click="openDrawer"
+    />
   </view>
 </view>
 
-<!-- 加购抽屉 -->
-<view class="mask" wx:if="{{drawerOpen}}" catchtouchmove="noop">
-  <view class="sheet" catchtap="noop">
-    <view class="handle"></view>
+<van-popup show="{{drawerOpen}}" position="bottom" round bind:close="closeDrawer" closeable>
+  <view class="sheet-inner" wx:if="{{drawerProduct}}">
     <view class="sheet-head">
       <view>
         <view style="font-size:34rpx;font-weight:600">{{drawerProduct.name}}</view>
         <view class="price" style="margin-top:8rpx">¥{{drawerProduct.priceYuan}} /{{drawerProduct.unit}}</view>
       </view>
-      <view class="tiny" bindtap="closeDrawer">关闭</view>
     </view>
-    <view class="qty">
-      <button size="mini" bindtap="decQty">−</button>
-      <text class="qty-val">{{qty}}</text>
-      <button size="mini" bindtap="incQty">+</button>
+    <view class="qty-row">
+      <text class="muted">数量</text>
+      <van-stepper
+        value="{{qty}}"
+        min="{{drawerMin}}"
+        step="{{drawerStep}}"
+        decimal-length="{{drawerDecimal}}"
+        bind:change="onQtyChange"
+      />
     </view>
     <view class="muted">小计 ¥{{lineYuan}}</view>
-    <button class="btn-primary" style="margin-top:24rpx" bindtap="addCart">加入待下单</button>
+    <van-button type="primary" block round custom-style="margin-top:24rpx" bind:click="addCart">加入待下单</van-button>
   </view>
-</view>
+</van-popup>
 
-<!-- 购物车条 -->
-<view class="cartbar" wx:if="{{cartCount > 0}}">
-  <view>
-    <view>已选 {{cartCount}} 件</view>
-    <view class="tiny" style="color:#ccc">合计 ¥{{cartYuan}}</view>
-  </view>
-  <button class="go" bindtap="goConfirm" disabled="{{!config.canOrderNow}}">去下单</button>
-</view>
+<van-submit-bar
+  wx:if="{{cartCount > 0}}"
+  custom-class="mp-cart-submit"
+  label="已选 {{cartCount}} 件"
+  price="{{cartPriceFen}}"
+  button-text="去下单"
+  disabled="{{!config.canOrderNow}}"
+  bind:submit="goConfirm"
+/>
 
 <view class="tabbar-mock">
   <view class="tab on"><text class="ico">⌂</text>商品</view>

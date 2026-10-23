@@ -1,4 +1,5 @@
 @import './styles/common.wxss';
+@import './styles/vant-theme.wxss';
 
 page {
   background: #FAF7F5;
