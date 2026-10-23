@@ -1,0 +1,45 @@
+# 自动部署骨架：暂无服务器。后续填写 DEPLOY_HOST / SSH / 重启命令。
+# 勿提交真实密钥；微信/商户密钥由权限对接人收取。
+
+name: deploy
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+env:
+  # TODO: 后续填部署目标
+  # DEPLOY_HOST: ""
+  # DEPLOY_USER: ""
+  # DEPLOY_PATH: ""
+  JAVA_VERSION: "17"
+
+jobs:
+  build-api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+      - name: Build API
+        run: mvn -B -q -DskipTests package
+
+  deploy:
+    needs: build-api
+    runs-on: ubuntu-latest
+    # 无服务器前保持关闭；填好 DEPLOY_HOST 等后改为 true / 去掉 if
+    if: false
+    steps:
+      - name: Placeholder deploy
+        run: |
+          echo "TODO: scp/rsync jar to \$DEPLOY_HOST and restart process"
+          echo "Fill DEPLOY_HOST, DEPLOY_USER, DEPLOY_PATH when infra is ready."

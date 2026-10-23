@@ -1,0 +1,196 @@
+openapi: 3.0.3
+info:
+  title: Yang Pork Preorder API
+  version: 0.1.0
+  description: Local mock; base path /api/v1; port 8082
+servers:
+  - url: http://127.0.0.1:8082
+paths:
+  /api/v1/auth/wx-login:
+    post:
+      summary: Mock WeChat login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code: { type: string }
+      responses:
+        "200":
+          description: JWT + user
+  /api/v1/auth/profile:
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Complete profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                realName: { type: string }
+                phone: { type: string }
+      responses:
+        "200": { description: ok }
+  /api/v1/auth/me:
+    get:
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: ok }
+  /api/v1/config/ordering:
+    get:
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: ordering config }
+  /api/v1/admin/config/ordering:
+    put:
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: updated }
+  /api/v1/products:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: includeOffShelf
+          schema: { type: string }
+      responses:
+        "200": { description: product list }
+  /api/v1/products/{id}:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: product }
+  /api/v1/admin/products:
+    post:
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: created }
+  /api/v1/admin/products/{id}:
+    put:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: updated }
+  /api/v1/admin/products/{id}/shelf:
+    patch:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: shelf status }
+  /api/v1/orders:
+    get:
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: my orders }
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Create PREORDER (window 12:00-22:00 Asia/Shanghai)
+      responses:
+        "200": { description: order }
+  /api/v1/orders/{id}:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: order }
+  /api/v1/orders/{id}/cancel:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: cancelled }
+  /api/v1/orders/{id}/pay:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: mock prepay }
+  /api/v1/orders/{id}/pay/mock-success:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: paid -> PENDING_PREPARE }
+  /api/v1/shop/orders/preorder:
+    get:
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: shop preorder list }
+  /api/v1/shop/orders/manual:
+    get:
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: manual list }
+    post:
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: created manual }
+  /api/v1/shop/orders/{id}/prepare:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: PREPARED }
+  /api/v1/shop/orders/{id}/pickup:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: PICKED_UP }
+  /api/v1/shop/orders/{id}/cancel:
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Shop/Admin cancel (no 22:00 limit; reason required)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: CANCELLED }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: yang-pork-api
+  profiles:
+    active: local
+  jackson:
+    time-zone: Asia/Shanghai
+    serialization:
+      write-dates-as-timestamps: false
+  datasource:
+    url: jdbc:h2:file:./data/pork_preorder;MODE=MySQL;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Shanghai
+
+server:
+  port: 8082
+  servlet:
+    context-path: /
+
+app:
+  pay-mode: ${PAY_MODE:mock}
+  jwt:
+    secret: "yang-pork-local-dev-secret-change-me-32bytes!!"
+    expires-in-sec: 7200
+  roles:
+    admin-phones:
+      - "13800000001"
+      - "13900000001"
+    shop-phones:
+      - "13800000002"
+      - "13900000002"
+  ordering:
+    timezone: Asia/Shanghai
+    order-window-start: "12:00"
+    order-window-end: "22:00"
+    cancel-deadline: "22:00"
+    pickup-day-offset: 1
+    deposit-threshold-fen: 1000
+    deposit-rate-bps: 2000
+    pay-timeout-sec: 600
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.yangpork: INFO
