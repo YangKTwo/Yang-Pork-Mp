@@ -32,6 +32,10 @@ server:
 
 app:
   pay-mode: ${PAY_MODE:mock}
+  wx:
+    mode: ${WX_MODE:mock}   # mock | real
+    app-id: ${WX_APP_ID:}
+    app-secret: ${WX_APP_SECRET:}
   jwt:
     secret: "yang-pork-local-dev-secret-change-me-32bytes!!"
     expires-in-sec: 7200

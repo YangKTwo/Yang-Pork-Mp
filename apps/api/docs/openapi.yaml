@@ -2,13 +2,22 @@ openapi: 3.0.3
 info:
   title: Yang Pork Preorder API
   version: 0.1.0
-  description: Local mock; base path /api/v1; port 8082
+  description: |
+    Local dev base path /api/v1; port 8082.
+    Mock WeChat login (app.wx.mode=mock) requires a stable devKey (body) or X-Dev-Key header;
+    wx.login code is accepted for compatibility but must not be used as openid in mock mode.
 servers:
   - url: http://127.0.0.1:8082
 paths:
   /api/v1/auth/wx-login:
     post:
-      summary: Mock WeChat login
+      summary: WeChat login (mock or real per app.wx.mode)
+      parameters:
+        - in: header
+          name: X-Dev-Key
+          required: false
+          description: Mock mode stable identity key (alternative to body devKey)
+          schema: { type: string }
       requestBody:
         required: true
         content:
@@ -16,10 +25,20 @@ paths:
             schema:
               type: object
               properties:
-                code: { type: string }
+                code:
+                  type: string
+                  description: wx.login code (required for real mode; optional in mock)
+                devKey:
+                  type: string
+                  description: Mock mode stable key → openid mock_dev_<normalized>
+                mockOpenid:
+                  type: string
+                  description: Alias of devKey in mock mode
       responses:
         "200":
           description: JWT + user
+        "400":
+          description: Business error e.g. code 40001 when mock mode without devKey
   /api/v1/auth/profile:
     post:
       security: [{ bearerAuth: [] }]
