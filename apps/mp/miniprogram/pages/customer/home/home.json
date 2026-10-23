@@ -1,1 +1,6 @@
-{ "navigationBarTitleText": "商品", "usingComponents": {} }
+{
+  "navigationBarTitleText": "商品",
+  "usingComponents": {
+    "van-submit-bar": "@vant/weapp/submit-bar/index"
+  }
+}

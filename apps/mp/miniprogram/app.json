@@ -57,7 +57,6 @@
     "van-empty": "@vant/weapp/empty/index",
     "van-stepper": "@vant/weapp/stepper/index",
     "van-switch": "@vant/weapp/switch/index",
-    "van-tag": "@vant/weapp/tag/index",
-    "van-submit-bar": "@vant/weapp/submit-bar/index"
+    "van-tag": "@vant/weapp/tag/index"
   }
 }
