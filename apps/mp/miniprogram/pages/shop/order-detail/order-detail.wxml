@@ -1,0 +1,68 @@
+<view class="page" wx:if="{{order}}" style="padding-bottom:48rpx">
+  <view class="card" style="text-align:center">
+    <view class="badge">{{statusText}}</view>
+    <view class="badge muted" style="margin-left:8rpx">{{order.source === 'MANUAL' ? '代录' : '预定'}}</view>
+    <view class="pickup-code" wx:if="{{order.pickupCode}}">
+      <view class="lbl">取货码</view>
+      <view class="code">{{order.pickupCode}}</view>
+    </view>
+  </view>
+  <view class="card">
+    <view class="row"><text class="muted">姓名</text><text style="font-weight:600">{{order.realName}}</text></view>
+    <view class="row"><text class="muted">手机</text><text style="font-size:34rpx;letter-spacing:1rpx">{{order.phone}}</text></view>
+    <view class="row"><text class="muted">取货日</text><text>{{order.pickupDate}}</text></view>
+    <view class="row"><text class="muted">定金</text><text>{{depositText}}</text></view>
+  </view>
+  <view class="card">
+    <view style="font-weight:500;margin-bottom:12rpx">明细</view>
+    <view class="row" wx:for="{{order.items}}" wx:key="productId">
+      <text>{{item.name}} ×{{item.quantity}} {{item.unit}}</text>
+      <text>¥{{item.lineYuan}}</text>
+    </view>
+  </view>
+  <view style="padding:0 32rpx 16rpx" wx:if="{{order.status === 'PENDING_PREPARE'}}">
+    <button class="btn-primary" bindtap="onPrepare" loading="{{acting}}">标记已备货</button>
+  </view>
+  <view style="padding:0 32rpx 16rpx" wx:if="{{order.status === 'PREPARED'}}">
+    <button class="btn-primary" bindtap="onPickup" loading="{{acting}}">确认核销（已取货）</button>
+  </view>
+  <button
+    class="btn-ghost-danger"
+    wx:if="{{canShopCancel}}"
+    bindtap="openCancel"
+  >取消订单</button>
+  <view class="tiny" style="text-align:center;padding:0 32rpx" wx:if="{{canShopCancel}}">
+    店家代取消 · 不受顾客 22:00 窗限制 · 仅待备货/已备货
+  </view>
+</view>
+
+<!-- 代取消：原因必填 -->
+<view class="mask" wx:if="{{showCancel}}" catchtouchmove="noop">
+  <view class="sheet">
+    <view class="handle"></view>
+    <view style="text-align:center;font-size:34rpx;font-weight:600;margin-bottom:16rpx">取消订单</view>
+    <view class="muted" style="text-align:center;margin-bottom:24rpx">
+      店家代取消，<text style="font-weight:600">不受</text>顾客 22:00 自助取消限制。
+      取消后不可恢复；已付定金将原路退回。
+    </view>
+    <view class="field">
+      <label>取消原因 <text class="req">*</text>（必填）</label>
+      <textarea
+        placeholder="请填写取消原因，例如：顾客电话要求取消 / 缺货无法履约"
+        value="{{cancelReason}}"
+        bindinput="onReason"
+        maxlength="100"
+      />
+      <view class="tiny" style="color:#D32F2F;margin-top:8rpx" wx:if="{{reasonError}}">请填写取消原因后再确认</view>
+    </view>
+    <view class="btn-row">
+      <button class="btn-secondary" bindtap="closeCancel">再想想</button>
+      <button
+        class="btn-primary {{canConfirmCancel ? '' : 'disabled'}}"
+        disabled="{{!canConfirmCancel}}"
+        bindtap="confirmCancel"
+        loading="{{cancelling}}"
+      >确认取消</button>
+    </view>
+  </view>
+</view>

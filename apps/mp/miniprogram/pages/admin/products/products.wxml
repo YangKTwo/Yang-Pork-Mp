@@ -1,0 +1,18 @@
+<view class="page" style="padding:16rpx 0 48rpx">
+  <view class="card" wx:for="{{list}}" wx:key="id">
+    <view class="row">
+      <text style="font-weight:500">{{item.name}}</text>
+      <text class="badge {{item.status==='ON_SHELF'?'ok':'muted'}}">{{item.status==='ON_SHELF'?'上架':'下架'}}</text>
+    </view>
+    <view class="muted">{{item.skuCode}} · ¥{{item.priceYuan}}/{{item.unit}}</view>
+    <view class="btn-row" style="margin-top:16rpx">
+      <button
+        class="btn-secondary"
+        size="mini"
+        data-id="{{item.id}}"
+        data-status="{{item.status==='ON_SHELF'?'OFF_SHELF':'ON_SHELF'}}"
+        bindtap="toggleShelf"
+      >{{item.status==='ON_SHELF'?'下架':'上架'}}</button>
+    </view>
+  </view>
+</view>

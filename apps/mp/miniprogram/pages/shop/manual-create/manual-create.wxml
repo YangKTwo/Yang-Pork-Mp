@@ -1,0 +1,35 @@
+<view class="page" style="padding:24rpx 0 160rpx">
+  <view class="card">
+    <view class="field">
+      <label>姓名 <text class="req">*</text></label>
+      <input value="{{realName}}" bindinput="onName" placeholder="顾客姓名" />
+    </view>
+    <view class="field">
+      <label>手机 <text class="req">*</text></label>
+      <input type="number" value="{{phone}}" bindinput="onPhone" maxlength="11" placeholder="11 位手机号" />
+    </view>
+    <view class="field">
+      <label>取货日</label>
+      <input value="{{pickupDate}}" bindinput="onDate" placeholder="YYYY-MM-DD" />
+    </view>
+    <view class="field">
+      <label>商品（简化：选首个上架 SKU ×1）</label>
+      <picker range="{{productNames}}" value="{{productIndex}}" bindchange="onPick">
+        <view class="picker">{{productNames[productIndex] || '选择商品'}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <label>线下定金</label>
+      <picker range="{{depositOptions}}" value="{{depositIndex}}" bindchange="onDeposit">
+        <view class="picker">{{depositOptions[depositIndex]}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <label>备注</label>
+      <input value="{{remark}}" bindinput="onRemark" placeholder="电话预定等" />
+    </view>
+  </view>
+</view>
+<view class="foot-safe">
+  <button class="btn-primary" bindtap="onSubmit" loading="{{loading}}">提交代录</button>
+</view>

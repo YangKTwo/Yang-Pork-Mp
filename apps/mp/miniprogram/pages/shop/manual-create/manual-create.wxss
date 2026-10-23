@@ -1,0 +1,4 @@
+.picker {
+  height: 88rpx; line-height: 88rpx; padding: 0 24rpx;
+  border: 1rpx solid #E8E0DC; border-radius: 16rpx; background: #fff;
+}

@@ -1,0 +1,14 @@
+<view class="page" style="padding-top:24rpx;padding-bottom:140rpx">
+  <view class="card">
+    <view class="row"><text class="muted">角色</text><text>{{role}}</text></view>
+    <view class="row"><text class="muted">姓名</text><text>{{user.realName || '—'}}</text></view>
+    <view class="muted" style="margin-top:12rpx">店家/超管账号由超管配置；顾客端入口见首页 Mock 切换。</view>
+  </view>
+  <view style="padding:0 32rpx">
+    <button class="btn-ghost-danger" bindtap="logout">退出</button>
+  </view>
+</view>
+<view class="tabbar-mock">
+  <view class="tab" bindtap="goWorkbench"><text class="ico">▦</text>工作台</view>
+  <view class="tab on"><text class="ico">☺</text>我的</view>
+</view>

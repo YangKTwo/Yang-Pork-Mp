@@ -1,0 +1,57 @@
+<view class="page" style="padding-bottom: {{cartCount ? 280 : 140}}rpx">
+  <view class="nav-extra tiny">次日取货 {{config.nextPickupDate || '—'}}</view>
+  <view class="banner" wx:if="{{config.canOrderNow}}">
+    <view class="dot"></view>
+    <view>可下单时段 <text class="strong">{{config.orderWindowStart}}–{{config.orderWindowEnd}}</text>（含）· 当前可下单</view>
+  </view>
+  <view class="banner off" wx:else>
+    <view class="dot"></view>
+    <view>当前不在下单窗口（{{config.orderWindowStart}}–{{config.orderWindowEnd}}），暂不可下单</view>
+  </view>
+
+  <view class="item" wx:for="{{products}}" wx:key="id">
+    <view class="thumb">{{item.name[0]}}</view>
+    <view class="info">
+      <view class="name">{{item.name}}</view>
+      <view class="meta">{{item.remark || ('按' + item.unit)}}</view>
+      <view class="price">¥{{item.priceYuan}}<text class="tiny"> /{{item.unit}}</text></view>
+    </view>
+    <button class="add" size="mini" data-id="{{item.id}}" bindtap="openDrawer" disabled="{{!config.canOrderNow}}">+</button>
+  </view>
+</view>
+
+<!-- 加购抽屉 -->
+<view class="mask" wx:if="{{drawerOpen}}" catchtouchmove="noop">
+  <view class="sheet" catchtap="noop">
+    <view class="handle"></view>
+    <view class="sheet-head">
+      <view>
+        <view style="font-size:34rpx;font-weight:600">{{drawerProduct.name}}</view>
+        <view class="price" style="margin-top:8rpx">¥{{drawerProduct.priceYuan}} /{{drawerProduct.unit}}</view>
+      </view>
+      <view class="tiny" bindtap="closeDrawer">关闭</view>
+    </view>
+    <view class="qty">
+      <button size="mini" bindtap="decQty">−</button>
+      <text class="qty-val">{{qty}}</text>
+      <button size="mini" bindtap="incQty">+</button>
+    </view>
+    <view class="muted">小计 ¥{{lineYuan}}</view>
+    <button class="btn-primary" style="margin-top:24rpx" bindtap="addCart">加入待下单</button>
+  </view>
+</view>
+
+<!-- 购物车条 -->
+<view class="cartbar" wx:if="{{cartCount > 0}}">
+  <view>
+    <view>已选 {{cartCount}} 件</view>
+    <view class="tiny" style="color:#ccc">合计 ¥{{cartYuan}}</view>
+  </view>
+  <button class="go" bindtap="goConfirm" disabled="{{!config.canOrderNow}}">去下单</button>
+</view>
+
+<view class="tabbar-mock">
+  <view class="tab on"><text class="ico">⌂</text>商品</view>
+  <view class="tab" bindtap="goOrders"><text class="ico">☰</text>订单</view>
+  <view class="tab" bindtap="goMe"><text class="ico">☺</text>我的</view>
+</view>

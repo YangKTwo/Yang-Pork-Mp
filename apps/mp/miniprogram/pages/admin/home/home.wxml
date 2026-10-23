@@ -1,0 +1,14 @@
+<view class="page" style="padding:24rpx 0 140rpx">
+  <view class="card" bindtap="goProducts">
+    <view style="font-weight:600;font-size:32rpx">商品管理</view>
+    <view class="muted">列表 / 上下架</view>
+  </view>
+  <view class="card" bindtap="goConfig">
+    <view style="font-weight:600;font-size:32rpx">业务配置</view>
+    <view class="muted">下单窗、定金门槛与比例</view>
+  </view>
+  <view class="card" bindtap="goWorkbench">
+    <view style="font-weight:600;font-size:32rpx">返回工作台</view>
+    <view class="muted">预定 / 代录订单</view>
+  </view>
+</view>

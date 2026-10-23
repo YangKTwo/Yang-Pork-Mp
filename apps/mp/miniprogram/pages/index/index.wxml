@@ -1,0 +1,11 @@
+<view class="wrap">
+  <view class="logo">🥩</view>
+  <view class="title">提前一天预定猪肉</view>
+  <view class="tiny">正在进入…</view>
+  <view class="dev card" wx:if="{{showDev}}">
+    <view class="muted">开发：Mock 角色快捷入口</view>
+    <button class="btn-primary" size="mini" bindtap="goAs" data-role="CUSTOMER">顾客</button>
+    <button class="btn-secondary" size="mini" bindtap="goAs" data-role="SHOP">店家</button>
+    <button class="btn-secondary" size="mini" bindtap="goAs" data-role="ADMIN">超管</button>
+  </view>
+</view>
