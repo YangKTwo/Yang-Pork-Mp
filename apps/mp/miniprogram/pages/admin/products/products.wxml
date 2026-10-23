@@ -1,18 +1,70 @@
 <view class="page" style="padding:16rpx 0 48rpx">
+  <view style="padding:0 32rpx 24rpx">
+    <button class="btn-primary" bindtap="openCreate">新建商品</button>
+  </view>
   <view class="card" wx:for="{{list}}" wx:key="id">
     <view class="row">
       <text style="font-weight:500">{{item.name}}</text>
       <text class="badge {{item.status==='ON_SHELF'?'ok':'muted'}}">{{item.status==='ON_SHELF'?'上架':'下架'}}</text>
     </view>
     <view class="muted">{{item.skuCode}} · ¥{{item.priceYuan}}/{{item.unit}}</view>
+    <view class="muted" wx:if="{{item.remark}}" style="margin-top:8rpx">{{item.remark}}</view>
     <view class="btn-row" style="margin-top:16rpx">
+      <button class="btn-secondary" size="mini" data-id="{{item.id}}" bindtap="openEdit">编辑</button>
       <button
+        wx:if="{{item.status==='ON_SHELF'}}"
         class="btn-secondary"
         size="mini"
         data-id="{{item.id}}"
-        data-status="{{item.status==='ON_SHELF'?'OFF_SHELF':'ON_SHELF'}}"
+        data-name="{{item.name}}"
+        bindtap="confirmShelfOff"
+      >删除（下架）</button>
+      <button
+        wx:else
+        class="btn-secondary"
+        size="mini"
+        data-id="{{item.id}}"
+        data-status="ON_SHELF"
         bindtap="toggleShelf"
-      >{{item.status==='ON_SHELF'?'下架':'上架'}}</button>
+      >上架</button>
+    </view>
+  </view>
+</view>
+
+<view class="mask" wx:if="{{showForm}}" catchtouchmove="noop">
+  <view class="sheet">
+    <view class="handle"></view>
+    <view style="text-align:center;font-size:34rpx;font-weight:600;margin-bottom:24rpx">
+      {{formMode === 'create' ? '新建商品' : '编辑商品'}}
+    </view>
+    <view class="field" wx:if="{{formMode === 'create'}}">
+      <label>SKU 编码 <text class="req">*</text></label>
+      <input placeholder="如 P08" value="{{form.skuCode}}" data-k="skuCode" bindinput="onFormField" />
+    </view>
+    <view class="field">
+      <label>名称 <text class="req">*</text></label>
+      <input placeholder="商品名称" value="{{form.name}}" data-k="name" bindinput="onFormField" />
+    </view>
+    <view class="field">
+      <label>单位 <text class="req">*</text></label>
+      <input placeholder="斤 / 条 / 只" value="{{form.unit}}" data-k="unit" bindinput="onFormField" />
+    </view>
+    <view class="field">
+      <label>单价（元） <text class="req">*</text></label>
+      <input type="digit" placeholder="如 15.00" value="{{form.priceYuan}}" data-k="priceYuan" bindinput="onFormField" />
+    </view>
+    <view class="field">
+      <label>备注（选填）</label>
+      <input placeholder="展示给顾客看的说明" value="{{form.remark}}" data-k="remark" bindinput="onFormField" />
+    </view>
+    <view class="btn-row">
+      <button class="btn-secondary" bindtap="closeForm">取消</button>
+      <button
+        class="btn-primary {{canSubmitForm ? '' : 'disabled'}}"
+        disabled="{{!canSubmitForm}}"
+        bindtap="submitForm"
+        loading="{{formLoading}}"
+      >保存</button>
     </view>
   </view>
 </view>

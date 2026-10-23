@@ -106,7 +106,12 @@ export const api = {
 
   async completeProfile(realName: string, phone: string) {
     if (useMock()) return mockApi.completeProfile(realName, phone)
-    return request<{ user: UserInfo; profileCompleted: boolean }>('POST', '/auth/profile', {
+    return request<{
+      accessToken: string
+      expiresIn?: number
+      user: UserInfo
+      profileCompleted: boolean
+    }>('POST', '/auth/profile', {
       realName,
       phone,
     })
@@ -233,6 +238,34 @@ export const api = {
   async setShelf(id: string, status: 'ON_SHELF' | 'OFF_SHELF') {
     if (useMock()) return mockApi.setShelf(id, status)
     return request<Product>('PATCH', `/admin/products/${id}/shelf`, { status })
+  },
+
+  async createProduct(body: {
+    skuCode: string
+    name: string
+    unit: string
+    priceFen: number
+    remark?: string
+    sort?: number
+    status?: 'ON_SHELF' | 'OFF_SHELF'
+  }) {
+    if (useMock()) return mockApi.createProduct(body)
+    return request<Product>('POST', '/admin/products', body)
+  },
+
+  async updateProduct(
+    id: string,
+    body: Partial<{
+      name: string
+      unit: string
+      priceFen: number
+      remark: string
+      sort: number
+      status: 'ON_SHELF' | 'OFF_SHELF'
+    }>
+  ) {
+    if (useMock()) return mockApi.updateProduct(id, body)
+    return request<Product>('PUT', `/admin/products/${id}`, body)
   },
 }
 

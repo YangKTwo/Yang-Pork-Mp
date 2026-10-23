@@ -13,7 +13,9 @@ Page({
           pickupDate: o.pickupDate,
           totalYuan: fenToYuan(o.totalFen),
           pickupCode: o.pickupCode,
-          summary: (o.items || []).map((i) => i.name).join('、') || '订单',
+          summary:
+            (o.items || []).map((i) => `${i.name}×${i.quantity}${i.unit || ''}`).join('、') ||
+            '订单',
         })),
       })
     } catch (e: any) {

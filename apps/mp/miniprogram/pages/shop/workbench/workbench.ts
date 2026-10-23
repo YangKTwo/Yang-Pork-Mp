@@ -1,6 +1,11 @@
 import { api } from '../../../services/api'
 import { fenToYuan, statusLabel } from '../../../utils/money'
 
+function itemSummary(items: OrderItem[] | undefined): string {
+  if (!items || !items.length) return '订单'
+  return items.map((i) => `${i.name}×${i.quantity}${i.unit || ''}`).join('、')
+}
+
 function mapList(orders: Order[]) {
   return orders.map((o) => ({
     id: o.id,
@@ -9,7 +14,8 @@ function mapList(orders: Order[]) {
     realName: o.realName || '—',
     phone: o.phone || '—',
     totalYuan: fenToYuan(o.totalFen),
-    summary: (o.items || []).map((i) => i.name).join('、') || '订单',
+    summary: itemSummary(o.items),
+    remark: (o.remark || '').trim(),
   }))
 }
 

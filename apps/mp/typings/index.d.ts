@@ -62,7 +62,8 @@ interface OrderItem {
   unit: string
   quantity: string
   priceFen: number
-  lineFen: number
+  lineFen?: number
+  lineTotalFen?: number
 }
 
 interface Order {

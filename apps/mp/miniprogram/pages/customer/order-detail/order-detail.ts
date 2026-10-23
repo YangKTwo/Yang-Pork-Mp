@@ -1,5 +1,5 @@
 import { api } from '../../../services/api'
-import { fenToYuan, statusLabel } from '../../../utils/money'
+import { fenToYuan, lineItemYuan, statusLabel } from '../../../utils/money'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
 Page({
@@ -25,7 +25,7 @@ Page({
       const order = await api.getOrder(this.data.id)
       const items = (order.items || []).map((it) => ({
         ...it,
-        lineYuan: fenToYuan(it.lineFen),
+        lineYuan: lineItemYuan(it),
       }))
       const canCancel =
         order.status === 'PENDING_PREPARE' || order.status === 'PREPARED'

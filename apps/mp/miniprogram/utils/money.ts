@@ -1,7 +1,30 @@
 /** 分 → 展示元 */
-export function fenToYuan(fen: number): string {
-  const n = (fen || 0) / 100
-  return n.toFixed(2)
+export function fenToYuan(fen: number | null | undefined): string {
+  const raw = fen == null || Number.isNaN(Number(fen)) ? 0 : Number(fen)
+  return (raw / 100).toFixed(2)
+}
+
+/** 元字符串 → 分（支持两位小数） */
+export function yuanToFen(yuan: string | number): number {
+  const n = typeof yuan === 'number' ? yuan : parseFloat(String(yuan).trim())
+  if (!Number.isFinite(n) || n < 0) return 0
+  return Math.round(n * 100)
+}
+
+/** 订单行小计（分），兼容 API 的 lineFen / lineTotalFen */
+export function getLineTotalFen(item: {
+  lineFen?: number
+  lineTotalFen?: number
+}): number {
+  const a = item.lineTotalFen
+  const b = item.lineFen
+  if (typeof a === 'number' && Number.isFinite(a)) return a
+  if (typeof b === 'number' && Number.isFinite(b)) return b
+  return 0
+}
+
+export function lineItemYuan(item: { lineFen?: number; lineTotalFen?: number }): string {
+  return fenToYuan(getLineTotalFen(item))
 }
 
 export function formatYuan(fen: number): string {
