@@ -22,21 +22,21 @@ public class AuthService {
     private final JwtService jwtService;
     private final IdGenerator idGenerator;
     private final AppProperties props;
+    private final WeChatSessionService weChatSessionService;
 
     public AuthService(UserRepository userRepository, JwtService jwtService,
-                       IdGenerator idGenerator, AppProperties props) {
+                       IdGenerator idGenerator, AppProperties props,
+                       WeChatSessionService weChatSessionService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.idGenerator = idGenerator;
         this.props = props;
+        this.weChatSessionService = weChatSessionService;
     }
 
     @Transactional
-    public Map<String, Object> wxLogin(String code) {
-        if (!StringUtils.hasText(code)) {
-            throw new BizException(ErrorCodes.BAD_PARAM, "code 必填");
-        }
-        String openid = "mock_" + code.trim();
+    public Map<String, Object> wxLogin(String code, String devKey, String mockOpenid, String headerDevKey) {
+        String openid = resolveOpenid(code, devKey, mockOpenid, headerDevKey);
         UserEntity user = userRepository.findByOpenid(openid).orElseGet(() -> {
             UserEntity u = new UserEntity();
             u.setId(idGenerator.userId());
@@ -51,6 +51,37 @@ public class AuthService {
         data.put("profileCompleted", user.isProfileCompleted());
         data.put("user", toUserView(user));
         return data;
+    }
+
+    private String resolveOpenid(String code, String devKey, String mockOpenid, String headerDevKey) {
+        AppProperties.Wx wx = props.getWx();
+        if (wx.isRealMode()) {
+            return weChatSessionService.openidFromCode(code);
+        }
+        if (!wx.isMockMode()) {
+            throw new BizException(ErrorCodes.BAD_PARAM,
+                    "app.wx.mode 无效，仅支持 mock 或 real，当前: " + wx.getMode());
+        }
+        String stableRaw = firstNonBlank(devKey, mockOpenid, headerDevKey);
+        if (!StringUtils.hasText(stableRaw)) {
+            throw new BizException(ErrorCodes.BAD_PARAM,
+                    "mock 登录须传稳定身份键：请求体 devKey（或 mockOpenid），或 Header X-Dev-Key；勿依赖每次变化的 wx.login code");
+        }
+        String normalized = DevKeyNormalizer.normalize(stableRaw);
+        if (!StringUtils.hasText(normalized)) {
+            throw new BizException(ErrorCodes.BAD_PARAM,
+                    "devKey 规范化后为空，请使用字母、数字及 . _ -");
+        }
+        return "mock_dev_" + normalized;
+    }
+
+    private static String firstNonBlank(String... values) {
+        for (String v : values) {
+            if (StringUtils.hasText(v)) {
+                return v;
+            }
+        }
+        return null;
     }
 
     @Transactional

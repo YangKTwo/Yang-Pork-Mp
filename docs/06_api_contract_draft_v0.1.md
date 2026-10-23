@@ -79,7 +79,7 @@ PICKED_UP | CLOSED → 不可取消
 
 ### POST `/auth/wx-login`
 
-匿名。Body: `{ "code": "<wx.login code>" }`
+匿名。Body: `{ "code": "<wx.login code>", "devKey": "<稳定键>" }`（**mock/本地**：`devKey` 或 Header `X-Dev-Key` 必填，服务端 openid 为 `mock_dev_<规范化键>`，同一键同一用户；`code` 可传以兼容前端但 mock 下不得用 code 派生 openid。真机 `real` 模式走 code2session。）
 
 Response `data`:
 ```json

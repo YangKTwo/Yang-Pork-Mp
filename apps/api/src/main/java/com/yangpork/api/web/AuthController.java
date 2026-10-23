@@ -17,8 +17,19 @@ public class AuthController {
     }
 
     @PostMapping("/wx-login")
-    public ApiResponse<Map<String, Object>> wxLogin(@RequestBody Map<String, Object> body) {
-        return ApiResponse.ok(authService.wxLogin(body.get("code") == null ? null : String.valueOf(body.get("code"))));
+    public ApiResponse<Map<String, Object>> wxLogin(
+            @RequestBody Map<String, Object> body,
+            @RequestHeader(value = "X-Dev-Key", required = false) String headerDevKey) {
+        return ApiResponse.ok(authService.wxLogin(
+                stringField(body, "code"),
+                stringField(body, "devKey"),
+                stringField(body, "mockOpenid"),
+                headerDevKey));
+    }
+
+    private static String stringField(Map<String, Object> body, String key) {
+        Object v = body.get(key);
+        return v == null ? null : String.valueOf(v);
     }
 
     @PostMapping("/profile")
