@@ -1,0 +1,19 @@
+<view class="page" style="padding-bottom:140rpx;padding-top:16rpx">
+  <view class="card" wx:for="{{list}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+    <view class="row">
+      <text class="badge">{{item.statusText}}</text>
+      <text class="tiny">{{item.pickupDate}}</text>
+    </view>
+    <view class="muted" style="margin:8rpx 0">{{item.summary}}</view>
+    <view class="row">
+      <text class="price">¥{{item.totalYuan}}</text>
+      <text class="tiny" wx:if="{{item.pickupCode}}">码 {{item.pickupCode}}</text>
+    </view>
+  </view>
+  <view class="tiny" style="text-align:center;padding:48rpx" wx:if="{{!list.length}}">暂无订单</view>
+</view>
+<view class="tabbar-mock">
+  <view class="tab" bindtap="goHome"><text class="ico">⌂</text>商品</view>
+  <view class="tab on"><text class="ico">☰</text>订单</view>
+  <view class="tab" bindtap="goMe"><text class="ico">☺</text>我的</view>
+</view>

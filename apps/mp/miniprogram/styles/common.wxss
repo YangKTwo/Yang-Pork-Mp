@@ -1,0 +1,261 @@
+/* 对齐 docs/design/hifi/common.css · 主色 #C62828 · 背景 #FAF7F5 */
+.card {
+  background: #fff;
+  border: 1rpx solid #E8E0DC;
+  border-radius: 20rpx;
+  padding: 28rpx 32rpx;
+  margin: 0 32rpx 24rpx;
+}
+.btn-primary {
+  display: block;
+  width: 100%;
+  height: 96rpx;
+  line-height: 96rpx;
+  background: #C62828;
+  color: #fff;
+  border: none;
+  border-radius: 20rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  text-align: center;
+}
+.btn-primary[disabled],
+.btn-primary.disabled {
+  background: #BDBDBD;
+  color: #fff;
+}
+.btn-secondary {
+  height: 88rpx;
+  line-height: 88rpx;
+  padding: 0 32rpx;
+  border-radius: 20rpx;
+  background: #fff;
+  border: 3rpx solid #C62828;
+  color: #C62828;
+  font-size: 30rpx;
+  font-weight: 500;
+  text-align: center;
+}
+.btn-ghost-danger {
+  background: transparent;
+  border: none;
+  color: #D32F2F;
+  font-size: 30rpx;
+  padding: 24rpx;
+  width: 100%;
+  text-align: center;
+}
+.btn-row {
+  display: flex;
+  gap: 20rpx;
+}
+.btn-row .btn-secondary,
+.btn-row .btn-primary {
+  flex: 1;
+}
+.badge {
+  display: inline-block;
+  font-size: 24rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+  background: #FFEBEE;
+  color: #C62828;
+  font-weight: 500;
+}
+.badge.ok {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+.badge.warn {
+  background: #FFF3E0;
+  color: #ED6C02;
+}
+.badge.muted {
+  background: #eee;
+  color: #999;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 0;
+  font-size: 30rpx;
+}
+.muted {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+}
+.tiny {
+  font-size: 24rpx;
+  color: #999;
+}
+.price {
+  color: #C62828;
+  font-weight: 600;
+}
+.field {
+  margin-bottom: 28rpx;
+}
+.field label {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+}
+.field input,
+.field textarea {
+  width: 100%;
+  height: 88rpx;
+  padding: 0 24rpx;
+  border: 1rpx solid #E8E0DC;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  background: #fff;
+  color: #1A1A1A;
+  box-sizing: border-box;
+}
+.field textarea {
+  height: 176rpx;
+  padding: 20rpx 24rpx;
+}
+.pickup-code {
+  text-align: center;
+  padding: 40rpx 24rpx;
+  background: #FFEBEE;
+  border-radius: 24rpx;
+  margin: 16rpx 0 8rpx;
+}
+.pickup-code .lbl {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+}
+.pickup-code .code {
+  font-size: 88rpx;
+  font-weight: 700;
+  letter-spacing: 12rpx;
+  color: #C62828;
+  font-variant-numeric: tabular-nums;
+}
+.mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: flex-end;
+  z-index: 1000;
+}
+.mask.center {
+  align-items: center;
+  justify-content: center;
+}
+.sheet {
+  width: 100%;
+  background: #fff;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 32rpx 32rpx 56rpx;
+  max-height: 85vh;
+  box-sizing: border-box;
+}
+.sheet .handle {
+  width: 72rpx;
+  height: 8rpx;
+  background: #ddd;
+  border-radius: 4rpx;
+  margin: 0 auto 24rpx;
+}
+.dialog {
+  margin: 0 48rpx;
+  background: #fff;
+  border-radius: 28rpx;
+  padding: 40rpx 36rpx 32rpx;
+  width: 100%;
+  max-width: 640rpx;
+  box-sizing: border-box;
+}
+.dialog h3 {
+  font-size: 34rpx;
+  text-align: center;
+  margin-bottom: 20rpx;
+  font-weight: 600;
+}
+.dialog p {
+  font-size: 28rpx;
+  color: #666;
+  text-align: center;
+  margin-bottom: 16rpx;
+  line-height: 1.5;
+}
+.seg {
+  display: flex;
+  margin: 16rpx 32rpx 24rpx;
+  background: #ebe4df;
+  border-radius: 20rpx;
+  padding: 6rpx;
+}
+.seg .seg-item {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 8rpx;
+  font-size: 28rpx;
+  color: #666;
+  border-radius: 16rpx;
+  font-weight: 500;
+}
+.seg .seg-item.on {
+  background: #fff;
+  color: #C62828;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+}
+.formula-hint {
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.5;
+  margin-top: 8rpx;
+}
+.req {
+  color: #D32F2F;
+}
+.foot-safe {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 24rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1rpx solid #E8E0DC;
+  z-index: 50;
+}
+.tabbar-mock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 112rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #fff;
+  border-top: 1rpx solid #E8E0DC;
+  display: flex;
+  z-index: 40;
+}
+.tabbar-mock .tab {
+  flex: 1;
+  text-align: center;
+  padding-top: 16rpx;
+  font-size: 22rpx;
+  color: #999;
+}
+.tabbar-mock .tab.on {
+  color: #C62828;
+  font-weight: 600;
+}
+.tabbar-mock .ico {
+  display: block;
+  font-size: 36rpx;
+  line-height: 1.2;
+  margin-bottom: 4rpx;
+}

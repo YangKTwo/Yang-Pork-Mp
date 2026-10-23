@@ -1,0 +1,26 @@
+<view class="page" style="padding-bottom:160rpx">
+  <view class="card">
+    <view class="row"><text class="muted">取货日</text><text>{{pickupDate}}</text></view>
+    <view class="row"><text class="muted">取货方式</text><text>到店自取</text></view>
+  </view>
+  <view class="card">
+    <view style="font-weight:500;margin-bottom:12rpx">明细</view>
+    <view class="row" wx:for="{{lines}}" wx:key="id">
+      <text>{{item.name}} ×{{item.quantity}} {{item.unit}}</text>
+      <text>¥{{item.lineYuan}}</text>
+    </view>
+    <view class="row"><text>订单金额</text><text class="price">¥{{totalYuan}}</text></view>
+    <view class="row" wx:if="{{needDeposit}}"><text>预计定金</text><text class="price">¥{{depositYuan}}</text></view>
+    <view class="row" wx:else><text>定金</text><text>免定金（≤门槛）</text></view>
+    <view class="formula-hint">{{formulaText}}</view>
+  </view>
+  <view class="card">
+    <view class="field">
+      <label>备注（选填）</label>
+      <input placeholder="口味偏好等" value="{{remark}}" bindinput="onRemark" />
+    </view>
+  </view>
+</view>
+<view class="foot-safe">
+  <button class="btn-primary" bindtap="onSubmit" loading="{{loading}}" disabled="{{!canOrder}}">提交订单</button>
+</view>

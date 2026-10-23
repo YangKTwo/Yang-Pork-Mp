@@ -1,0 +1,32 @@
+<view class="page" style="padding:24rpx 0 160rpx">
+  <view class="card">
+    <view class="field">
+      <label>下单开始（HH:mm）</label>
+      <input value="{{form.orderWindowStart}}" bindinput="onField" data-k="orderWindowStart" />
+    </view>
+    <view class="field">
+      <label>下单结束（HH:mm）</label>
+      <input value="{{form.orderWindowEnd}}" bindinput="onField" data-k="orderWindowEnd" />
+    </view>
+    <view class="field">
+      <label>取消截止（HH:mm）</label>
+      <input value="{{form.cancelDeadline}}" bindinput="onField" data-k="cancelDeadline" />
+    </view>
+    <view class="field">
+      <label>定金门槛（分）</label>
+      <input type="number" value="{{form.depositThresholdFen}}" bindinput="onField" data-k="depositThresholdFen" />
+    </view>
+    <view class="field">
+      <label>定金比例（bps，2000=20%）</label>
+      <input type="number" value="{{form.depositRateBps}}" bindinput="onField" data-k="depositRateBps" />
+    </view>
+    <view class="field">
+      <label>支付超时（秒）</label>
+      <input type="number" value="{{form.payTimeoutSec}}" bindinput="onField" data-k="payTimeoutSec" />
+    </view>
+    <view class="formula-hint">{{form.depositFormulaText}}</view>
+  </view>
+</view>
+<view class="foot-safe">
+  <button class="btn-primary" bindtap="onSave" loading="{{loading}}">保存（Mock 本地生效示意）</button>
+</view>

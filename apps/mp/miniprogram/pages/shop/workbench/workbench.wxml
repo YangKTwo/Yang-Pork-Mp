@@ -1,0 +1,39 @@
+<view class="page" style="padding-bottom:140rpx">
+  <view class="seg">
+    <view class="seg-item {{tab==='preorder'?'on':''}}" data-tab="preorder" bindtap="switchTab">预定</view>
+    <view class="seg-item {{tab==='manual'?'on':''}}" data-tab="manual" bindtap="switchTab">代录</view>
+  </view>
+
+  <view wx:if="{{tab==='preorder'}}">
+    <view class="card" wx:for="{{preorderList}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+      <view class="row">
+        <text class="badge">{{item.statusText}}</text>
+        <text class="tiny">码 {{item.pickupCode || '—'}}</text>
+      </view>
+      <view class="row"><text>{{item.realName}}</text><text>{{item.phone}}</text></view>
+      <view class="muted">{{item.summary}} · ¥{{item.totalYuan}}</view>
+    </view>
+    <view class="tiny" style="text-align:center;padding:32rpx" wx:if="{{!preorderList.length}}">暂无预定订单</view>
+  </view>
+
+  <view wx:else>
+    <view style="padding:0 32rpx 16rpx">
+      <button class="btn-primary" bindtap="goManualCreate">新建代录</button>
+    </view>
+    <view class="card" wx:for="{{manualList}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+      <view class="row">
+        <text class="badge muted">代录</text>
+        <text class="badge">{{item.statusText}}</text>
+      </view>
+      <view class="row"><text>{{item.realName}}</text><text>{{item.phone}}</text></view>
+      <view class="muted">码 {{item.pickupCode}} · ¥{{item.totalYuan}}</view>
+    </view>
+    <view class="tiny" style="text-align:center;padding:32rpx" wx:if="{{!manualList.length}}">暂无代录订单</view>
+  </view>
+</view>
+
+<view class="tabbar-mock">
+  <view class="tab on"><text class="ico">▦</text>工作台</view>
+  <view class="tab" wx:if="{{isAdmin}}" bindtap="goAdmin"><text class="ico">⚙</text>管理</view>
+  <view class="tab" bindtap="goMe"><text class="ico">☺</text>我的</view>
+</view>

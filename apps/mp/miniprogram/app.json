@@ -1,0 +1,50 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "subpackages": [
+    {
+      "root": "pages/customer",
+      "name": "customer",
+      "pages": [
+        "auth/auth",
+        "profile/profile",
+        "home/home",
+        "confirm/confirm",
+        "pay-pending/pay-pending",
+        "order-detail/order-detail",
+        "orders/orders",
+        "me/me"
+      ]
+    },
+    {
+      "root": "pages/shop",
+      "name": "shop",
+      "pages": [
+        "workbench/workbench",
+        "order-detail/order-detail",
+        "manual-create/manual-create",
+        "me/me"
+      ]
+    },
+    {
+      "root": "pages/admin",
+      "name": "admin",
+      "pages": [
+        "home/home",
+        "products/products",
+        "config/config"
+      ]
+    }
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#FAF7F5",
+    "navigationBarTitleText": "预定猪肉",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FAF7F5",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

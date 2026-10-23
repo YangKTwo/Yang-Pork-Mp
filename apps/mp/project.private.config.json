@@ -1,0 +1,8 @@
+{
+  "description": "本地私有配置，可不入库敏感项",
+  "projectname": "Yang-Pork-Mp",
+  "setting": {
+    "compileHotReLoad": true,
+    "urlCheck": false
+  }
+}
