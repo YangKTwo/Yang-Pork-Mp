@@ -42,6 +42,46 @@ function useMock(): boolean {
   return false
 }
 
+function isBizSuccessCode(code: unknown): boolean {
+  return code === 0 || code === '0'
+}
+
+/** 是否像鉴权成功体（用于 envelope 未按 number code 解包时的兜底） */
+function looksLikeAuthPayload(value: unknown): boolean {
+  if (!value || typeof value !== 'object') return false
+  const o = value as Record<string, unknown>
+  const hasToken =
+    (typeof o.accessToken === 'string' && o.accessToken.length > 0) ||
+    (typeof o.token === 'string' && o.token.length > 0)
+  return hasToken && o.user != null && typeof o.user === 'object'
+}
+
+/** 统一解包 `{ code, message, data }`；兼容 code 为字符串、或未走 number 分支的 envelope */
+function unwrapApiSuccessBody<T>(body: unknown): T {
+  if (body === null || body === undefined) {
+    throw new Error('响应体为空')
+  }
+  if (typeof body !== 'object') {
+    return body as T
+  }
+  const env = body as Record<string, unknown>
+  const inner = env.data
+  if (inner !== undefined && inner !== null && looksLikeAuthPayload(inner)) {
+    return inner as T
+  }
+  if ('code' in env) {
+    if (isBizSuccessCode(env.code)) {
+      return env.data as T
+    }
+    if (env.code !== undefined && env.code !== null) {
+      const message =
+        typeof env.message === 'string' ? env.message : `业务错误 ${String(env.code)}`
+      throw new Error(message)
+    }
+  }
+  return body as T
+}
+
 function request<T>(
   method: string,
   path: string,
@@ -61,17 +101,12 @@ function request<T>(
         ...(extraHeaders || {}),
       },
       success(res) {
-        const body = res.data as ApiResponse<T>
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          if (body && typeof body.code === 'number') {
-            if (body.code === 0) {
-              resolve(body.data)
-              return
-            }
-            reject(new Error(body.message || `业务错误 ${body.code}`))
-            return
+          try {
+            resolve(unwrapApiSuccessBody<T>(res.data))
+          } catch (e) {
+            reject(e)
           }
-          resolve(body as unknown as T)
           return
         }
         reject(new Error(`HTTP ${res.statusCode}`))

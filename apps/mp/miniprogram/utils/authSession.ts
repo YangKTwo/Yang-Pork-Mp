@@ -6,8 +6,10 @@ export type AuthPayload = {
 }
 
 export function applyAuthResponse(app: IAppOption, data: AuthPayload): void {
-  if (!data.accessToken) {
-    throw new Error('响应缺少 accessToken')
+  const token = data.accessToken
+  if (!token) {
+    const keys = Object.keys((data as object) || {}).join(',') || '无'
+    throw new Error(`响应缺少 accessToken（顶层字段: ${keys}）`)
   }
-  app.setSession(data.accessToken, data.user, data.profileCompleted)
+  app.setSession(token, data.user, data.profileCompleted)
 }

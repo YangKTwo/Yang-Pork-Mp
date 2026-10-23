@@ -33,7 +33,9 @@ Page({
         result: 'fail',
         fail_reason: e.message || 'profile_fail',
       }, 'C-AUTH-02')
-      wx.showToast({ title: e.message || '提交失败', icon: 'none' })
+      const raw = e?.message || '提交失败'
+      const title = raw.length > 28 ? `${raw.slice(0, 28)}…` : raw
+      wx.showToast({ title, icon: 'none', duration: 3000 })
     } finally {
       this.setData({ loading: false })
     }
