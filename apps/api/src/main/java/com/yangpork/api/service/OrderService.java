@@ -6,7 +6,10 @@ import com.yangpork.api.config.AppProperties;
 import com.yangpork.api.domain.*;
 import com.yangpork.api.repo.OrderItemRepository;
 import com.yangpork.api.repo.OrderRepository;
+import com.yangpork.api.repo.UserRepository;
 import com.yangpork.api.security.AuthUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,6 +26,8 @@ import java.util.*;
 
 @Service
 public class OrderService {
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
+
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ProductService productService;
@@ -31,10 +36,13 @@ public class OrderService {
     private final TimeSupport timeSupport;
     private final IdGenerator idGenerator;
     private final AppProperties props;
+    private final UserRepository userRepository;
+    private final WeChatSubscribeMessageService subscribeMessageService;
 
     public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository,
                         ProductService productService, ConfigService configService, AuthService authService,
-                        TimeSupport timeSupport, IdGenerator idGenerator, AppProperties props) {
+                        TimeSupport timeSupport, IdGenerator idGenerator, AppProperties props,
+                        UserRepository userRepository, WeChatSubscribeMessageService subscribeMessageService) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.productService = productService;
@@ -43,6 +51,8 @@ public class OrderService {
         this.timeSupport = timeSupport;
         this.idGenerator = idGenerator;
         this.props = props;
+        this.userRepository = userRepository;
+        this.subscribeMessageService = subscribeMessageService;
     }
 
     @Transactional
@@ -76,6 +86,8 @@ public class OrderService {
         order.setUserId(user.getId());
         order.setSource(OrderSource.PREORDER);
         order.setPickupDate(timeSupport.nextPickupDate(cfg, now));
+        order.setPickupSlot(requirePickupSlot(body));
+        order.setSubscribeStatus(parseSubscribeAccept(body));
         order.setRemark(body.get("remark") == null ? null : String.valueOf(body.get("remark")));
         order.setCustomerRealName(user.getRealName());
         order.setCustomerPhone(user.getPhone());
@@ -258,6 +270,8 @@ public class OrderService {
         order.setSource(OrderSource.MANUAL);
         order.setStatus(OrderStatus.PENDING_PREPARE);
         order.setPickupDate(pickupDate);
+        order.setPickupSlot(requirePickupSlot(body));
+        order.setSubscribeStatus(parseSubscribeAccept(body));
         order.setRemark(body.get("remark") == null ? null : String.valueOf(body.get("remark")));
         order.setCustomerRealName(realName);
         order.setCustomerPhone(phone);
@@ -281,9 +295,10 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public Map<String, Object> shopList(AuthUser auth, OrderSource source, LocalDate pickupDate,
-                                        OrderStatus status, String pickupCode, int page, int pageSize) {
+                                        OrderStatus status, String pickupCode, PickupSlot pickupSlot,
+                                        int page, int pageSize) {
         configService.requireShopOrAdmin(auth);
-        Page<OrderEntity> p = orderRepository.searchShop(source, pickupDate, status, pickupCode,
+        Page<OrderEntity> p = orderRepository.searchShop(source, pickupDate, status, pickupCode, pickupSlot,
                 PageRequest.of(Math.max(page - 1, 0), Math.min(pageSize, 100)));
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("list", p.getContent().stream().map(o -> toView(o, true)).toList());
@@ -301,9 +316,84 @@ public class OrderService {
             throw new BizException(ErrorCodes.BAD_STATUS, "仅待备货可备货");
         }
         o.setStatus(OrderStatus.PREPARED);
+        onTransitionToPrepared(o);
         o.setUpdatedAt(Instant.now());
         orderRepository.save(o);
         return toView(o, true);
+    }
+
+    @Transactional
+    public Map<String, Object> updateSubscribe(AuthUser auth, String id, Map<String, Object> body) {
+        OrderEntity o = requireMine(auth, id);
+        if (body.get("accepted") == null) {
+            throw new BizException(ErrorCodes.BAD_PARAM, "accepted 必填");
+        }
+        boolean accepted = parseBoolean(body.get("accepted"));
+        o.setSubscribeStatus(accepted ? SubscribeStatus.ACCEPTED : SubscribeStatus.NONE);
+        o.setUpdatedAt(Instant.now());
+        orderRepository.save(o);
+        return toView(o, true);
+    }
+
+    private void onTransitionToPrepared(OrderEntity order) {
+        if (order.getSubscribeStatus() != SubscribeStatus.ACCEPTED) {
+            log.info("subscribe prepared skipped: orderId={}, subscribeStatus={}",
+                    order.getId(), order.getSubscribeStatus());
+            return;
+        }
+        String tmplId = props.getWx().getSubscribe().getPreparedTemplateId();
+        if (!StringUtils.hasText(tmplId)) {
+            order.setSubscribeStatus(SubscribeStatus.SKIPPED_NO_AUTH);
+            log.info("subscribe prepared skipped: no template id, orderId={}", order.getId());
+            return;
+        }
+        UserEntity user = userRepository.findById(order.getUserId()).orElse(null);
+        if (user == null || !StringUtils.hasText(user.getOpenid())) {
+            order.setSubscribeStatus(SubscribeStatus.SKIPPED_NO_AUTH);
+            log.info("subscribe prepared skipped: no openid, orderId={}", order.getId());
+            return;
+        }
+        try {
+            subscribeMessageService.sendPreparedNotice(user, order, tmplId.trim());
+            order.setSubscribeStatus(SubscribeStatus.SENT);
+        } catch (Exception e) {
+            order.setSubscribeStatus(SubscribeStatus.FAILED);
+            log.warn("subscribe prepared send failed: orderId={}, err={}", order.getId(), e.toString());
+        }
+    }
+
+    private PickupSlot requirePickupSlot(Map<String, Object> body) {
+        if (body.get("pickupSlot") == null) {
+            throw new BizException(ErrorCodes.BAD_PARAM, "pickupSlot 必填");
+        }
+        return parsePickupSlot(body.get("pickupSlot"));
+    }
+
+    private PickupSlot parsePickupSlot(Object raw) {
+        String s = String.valueOf(raw).trim();
+        if (!StringUtils.hasText(s) || "null".equalsIgnoreCase(s)) {
+            throw new BizException(ErrorCodes.BAD_PARAM, "pickupSlot 无效");
+        }
+        try {
+            return PickupSlot.valueOf(s.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BizException(ErrorCodes.BAD_PARAM, "pickupSlot 无效");
+        }
+    }
+
+    private SubscribeStatus parseSubscribeAccept(Map<String, Object> body) {
+        Object v = body.get("acceptSubscribePrepared");
+        if (v == null) {
+            return SubscribeStatus.NONE;
+        }
+        return parseBoolean(v) ? SubscribeStatus.ACCEPTED : SubscribeStatus.NONE;
+    }
+
+    private static boolean parseBoolean(Object v) {
+        if (v instanceof Boolean b) {
+            return b;
+        }
+        return "true".equalsIgnoreCase(String.valueOf(v).trim());
     }
 
     @Transactional
@@ -379,6 +469,8 @@ public class OrderService {
         m.put("source", o.getSource().name());
         m.put("status", o.getStatus().name());
         m.put("pickupDate", o.getPickupDate().toString());
+        m.put("pickupSlot", o.getPickupSlot() == null ? null : o.getPickupSlot().name());
+        m.put("subscribeStatus", o.getSubscribeStatus().name());
         m.put("totalFen", o.getTotalFen());
         m.put("depositFen", o.getDepositFen());
         m.put("depositRequired", o.isDepositRequired());

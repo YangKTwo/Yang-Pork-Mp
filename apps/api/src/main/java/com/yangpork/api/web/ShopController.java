@@ -3,6 +3,7 @@ package com.yangpork.api.web;
 import com.yangpork.api.common.ApiResponse;
 import com.yangpork.api.domain.OrderSource;
 import com.yangpork.api.domain.OrderStatus;
+import com.yangpork.api.domain.PickupSlot;
 import com.yangpork.api.security.AuthContext;
 import com.yangpork.api.service.OrderService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,10 +26,11 @@ public class ShopController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate pickupDate,
             @RequestParam(required = false) OrderStatus status,
             @RequestParam(required = false) String pickupCode,
+            @RequestParam(required = false) PickupSlot pickupSlot,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int pageSize) {
         return ApiResponse.ok(orderService.shopList(AuthContext.get(), OrderSource.PREORDER,
-                pickupDate, status, pickupCode, page, pageSize));
+                pickupDate, status, pickupCode, pickupSlot, page, pageSize));
     }
 
     @GetMapping("/manual")
@@ -36,10 +38,11 @@ public class ShopController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate pickupDate,
             @RequestParam(required = false) OrderStatus status,
             @RequestParam(required = false) String pickupCode,
+            @RequestParam(required = false) PickupSlot pickupSlot,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int pageSize) {
         return ApiResponse.ok(orderService.shopList(AuthContext.get(), OrderSource.MANUAL,
-                pickupDate, status, pickupCode, page, pageSize));
+                pickupDate, status, pickupCode, pickupSlot, page, pageSize));
     }
 
     @PostMapping("/manual")
