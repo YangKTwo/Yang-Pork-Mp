@@ -3,6 +3,7 @@ package com.yangpork.api.repo;
 import com.yangpork.api.domain.OrderEntity;
 import com.yangpork.api.domain.OrderSource;
 import com.yangpork.api.domain.OrderStatus;
+import com.yangpork.api.domain.PickupSlot;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,12 +24,14 @@ public interface OrderRepository extends JpaRepository<OrderEntity, String> {
         AND (:pickupDate IS NULL OR o.pickupDate = :pickupDate)
         AND (:status IS NULL OR o.status = :status)
         AND (:pickupCode IS NULL OR o.pickupCode = :pickupCode)
+        AND (:pickupSlot IS NULL OR o.pickupSlot = :pickupSlot)
         ORDER BY o.createdAt DESC
         """)
     Page<OrderEntity> searchShop(@Param("source") OrderSource source,
                                  @Param("pickupDate") LocalDate pickupDate,
                                  @Param("status") OrderStatus status,
                                  @Param("pickupCode") String pickupCode,
+                                 @Param("pickupSlot") PickupSlot pickupSlot,
                                  Pageable pageable);
 
     List<OrderEntity> findByStatusAndPayExpireAtBefore(OrderStatus status, Instant before);

@@ -1,5 +1,6 @@
 import { api } from '../../../services/api'
 import { fenToYuan, lineItemYuan, statusLabel } from '../../../utils/money'
+import { formatPickupSlotDisplay, resolvePickupSlots } from '../../../utils/pickupSlot'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
 Page({
@@ -8,6 +9,7 @@ Page({
     order: null as any,
     statusText: '',
     depositText: '',
+    pickupSlotText: '',
     canShopCancel: false,
     showCancel: false,
     cancelReason: '',
@@ -25,6 +27,8 @@ Page({
   async load() {
     try {
       const order = await api.getOrder(this.data.id)
+      const config = await api.orderingConfig()
+      const slotMeta = resolvePickupSlots(config)
       const items = (order.items || []).map((it) => ({
         ...it,
         lineYuan: lineItemYuan(it),
@@ -43,6 +47,7 @@ Page({
         order: { ...order, items },
         statusText: statusLabel(order.status),
         depositText,
+        pickupSlotText: formatPickupSlotDisplay(order.pickupDate, order.pickupSlot, slotMeta),
         canShopCancel,
       })
     } catch (e: any) {

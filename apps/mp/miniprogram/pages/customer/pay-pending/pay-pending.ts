@@ -1,5 +1,6 @@
 import { api } from '../../../services/api'
 import { fenToYuan } from '../../../utils/money'
+import { runPreparedSubscribeFlow } from '../../../utils/subscribeReady'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
 Page({
@@ -80,6 +81,7 @@ Page({
         from_status: 'PENDING_PAY',
         to_status: order.status,
       }, 'C-PAY-02')
+      await runPreparedSubscribeFlow(order.id)
       wx.redirectTo({ url: `/pages/customer/order-detail/order-detail?id=${order.id}` })
     } catch (e: any) {
       track(TrackEvents.PAY_MOCK_FAIL, {

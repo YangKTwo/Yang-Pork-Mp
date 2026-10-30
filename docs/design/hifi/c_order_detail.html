@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>订单详情 · C-DETAIL · F-SUB / F-SLOT</title>
+<link rel="stylesheet" href="common.css"/>
+<style>
+  .phones{display:flex;flex-wrap:wrap;gap:24px;justify-content:center}
+  .sub-inline{
+    background:var(--primary-soft);border:1px solid #ffcdd2;
+    border-radius:10px;padding:12px 14px;margin:0 16px 12px;
+  }
+  .sub-inline .btn-primary{height:40px;font-size:14px;margin-top:10px}
+  .mask{display:none}
+</style>
+</head>
+<body>
+<p class="page-label">高保真 · C-DETAIL · 时段展示 + 订阅未开/已开两态（F-SLOT-01 / F-SUB-01）</p>
+<div class="phones">
+
+<!-- 未开启订阅 -->
+<div class="phone">
+  <div class="status"><span>12:20</span><span>···· Wi‑Fi</span></div>
+  <div class="nav"><span class="back">←</span><div class="title">订单详情</div></div>
+  <div class="content">
+    <p class="tiny" style="text-align:center;padding:0 16px 8px">态 A · subscribeStatus 未开（NONE / SKIPPED_NO_AUTH 等）</p>
+    <div class="card" style="text-align:center">
+      <span class="badge">待备货</span>
+      <div class="pickup-code">
+        <div class="lbl">取货码</div>
+        <div class="code">382915</div>
+        <p class="tiny" style="margin-top:8px">到店出示此码，并报姓名与手机号</p>
+      </div>
+    </div>
+    <div class="sub-inline">
+      <div style="font-size:14px;font-weight:500">备好货时想收到提醒？</div>
+      <p class="muted" style="margin:4px 0 0">点下面开一下，微信会通知你</p>
+      <button class="btn-primary" type="button">开启取货提醒</button>
+    </div>
+    <div class="card">
+      <div class="row"><span class="muted">取货日</span><strong>10月24日</strong></div>
+      <div class="row"><span class="muted">取货时段</span><span class="badge">中午取 · 11:00–14:00</span></div>
+      <div class="row"><span class="muted">取货方式</span><span>到店自取</span></div>
+      <div class="row"><span class="muted">定金</span><span>已付 ¥9.40</span></div>
+      <div class="row"><span class="muted">备注</span><span>少放花椒</span></div>
+      <p class="muted">定金 = 订单金额 × 20%（订单满 10 元收取）</p>
+    </div>
+    <div class="card">
+      <div style="font-weight:500;margin-bottom:6px">明细</div>
+      <div class="row"><span>精瘦肉 ×1 斤</span><span>¥15.00</span></div>
+      <div class="row"><span>肋排 ×1 条</span><span>¥32.00</span></div>
+      <div class="row"><span>订单金额</span><span class="price">¥47.00</span></div>
+    </div>
+    <button class="btn-ghost-danger" type="button">取消订单</button>
+    <p class="tiny" style="text-align:center;padding:0 24px 16px">仅下单当日 22:00（含）前可自助取消</p>
+  </div>
+</div>
+
+<!-- 已开启订阅 -->
+<div class="phone">
+  <div class="status"><span>12:20</span><span>···· Wi‑Fi</span></div>
+  <div class="nav"><span class="back">←</span><div class="title">订单详情</div></div>
+  <div class="content">
+    <p class="tiny" style="text-align:center;padding:0 16px 8px">态 B · 已开启（ACCEPTED / SENT）· 弱化打扰</p>
+    <div class="card" style="text-align:center">
+      <span class="badge">待备货</span>
+      <div class="pickup-code">
+        <div class="lbl">取货码</div>
+        <div class="code">382915</div>
+        <p class="tiny" style="margin-top:8px">到店出示此码，并报姓名与手机号</p>
+      </div>
+    </div>
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between">
+      <span class="muted">取货提醒</span>
+      <span class="badge ok">✓ 已开启提醒</span>
+    </div>
+    <div class="card">
+      <div class="row"><span class="muted">取货日</span><strong>10月24日</strong></div>
+      <div class="row"><span class="muted">取货时段</span><span class="badge">中午取 · 11:00–14:00</span></div>
+      <div class="row"><span class="muted">取货方式</span><span>到店自取</span></div>
+      <div class="row"><span class="muted">定金</span><span>已付 ¥9.40</span></div>
+      <div class="row"><span class="muted">备注</span><span>少放花椒</span></div>
+      <p class="muted">定金 = 订单金额 × 20%（订单满 10 元收取）</p>
+    </div>
+    <div class="card">
+      <div style="font-weight:500;margin-bottom:6px">明细</div>
+      <div class="row"><span>精瘦肉 ×1 斤</span><span>¥15.00</span></div>
+      <div class="row"><span>肋排 ×1 条</span><span>¥32.00</span></div>
+      <div class="row"><span>订单金额</span><span class="price">¥47.00</span></div>
+    </div>
+    <button class="btn-ghost-danger" type="button">取消订单</button>
+    <p class="tiny" style="text-align:center;padding:0 24px 16px">仅下单当日 22:00（含）前可自助取消</p>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

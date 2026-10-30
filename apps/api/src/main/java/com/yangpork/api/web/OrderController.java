@@ -47,4 +47,10 @@ public class OrderController {
     public ApiResponse<Map<String, Object>> mockSuccess(@PathVariable String id) {
         return ApiResponse.ok(orderService.mockPaySuccess(AuthContext.get(), id));
     }
+
+    @PostMapping("/{id}/subscribe")
+    public ApiResponse<Map<String, Object>> subscribe(@PathVariable String id,
+                                                      @RequestBody Map<String, Object> body) {
+        return ApiResponse.ok(orderService.updateSubscribe(AuthContext.get(), id, body));
+    }
 }

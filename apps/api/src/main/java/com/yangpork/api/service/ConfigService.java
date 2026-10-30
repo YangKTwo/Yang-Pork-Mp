@@ -4,6 +4,7 @@ import com.yangpork.api.common.BizException;
 import com.yangpork.api.common.ErrorCodes;
 import com.yangpork.api.config.AppProperties;
 import com.yangpork.api.domain.OrderingConfigEntity;
+import com.yangpork.api.domain.PickupSlot;
 import com.yangpork.api.domain.Role;
 import com.yangpork.api.repo.OrderingConfigRepository;
 import com.yangpork.api.security.AuthUser;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -61,7 +64,28 @@ public class ConfigService {
         data.put("canOrderNow", timeSupport.inOrderWindow(cfg, now));
         data.put("serverNow", timeSupport.formatNow(cfg));
         data.put("nextPickupDate", timeSupport.nextPickupDate(cfg, now).toString());
+        data.put("pickupSlots", pickupSlotsView());
+        data.put("defaultPickupSlot", props.getOrdering().getDefaultPickupSlot());
+        String tmplId = props.getWx().getSubscribe().getPreparedTemplateId();
+        data.put("subscribePreparedTmplId", tmplId == null || tmplId.isBlank() ? "" : tmplId);
         return data;
+    }
+
+    private List<Map<String, String>> pickupSlotsView() {
+        AppProperties.Ordering o = props.getOrdering();
+        List<Map<String, String>> list = new ArrayList<>();
+        list.add(slotEntry(PickupSlot.MORNING, o.getPickupSlotMorningLabel(), o.getPickupSlotMorningHint()));
+        list.add(slotEntry(PickupSlot.NOON, o.getPickupSlotNoonLabel(), o.getPickupSlotNoonHint()));
+        list.add(slotEntry(PickupSlot.EVENING, o.getPickupSlotEveningLabel(), o.getPickupSlotEveningHint()));
+        return list;
+    }
+
+    private static Map<String, String> slotEntry(PickupSlot code, String label, String hint) {
+        Map<String, String> m = new LinkedHashMap<>();
+        m.put("code", code.name());
+        m.put("label", label);
+        m.put("hint", hint);
+        return m;
     }
 
     @Transactional

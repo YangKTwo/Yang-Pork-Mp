@@ -1,4 +1,4 @@
-/** 与 docs/TRACKING_MP_FUNNEL.md 事件名一一对应；禁止业务散落魔法字符串 */
+/** 与 docs/08_TRACKING_MP_FUNNEL.md 事件名一一对应；禁止业务散落魔法字符串 */
 export const TrackEvents = {
   LOGIN_WX: 'login_wx',
   PROFILE_SUBMIT: 'profile_submit',
@@ -21,6 +21,8 @@ export const TrackEvents = {
   MANUAL_ORDER_CREATE: 'manual_order_create',
   API_ERROR: 'api_error',
   ORDER_WINDOW_BLOCK: 'order_window_block',
+  SUBSCRIBE_AUTH_PROMPT: 'subscribe_auth_prompt',
+  SUBSCRIBE_AUTH_RESULT: 'subscribe_auth_result',
 } as const
 
 export type TrackEventName = (typeof TrackEvents)[keyof typeof TrackEvents]

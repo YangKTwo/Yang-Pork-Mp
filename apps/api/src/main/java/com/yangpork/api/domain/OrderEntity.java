@@ -32,6 +32,14 @@ public class OrderEntity {
     @Column(nullable = false)
     private LocalDate pickupDate;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 16)
+    private PickupSlot pickupSlot;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 24)
+    private SubscribeStatus subscribeStatus = SubscribeStatus.NONE;
+
     @Column(nullable = false)
     private long totalFen;
 
@@ -101,6 +109,10 @@ public class OrderEntity {
     public void setStatus(OrderStatus status) { this.status = status; }
     public LocalDate getPickupDate() { return pickupDate; }
     public void setPickupDate(LocalDate pickupDate) { this.pickupDate = pickupDate; }
+    public PickupSlot getPickupSlot() { return pickupSlot; }
+    public void setPickupSlot(PickupSlot pickupSlot) { this.pickupSlot = pickupSlot; }
+    public SubscribeStatus getSubscribeStatus() { return subscribeStatus; }
+    public void setSubscribeStatus(SubscribeStatus subscribeStatus) { this.subscribeStatus = subscribeStatus; }
     public long getTotalFen() { return totalFen; }
     public void setTotalFen(long totalFen) { this.totalFen = totalFen; }
     public long getDepositFen() { return depositFen; }

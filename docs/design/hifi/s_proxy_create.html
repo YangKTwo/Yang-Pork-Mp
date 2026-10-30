@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>新建代录单 · S-PROXY-01 · F-SLOT</title>
+<link rel="stylesheet" href="common.css"/>
+<style>
+  .slot-grid{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .slot-opt{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;
+    background:#fff;font-size:15px;
+  }
+  .slot-opt .meta{font-size:12px;color:var(--text-3);margin-top:2px}
+  .slot-opt.on{border-color:var(--primary);background:var(--primary-soft)}
+  .slot-opt .radio{
+    width:18px;height:18px;border-radius:50%;border:2px solid var(--border);
+    flex-shrink:0;margin-left:10px;
+  }
+  .slot-opt.on .radio{
+    border-color:var(--primary);background:var(--primary);
+    box-shadow:inset 0 0 0 3px #fff;
+  }
+  .req{color:var(--primary);font-size:12px;font-weight:500}
+  .dep-opt{
+    display:flex;flex-direction:column;gap:8px;margin-top:8px;
+  }
+  .dep-opt label{
+    display:flex;align-items:center;gap:8px;font-size:14px;
+    padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:#fff;
+  }
+  .dep-opt input{accent-color:var(--primary)}
+</style>
+</head>
+<body>
+<p class="page-label">高保真 · S-PROXY-01 · 代录创建 · 时段必选（F-SLOT-01）</p>
+<div class="phone">
+  <div class="status"><span>15:25</span><span>···· Wi‑Fi</span></div>
+  <div class="nav"><span class="back">←</span><div class="title">新建代录单</div></div>
+  <div class="content">
+    <div class="card">
+      <div class="field">
+        <label>客户姓名</label>
+        <input type="text" placeholder="真实姓名，便于到店核对"/>
+      </div>
+      <div class="field">
+        <label>手机号</label>
+        <input type="text" inputmode="tel" placeholder="完整手机号"/>
+      </div>
+      <div class="field">
+        <label>取货日</label>
+        <select>
+          <option selected>明天（默认）</option>
+          <option>今天</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font-size:15px;font-weight:500">取货时段</div>
+        <span class="req">必选</span>
+      </div>
+      <p class="tiny" style="margin-top:4px">pickupSlot · 与顾客确认页同一套三档 · 默认不预选</p>
+      <div class="slot-grid">
+        <div class="slot-opt" data-slot="MORNING">
+          <div>
+            <div>上午取</div>
+            <div class="meta">08:00–11:00 · 待 PM 可改</div>
+          </div>
+          <div class="radio"></div>
+        </div>
+        <div class="slot-opt" data-slot="NOON">
+          <div>
+            <div>中午取</div>
+            <div class="meta">11:00–14:00 · 待 PM 可改</div>
+          </div>
+          <div class="radio"></div>
+        </div>
+        <div class="slot-opt" data-slot="EVENING">
+          <div>
+            <div>下午取</div>
+            <div class="meta">14:00–18:00 · 待 PM 可改</div>
+          </div>
+          <div class="radio"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="field">
+        <label>商品 / 数量或备注</label>
+        <textarea placeholder="如：五花肉 2 斤；或选 SKU + 数量"></textarea>
+      </div>
+      <p class="tiny">可简单选 SKU + 数量，或多行备注（与现线框一致）</p>
+    </div>
+    <div class="card">
+      <div style="font-size:15px;font-weight:500;margin-bottom:4px">定金</div>
+      <div class="dep-opt">
+        <label><input type="radio" name="dep" checked/> 按规则收取</label>
+        <label><input type="radio" name="dep"/> 线下已收</label>
+        <label><input type="radio" name="dep"/> 未收 / 无需</label>
+      </div>
+    </div>
+    <div class="card">
+      <p class="tiny">未选时段不可保存。保存成功建议进入待备货并生成取货码，便于核销。</p>
+    </div>
+  </div>
+  <div class="foot-safe">
+    <button class="btn-primary disabled" type="button" id="saveBtn" disabled>保存并进入待备货</button>
+  </div>
+</div>
+<script>
+  const opts=document.querySelectorAll('.slot-opt');
+  const btn=document.getElementById('saveBtn');
+  opts.forEach(el=>{
+    el.onclick=()=>{
+      opts.forEach(o=>o.classList.remove('on'));
+      el.classList.add('on');
+      btn.disabled=false;
+      btn.classList.remove('disabled');
+    };
+  });
+</script>
+</body>
+</html>

@@ -11,6 +11,7 @@
   <van-cell-group inset>
     <van-cell title="姓名" value="{{order.realName}}" value-class="cell-strong" />
     <van-cell title="手机" value="{{order.phone}}" value-class="cell-phone" />
+    <van-cell title="取货时段" value="{{pickupSlotText}}" />
     <van-cell title="取货日" value="{{order.pickupDate}}" />
     <van-cell title="定金" value="{{depositText}}" />
     <van-cell wx:if="{{order.remark}}" title="备注" value="{{order.remark}}" />

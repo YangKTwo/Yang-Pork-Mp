@@ -1,5 +1,14 @@
 import { api } from '../../../services/api'
 import { fenToYuan, lineItemYuan, statusLabel } from '../../../utils/money'
+import { formatPickupSlotDisplay, resolvePickupSlots } from '../../../utils/pickupSlot'
+import {
+  canOfferPreparedSubscribe,
+  isSubscribeReminderActive,
+  isSubscribeOfferRetryable,
+  runPreparedSubscribeFlow,
+  subscribeReminderCopy,
+  trackSubscribeOfferExposure,
+} from '../../../utils/subscribeReady'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
 Page({
@@ -9,9 +18,15 @@ Page({
     statusText: '',
     totalYuan: '0.00',
     depositText: '',
+    pickupSlotText: '',
     canCancel: false,
     showCancel: false,
     cancelling: false,
+    subscribeReminderOn: false,
+    subscribeBadge: '',
+    subscribeHint: '',
+    showSubscribeOffer: false,
+    subscribing: false,
   },
   onLoad(q: Record<string, string | undefined>) {
     this.setData({ id: q.id || '' })
@@ -23,6 +38,8 @@ Page({
   async load() {
     try {
       const order = await api.getOrder(this.data.id)
+      const config = await api.orderingConfig()
+      const slotMeta = resolvePickupSlots(config)
       const items = (order.items || []).map((it) => ({
         ...it,
         lineYuan: lineItemYuan(it),
@@ -36,22 +53,48 @@ Page({
             ? `待付 ¥${fenToYuan(order.depositFen)}`
             : `已付 ¥${fenToYuan(order.depositFen)}`
       }
+      const reminderOn = isSubscribeReminderActive(order.subscribeStatus)
+      const copy = subscribeReminderCopy(order.subscribeStatus)
+      const offerSubscribe =
+        order.status === 'PENDING_PREPARE' &&
+        !reminderOn &&
+        isSubscribeOfferRetryable(order.subscribeStatus) &&
+        (await canOfferPreparedSubscribe())
       this.setData({
         order: { ...order, items },
         statusText: statusLabel(order.status),
         totalYuan: fenToYuan(order.totalFen),
         depositText,
+        pickupSlotText: formatPickupSlotDisplay(order.pickupDate, order.pickupSlot, slotMeta),
         canCancel,
+        subscribeReminderOn: reminderOn,
+        subscribeBadge: copy.badge,
+        subscribeHint: copy.hint,
+        showSubscribeOffer: offerSubscribe,
       })
+      if (offerSubscribe) {
+        await trackSubscribeOfferExposure(order.id, 'order_detail')
+      }
       track(TrackEvents.ORDER_DETAIL_VIEW, {
         order_id: order.id,
         status: order.status,
         has_pickup_code: !!order.pickupCode,
         need_deposit: order.depositRequired,
         source: order.source,
+        subscribe_status: order.subscribeStatus || 'NONE',
       }, 'C-DETAIL-01')
     } catch (e: any) {
       wx.showToast({ title: e.message || '加载失败', icon: 'none' })
+    }
+  },
+  async onEnableSubscribe() {
+    if (this.data.subscribing) return
+    this.setData({ subscribing: true })
+    try {
+      await runPreparedSubscribeFlow(this.data.id, 'order_detail')
+      await this.load()
+    } finally {
+      this.setData({ subscribing: false })
     }
   },
   openCancel() {
