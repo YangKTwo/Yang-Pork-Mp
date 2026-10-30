@@ -19,6 +19,10 @@ mvn spring-boot:run
 - 时区：Asia/Shanghai
 - DB：H2 文件库 `./data/pork_preorder`（零依赖 MySQL）
 
+### H2 本地库与 schema 变更
+
+`spring.jpa.hibernate.ddl-auto: update` 对**已有**文件库有时不会稳定追加新列（例如 F-SLOT-01 / F-SUB-01 的 `pickupSlot`、`subscribeStatus`）。本地 smoke 若出现列缺失、启动或下单异常，请先**停服务**，删除 `apps/api/data/pork_preorder*`（含 `.mv.db` / `.trace.db` 等），再启动让 Hibernate 重建/更新表结构。无需 MySQL；mock 环境以 wipe 为准即可。
+
 ## Mock 登录（curl）
 
 ```bash
