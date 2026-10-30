@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>下单确认 · C-ORDER-01</title>
+<link rel="stylesheet" href="common.css"/>
+<style>
+  .slot-grid{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .slot-opt{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;
+    background:#fff;cursor:default;font-size:15px;
+  }
+  .slot-opt .meta{font-size:12px;color:var(--text-3);margin-top:2px}
+  .slot-opt.on{
+    border-color:var(--primary);background:var(--primary-soft);
+  }
+  .slot-opt .radio{
+    width:18px;height:18px;border-radius:50%;border:2px solid var(--border);
+    flex-shrink:0;margin-left:10px;
+  }
+  .slot-opt.on .radio{
+    border-color:var(--primary);background:var(--primary);
+    box-shadow:inset 0 0 0 3px #fff;
+  }
+  .req{color:var(--primary);font-size:12px;font-weight:500}
+</style>
+</head>
+<body>
+<p class="page-label">高保真 · C-ORDER-01 · 三档时段必选（不预选）· F-SLOT-01</p>
+<div class="phone">
+  <div class="status"><span>12:15</span><span>···· Wi‑Fi</span></div>
+  <div class="nav"><span class="back">←</span><div class="title">确认订单</div></div>
+  <div class="content">
+    <div class="card">
+      <span class="badge">次日到店自取</span>
+      <div class="row" style="margin-top:10px"><span class="muted">取货日</span><strong>明天 10月24日</strong></div>
+      <div class="row"><span class="muted">联系人</span><span>张三 · 138****5678</span></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font-size:15px;font-weight:500">取货时段</div>
+        <span class="req">必选 · 请点选一档</span>
+      </div>
+      <p class="tiny" style="margin-top:4px">字段 pickupSlot：MORNING / NOON / EVENING · 默认不预选</p>
+      <div class="slot-grid">
+        <div class="slot-opt" data-slot="MORNING">
+          <div>
+            <div>上午取</div>
+            <div class="meta">08:00–11:00 · 待 PM 可改</div>
+          </div>
+          <div class="radio"></div>
+        </div>
+        <div class="slot-opt" data-slot="NOON">
+          <div>
+            <div>中午取</div>
+            <div class="meta">11:00–14:00 · 待 PM 可改</div>
+          </div>
+          <div class="radio"></div>
+        </div>
+        <div class="slot-opt" data-slot="EVENING">
+          <div>
+            <div>下午取</div>
+            <div class="meta">14:00–18:00 · 待 PM 可改</div>
+          </div>
+          <div class="radio"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:15px;font-weight:500;margin-bottom:8px">商品明细</div>
+      <div class="row"><span>精瘦肉 ×1 斤</span><span>¥15.00</span></div>
+      <div class="row"><span>肋排 ×1 条</span><span>¥32.00</span></div>
+      <div style="height:1px;background:var(--border);margin:10px 0"></div>
+      <div class="row"><span>订单金额</span><span class="price" style="font-size:17px">¥47.00</span></div>
+      <div class="row"><span>定金应付</span><span class="price" style="font-size:17px">¥9.40</span></div>
+      <p class="muted" style="margin-top:6px">定金 = 订单金额 × 20%（订单满 10 元收取）</p>
+    </div>
+    <div class="card">
+      <div class="field" style="margin-bottom:0">
+        <label>备注（选填）</label>
+        <input type="text" placeholder="口味/切法偏好，选填"/>
+      </div>
+      <p class="tiny" style="margin-top:8px">备注将同步展示给店家（两端同一 remark）</p>
+    </div>
+    <div class="card">
+      <p class="tiny">未选时段不可提交。若订单金额 ≤10 元：显示「无需定金」，主按钮为「提交订单」，提交后直接进入成功帧再进详情。</p>
+    </div>
+  </div>
+  <div class="foot-safe">
+    <button class="btn-primary disabled" type="button" id="submitBtn" disabled>提交订单并支付定金</button>
+  </div>
+</div>
+<script>
+  const opts=document.querySelectorAll('.slot-opt');
+  const btn=document.getElementById('submitBtn');
+  opts.forEach(el=>{
+    el.onclick=()=>{
+      opts.forEach(o=>o.classList.remove('on'));
+      el.classList.add('on');
+      btn.disabled=false;
+      btn.classList.remove('disabled');
+    };
+  });
+</script>
+</body>
+</html>

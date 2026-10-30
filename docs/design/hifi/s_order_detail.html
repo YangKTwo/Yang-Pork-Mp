@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>店家订单详情 · S-ORDER-01 + S-ACT-03</title>
+<link rel="stylesheet" href="common.css"/>
+<style>
+  .req{color:var(--danger)}
+  .reason-err{font-size:12px;color:var(--danger);margin-top:4px;display:none}
+</style>
+</head>
+<body>
+<p class="page-label">高保真 · S-ORDER-01 + S-ACT-03 · 完整手机号 / 备货核销 / 代取消</p>
+<div class="phone">
+  <div class="status"><span>15:25</span><span>···· Wi‑Fi</span></div>
+  <div class="nav"><span class="back">←</span><div class="title">订单详情</div><span class="badge">预定</span></div>
+  <div class="content">
+    <div class="card" style="text-align:center">
+      <span class="badge">待备货</span>
+      <div class="pickup-code">
+        <div class="lbl">取货码</div>
+        <div class="code">382915</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row"><span class="muted">姓名</span><strong>张三</strong></div>
+      <div class="row"><span class="muted">手机</span><strong style="font-size:17px;letter-spacing:.5px">13812345678</strong></div>
+      <div class="row"><span class="muted">取货日</span><span>10月24日</span></div>
+      <div class="row"><span class="muted">取货时段</span><span class="badge">中午取 · 11:00–14:00</span></div>
+      <div class="row"><span class="muted">定金</span><span>已付 ¥9.40</span></div>
+      <div class="row"><span class="muted">备注</span><span>少放花椒</span></div>
+    </div>
+    <div class="card">
+      <div style="font-weight:500;margin-bottom:6px">明细</div>
+      <div class="row"><span>精瘦肉 ×1 斤</span><span>¥15.00</span></div>
+      <div class="row"><span>肋排 ×1 条</span><span>¥32.00</span></div>
+    </div>
+    <div style="padding:0 16px 8px">
+      <button class="btn-primary" type="button">标记已备货</button>
+      <p class="tiny" style="text-align:center;margin:10px 0">已备货后主按钮变为「确认核销（已取货）」</p>
+      <button class="btn-ghost-danger" type="button">取消订单</button>
+      <p class="tiny" style="text-align:center">店家代取消 · 不受顾客 22:00 窗限制 · 仅待备货/已备货</p>
+    </div>
+  </div>
+  <div class="mask">
+    <div class="sheet">
+      <div class="handle"></div>
+      <h3 style="text-align:center;font-size:17px;margin-bottom:8px">取消订单</h3>
+      <p class="muted" style="text-align:center;margin-bottom:12px">
+        店家代取消，<strong>不受</strong>顾客 22:00 自助取消限制。<br/>
+        取消后不可恢复；已付定金将<strong>原路退回</strong>。
+      </p>
+      <div class="field">
+        <label>取消原因 <span class="req">*</span>（必填）</label>
+        <textarea placeholder="请填写取消原因，例如：顾客电话要求取消 / 缺货无法履约"></textarea>
+        <div class="reason-err" style="display:block">请填写取消原因后再确认</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" type="button">再想想</button>
+        <button class="btn-primary disabled" type="button" style="background:var(--disabled)" disabled>确认取消</button>
+      </div>
+      <p class="tiny" style="text-align:center;margin-top:10px">原因为空时「确认取消」不可点（S-ACT-03）</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>
