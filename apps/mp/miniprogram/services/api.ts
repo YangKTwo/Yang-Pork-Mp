@@ -189,6 +189,11 @@ export const api = {
     return request<Order>('POST', `/orders/${id}/cancel`)
   },
 
+  async orderSubscribe(id: string, body: { accepted: boolean }) {
+    if (useMock()) return mockApi.orderSubscribe(id, body)
+    return request<Order>('POST', `/orders/${id}/subscribe`, body)
+  },
+
   async createPay(id: string) {
     if (useMock()) {
       return { payMode: 'mock' as const, prepay: { mockTicket: id } }

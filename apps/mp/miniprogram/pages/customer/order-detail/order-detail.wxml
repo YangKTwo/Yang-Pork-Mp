@@ -1,6 +1,10 @@
 <view class="page" wx:if="{{order}}">
   <view class="card" style="text-align:center">
     <van-tag type="primary" plain>{{statusText}}</van-tag>
+    <view wx:if="{{subscribeReminderOn}}" class="subscribe-reminder">
+      <text class="badge ok">{{subscribeBadge}}</text>
+      <view class="muted" style="margin-top:16rpx;text-align:center">{{subscribeHint}}</view>
+    </view>
     <!-- P0：取货码大号自定义块 -->
     <view class="pickup-code" wx:if="{{order.pickupCode}}">
       <view class="lbl">取货码</view>
@@ -27,6 +31,14 @@
     <van-cell title="订单金额" value="¥{{totalYuan}}" value-class="price" />
   </van-cell-group>
   <view style="padding:0 32rpx">
+    <van-button
+      wx:if="{{showSubscribeOffer}}"
+      type="primary"
+      plain
+      block
+      loading="{{subscribing}}"
+      bind:click="onEnableSubscribe"
+    >开启可取货提醒</van-button>
     <van-button wx:if="{{canCancel}}" type="danger" plain block bind:click="openCancel">取消订单</van-button>
     <view class="tiny" style="text-align:center;padding:16rpx 0 32rpx" wx:if="{{canCancel}}">
       仅下单当日 22:00（含）前可自助取消
