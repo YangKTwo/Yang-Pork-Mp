@@ -161,3 +161,9 @@ FE **不依赖** 此字段；保留供旧客户端或联调兼容。
 POST /orders/{id}/subscribe
 { "accepted": true }
 ```
+
+---
+
+## 4. 本地 / dev（H2）
+
+`apps/api` 使用文件 H2 + `ddl-auto: update`。合并含 `pickupSlot` / `subscribeStatus` 等列变更后，旧库可能未正确加列。本地联调前若异常，删除 `apps/api/data/pork_preorder*` 后重启 API（详见 `apps/api/README.md`）。
