@@ -3,6 +3,7 @@ package com.yangpork.api.repo;
 import com.yangpork.api.domain.OrderEntity;
 import com.yangpork.api.domain.OrderSource;
 import com.yangpork.api.domain.OrderStatus;
+import com.yangpork.api.domain.PickupSlot;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
