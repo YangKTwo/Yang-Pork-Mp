@@ -36,6 +36,8 @@ app:
     mode: ${WX_MODE:mock}   # mock | real
     app-id: ${WX_APP_ID:}
     app-secret: ${WX_APP_SECRET:}
+    subscribe:
+      prepared-template-id: ${WX_SUBSCRIBE_PREPARED_TEMPLATE_ID:}
   jwt:
     secret: "yang-pork-local-dev-secret-change-me-32bytes!!"
     expires-in-sec: 7200
@@ -55,6 +57,13 @@ app:
     deposit-threshold-fen: 1000
     deposit-rate-bps: 2000
     pay-timeout-sec: 600
+    default-pickup-slot: MORNING
+    pickup-slot-morning-label: "上午取"
+    pickup-slot-morning-hint: "08:00–11:00"
+    pickup-slot-noon-label: "中午取"
+    pickup-slot-noon-hint: "11:00–14:00"
+    pickup-slot-evening-label: "下午取"
+    pickup-slot-evening-hint: "14:00–18:00"
 
 springdoc:
   api-docs:

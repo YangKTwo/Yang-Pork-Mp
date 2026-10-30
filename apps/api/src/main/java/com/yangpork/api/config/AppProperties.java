@@ -31,6 +31,7 @@ public class AppProperties {
         private String mode = "mock";
         private String appId;
         private String appSecret;
+        private Subscribe subscribe = new Subscribe();
 
         public String getMode() { return mode; }
         public void setMode(String mode) { this.mode = mode; }
@@ -38,6 +39,15 @@ public class AppProperties {
         public void setAppId(String appId) { this.appId = appId; }
         public String getAppSecret() { return appSecret; }
         public void setAppSecret(String appSecret) { this.appSecret = appSecret; }
+        public Subscribe getSubscribe() { return subscribe; }
+        public void setSubscribe(Subscribe subscribe) { this.subscribe = subscribe; }
+
+        public static class Subscribe {
+            private String preparedTemplateId;
+
+            public String getPreparedTemplateId() { return preparedTemplateId; }
+            public void setPreparedTemplateId(String preparedTemplateId) { this.preparedTemplateId = preparedTemplateId; }
+        }
 
         public boolean isMockMode() {
             return mode == null || mode.isBlank() || "mock".equalsIgnoreCase(mode.trim());
@@ -75,6 +85,13 @@ public class AppProperties {
         private long depositThresholdFen = 1000;
         private int depositRateBps = 2000;
         private int payTimeoutSec = 600;
+        private String defaultPickupSlot = "MORNING";
+        private String pickupSlotMorningLabel = "上午取";
+        private String pickupSlotMorningHint = "08:00–11:00";
+        private String pickupSlotNoonLabel = "中午取";
+        private String pickupSlotNoonHint = "11:00–14:00";
+        private String pickupSlotEveningLabel = "下午取";
+        private String pickupSlotEveningHint = "14:00–18:00";
         public String getTimezone() { return timezone; }
         public void setTimezone(String timezone) { this.timezone = timezone; }
         public String getOrderWindowStart() { return orderWindowStart; }
@@ -91,5 +108,19 @@ public class AppProperties {
         public void setDepositRateBps(int depositRateBps) { this.depositRateBps = depositRateBps; }
         public int getPayTimeoutSec() { return payTimeoutSec; }
         public void setPayTimeoutSec(int payTimeoutSec) { this.payTimeoutSec = payTimeoutSec; }
+        public String getDefaultPickupSlot() { return defaultPickupSlot; }
+        public void setDefaultPickupSlot(String defaultPickupSlot) { this.defaultPickupSlot = defaultPickupSlot; }
+        public String getPickupSlotMorningLabel() { return pickupSlotMorningLabel; }
+        public void setPickupSlotMorningLabel(String pickupSlotMorningLabel) { this.pickupSlotMorningLabel = pickupSlotMorningLabel; }
+        public String getPickupSlotMorningHint() { return pickupSlotMorningHint; }
+        public void setPickupSlotMorningHint(String pickupSlotMorningHint) { this.pickupSlotMorningHint = pickupSlotMorningHint; }
+        public String getPickupSlotNoonLabel() { return pickupSlotNoonLabel; }
+        public void setPickupSlotNoonLabel(String pickupSlotNoonLabel) { this.pickupSlotNoonLabel = pickupSlotNoonLabel; }
+        public String getPickupSlotNoonHint() { return pickupSlotNoonHint; }
+        public void setPickupSlotNoonHint(String pickupSlotNoonHint) { this.pickupSlotNoonHint = pickupSlotNoonHint; }
+        public String getPickupSlotEveningLabel() { return pickupSlotEveningLabel; }
+        public void setPickupSlotEveningLabel(String pickupSlotEveningLabel) { this.pickupSlotEveningLabel = pickupSlotEveningLabel; }
+        public String getPickupSlotEveningHint() { return pickupSlotEveningHint; }
+        public void setPickupSlotEveningHint(String pickupSlotEveningHint) { this.pickupSlotEveningHint = pickupSlotEveningHint; }
     }
 }
