@@ -3,7 +3,7 @@
     <van-cell-group inset wx:for="{{list}}" wx:key="id" custom-class="order-group">
       <van-cell
         is-link
-        title="{{item.statusText}} · {{item.pickupDate}}"
+        title="{{item.statusText}} · {{item.pickupSlotText}}"
         label="{{item.summary}}"
         value="¥{{item.totalYuan}}{{item.pickupCode ? ' · 码 ' + item.pickupCode : ''}}"
         bind:click="goDetail"

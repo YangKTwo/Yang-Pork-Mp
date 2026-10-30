@@ -10,6 +10,7 @@
     <view class="muted" wx:elif="{{order.status === 'PENDING_PAY'}}" style="margin-top:24rpx">支付成功后生成取货码</view>
   </view>
   <van-cell-group inset>
+    <van-cell title="取货时段" value="{{pickupSlotText}}" />
     <van-cell title="取货日" value="{{order.pickupDate}}" />
     <van-cell title="取货方式" value="到店自取" />
     <van-cell title="定金" value="{{depositText}}" />

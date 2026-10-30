@@ -13,6 +13,19 @@
       <input value="{{pickupDate}}" bindinput="onDate" placeholder="YYYY-MM-DD" />
     </view>
     <view class="field">
+      <label>取货时段 <text class="req">*</text></label>
+      <view class="seg slot-seg manual-slot-seg">
+        <view
+          wx:for="{{slotOptions}}"
+          wx:key="code"
+          class="seg-item {{pickupSlot===item.code?'on':''}}"
+          data-slot="{{item.code}}"
+          bindtap="onPickSlot"
+        >{{item.label}}</view>
+      </view>
+      <view class="tiny slot-hint-inline" wx:if="{{slotHint}}">{{slotHint}}</view>
+    </view>
+    <view class="field">
       <label>商品（简化：选首个上架 SKU ×1）</label>
       <picker range="{{productNames}}" value="{{productIndex}}" bindchange="onPick">
         <view class="picker">{{productNames[productIndex] || '选择商品'}}</view>

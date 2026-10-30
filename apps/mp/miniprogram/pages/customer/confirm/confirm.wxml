@@ -3,6 +3,18 @@
     <van-cell title="取货日" value="{{pickupDate}}" />
     <van-cell title="取货方式" value="到店自取" />
   </van-cell-group>
+  <van-cell-group inset title="取货时段（必选）">
+    <view class="seg slot-seg">
+      <view
+        wx:for="{{slotOptions}}"
+        wx:key="code"
+        class="seg-item {{pickupSlot===item.code?'on':''}}"
+        data-slot="{{item.code}}"
+        bindtap="onPickSlot"
+      >{{item.label}}</view>
+    </view>
+    <view class="formula-hint slot-hint" wx:if="{{slotHint}}">{{slotHint}}</view>
+  </van-cell-group>
   <van-cell-group inset title="明细">
     <van-cell
       wx:for="{{lines}}"

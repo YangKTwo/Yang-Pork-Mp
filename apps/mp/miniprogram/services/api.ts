@@ -154,12 +154,17 @@ export const api = {
     )
   },
 
-  async createOrder(items: { productId: string; quantity: string }[], remark = '') {
-    if (useMock()) return mockApi.createOrder(items, remark)
+  async createOrder(
+    items: { productId: string; quantity: string }[],
+    remark = '',
+    pickupSlot: PickupSlot
+  ) {
+    if (useMock()) return mockApi.createOrder(items, remark, pickupSlot)
     return request<Order>('POST', '/orders', {
       idempotencyKey: `idem_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       items,
       remark,
+      pickupSlot,
     })
   },
 
@@ -197,7 +202,7 @@ export const api = {
   },
 
   async shopPreorderOrders(query?: Record<string, string>) {
-    if (useMock()) return mockApi.shopPreorderOrders()
+    if (useMock()) return mockApi.shopPreorderOrders(query)
     const qs = query
       ? '?' +
         Object.keys(query)
@@ -209,9 +214,15 @@ export const api = {
     )
   },
 
-  async shopManualOrders() {
-    if (useMock()) return mockApi.shopManualOrders()
-    return request<Order[] | { list: Order[] }>('GET', '/shop/orders/manual').then((d) =>
+  async shopManualOrders(query?: Record<string, string>) {
+    if (useMock()) return mockApi.shopManualOrders(query)
+    const qs = query
+      ? '?' +
+        Object.keys(query)
+          .map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(query[k])}`)
+          .join('&')
+      : ''
+    return request<Order[] | { list: Order[] }>(`GET`, `/shop/orders/manual${qs}`).then((d) =>
       Array.isArray(d) ? d : d.list
     )
   },
@@ -220,6 +231,7 @@ export const api = {
     realName: string
     phone: string
     pickupDate: string
+    pickupSlot: PickupSlot
     items: { productId: string; quantity: string }[]
     remark: string
     depositOffline: string
