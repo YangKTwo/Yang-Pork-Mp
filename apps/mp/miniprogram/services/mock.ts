@@ -1,5 +1,7 @@
 /** 本地假数据：无后端时可点通主路径。金额单位：分。 */
 
+import { FALLBACK_PICKUP_SLOTS, type PickupSlot } from '../utils/pickupSlot'
+
 const PRODUCTS: Product[] = [
   { id: 'prod_p01', skuCode: 'P01', name: '精瘦肉', unit: '斤', priceFen: 1500, status: 'ON_SHELF', remark: '炒菜常用', sort: 10 },
   { id: 'prod_p02', skuCode: 'P02', name: '前腿肉', unit: '斤', priceFen: 1200, status: 'ON_SHELF', remark: '', sort: 20 },
@@ -106,6 +108,9 @@ export const mockApi = {
       canOrderNow,
       serverNow: nowIso(),
       nextPickupDate: tomorrowDate(),
+      pickupSlots: FALLBACK_PICKUP_SLOTS.map((s) => ({ ...s })),
+      defaultPickupSlot: 'MORNING',
+      subscribePreparedTmplId: '',
     }
   },
 
@@ -117,7 +122,12 @@ export const mockApi = {
     return [...PRODUCTS].sort((a, b) => a.sort - b.sort)
   },
 
-  async createOrder(items: { productId: string; quantity: string }[], remark: string): Promise<Order> {
+  async createOrder(
+    items: { productId: string; quantity: string }[],
+    remark: string,
+    pickupSlot?: PickupSlot
+  ): Promise<Order> {
+    if (!pickupSlot) throw new Error('请选择取货时段')
     const cfg = await this.orderingConfig()
     const lines: OrderItem[] = items.map((it) => {
       const p = PRODUCTS.find((x) => x.id === it.productId)!
@@ -144,6 +154,7 @@ export const mockApi = {
       source: 'PREORDER',
       status,
       pickupDate: cfg.nextPickupDate,
+      pickupSlot,
       totalFen,
       depositFen,
       depositRequired,
@@ -183,22 +194,34 @@ export const mockApi = {
     return o
   },
 
-  async shopPreorderOrders(): Promise<Order[]> {
-    return orders.filter((o) => o.source === 'PREORDER')
+  async shopPreorderOrders(query?: Record<string, string>): Promise<Order[]> {
+    let list = orders.filter((o) => o.source === 'PREORDER')
+    const slot = query && query.pickupSlot
+    if (slot) {
+      list = list.filter((o) => o.pickupSlot === slot)
+    }
+    return list
   },
 
-  async shopManualOrders(): Promise<Order[]> {
-    return orders.filter((o) => o.source === 'MANUAL')
+  async shopManualOrders(query?: Record<string, string>): Promise<Order[]> {
+    let list = orders.filter((o) => o.source === 'MANUAL')
+    const slot = query && query.pickupSlot
+    if (slot) {
+      list = list.filter((o) => o.pickupSlot === slot)
+    }
+    return list
   },
 
   async createManual(body: {
     realName: string
     phone: string
     pickupDate: string
+    pickupSlot: PickupSlot
     items: { productId: string; quantity: string }[]
     remark: string
     depositOffline: string
   }): Promise<Order> {
+    if (!body.pickupSlot) throw new Error('请选择取货时段')
     const lines: OrderItem[] = body.items.map((it) => {
       const p = PRODUCTS.find((x) => x.id === it.productId)!
       const q = parseFloat(it.quantity)
@@ -217,6 +240,7 @@ export const mockApi = {
       source: 'MANUAL',
       status: 'PENDING_PREPARE',
       pickupDate: body.pickupDate,
+      pickupSlot: body.pickupSlot,
       totalFen,
       depositFen: 0,
       depositRequired: false,

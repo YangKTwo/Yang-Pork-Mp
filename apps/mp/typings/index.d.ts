@@ -50,6 +50,21 @@ interface Product {
   sort: number
 }
 
+type PickupSlot = 'MORNING' | 'NOON' | 'EVENING'
+
+type SubscribeStatus =
+  | 'NONE'
+  | 'ACCEPTED'
+  | 'SENT'
+  | 'SKIPPED_NO_AUTH'
+  | 'FAILED'
+
+interface OrderingPickupSlot {
+  code: PickupSlot
+  label: string
+  hint: string
+}
+
 interface OrderingConfig {
   timezone: string
   orderWindowStart: string
@@ -63,6 +78,10 @@ interface OrderingConfig {
   canOrderNow: boolean
   serverNow: string
   nextPickupDate: string
+  pickupSlots?: OrderingPickupSlot[]
+  defaultPickupSlot?: PickupSlot
+  /** F-SUB-01：空字符串时 FE 跳过订阅授权 */
+  subscribePreparedTmplId?: string
 }
 
 interface OrderItem {
@@ -80,6 +99,9 @@ interface Order {
   source: 'PREORDER' | 'MANUAL'
   status: string
   pickupDate: string
+  /** F-SLOT-01：MORNING|NOON|EVENING；迁移期历史单可能 null */
+  pickupSlot?: PickupSlot | null
+  subscribeStatus?: SubscribeStatus
   totalFen: number
   depositFen: number
   depositRequired: boolean

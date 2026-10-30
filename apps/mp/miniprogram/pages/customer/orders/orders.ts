@@ -1,16 +1,19 @@
 import { api } from '../../../services/api'
 import { fenToYuan, statusLabel } from '../../../utils/money'
+import { formatPickupSlotDisplay, resolvePickupSlots } from '../../../utils/pickupSlot'
 
 Page({
   data: { list: [] as any[] },
   async onShow() {
     try {
-      const orders = await api.listMyOrders()
+      const [orders, config] = await Promise.all([api.listMyOrders(), api.orderingConfig()])
+      const slotMeta = resolvePickupSlots(config)
       this.setData({
         list: orders.map((o) => ({
           id: o.id,
           statusText: statusLabel(o.status),
           pickupDate: o.pickupDate,
+          pickupSlotText: formatPickupSlotDisplay(o.pickupDate, o.pickupSlot, slotMeta),
           totalYuan: fenToYuan(o.totalFen),
           pickupCode: o.pickupCode,
           summary:

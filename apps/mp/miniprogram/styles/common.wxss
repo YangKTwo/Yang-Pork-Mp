@@ -211,6 +211,34 @@
   color: #C62828;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
 }
+.slot-seg {
+  margin-top: 8rpx;
+}
+.manual-slot-seg {
+  margin: 12rpx 0 0;
+}
+.slot-hint-inline {
+  margin-top: 12rpx;
+  color: #999;
+}
+.slot-hint {
+  margin: 8rpx 32rpx 20rpx;
+}
+.slot-filter-scroll {
+  white-space: nowrap;
+  margin-bottom: 8rpx;
+}
+.slot-filter-seg {
+  display: inline-flex;
+  min-width: 100%;
+  margin: 0 32rpx 16rpx;
+  box-sizing: border-box;
+}
+.slot-filter-seg .seg-item {
+  flex: none;
+  padding-left: 24rpx;
+  padding-right: 24rpx;
+}
 .formula-hint {
   font-size: 24rpx;
   color: #999;
