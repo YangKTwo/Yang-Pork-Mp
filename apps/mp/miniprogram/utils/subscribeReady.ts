@@ -58,9 +58,11 @@ function isMockMode(): boolean {
 /** T21/T22 scene：入口场景（模板仍为备货完成 subscribePreparedTmplId） */
 export type SubscribeTrackScene = 'after_order' | 'order_detail'
 
-function subscribeAuthResultFromWxStatus(wxStatus: string): 'accept' | 'reject' {
+function subscribeAuthResultFromWxStatus(
+  wxStatus: string
+): 'accept' | 'reject' | 'ban' {
   if (wxStatus === 'accept') return 'accept'
-  // reject / ban 等同桶（docs/08 §3.3）
+  if (wxStatus === 'ban') return 'ban'
   return 'reject'
 }
 
@@ -76,7 +78,7 @@ function trackAuthResult(
   orderId: string,
   tmplId: string,
   scene: SubscribeTrackScene,
-  result: 'accept' | 'reject' | 'fail' | 'mock_accept',
+  result: 'accept' | 'reject' | 'ban' | 'fail' | 'mock_accept',
   wxStatus?: string
 ) {
   track(
