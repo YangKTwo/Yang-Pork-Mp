@@ -110,7 +110,7 @@ export const mockApi = {
       nextPickupDate: tomorrowDate(),
       pickupSlots: FALLBACK_PICKUP_SLOTS.map((s) => ({ ...s })),
       defaultPickupSlot: 'MORNING',
-      subscribePreparedTmplId: '',
+      subscribePreparedTmplId: 'mock-config-subscribe-prepared-tmpl',
     }
   },
 
@@ -165,9 +165,17 @@ export const mockApi = {
       realName: mockUser.realName || undefined,
       phone: mockUser.phone || undefined,
       remark,
+      subscribeStatus: 'NONE',
     }
     orders.unshift(order)
     return order
+  },
+
+  async orderSubscribe(id: string, body: { accepted: boolean }): Promise<Order> {
+    const o = orders.find((x) => x.id === id)
+    if (!o) throw new Error('订单不存在')
+    o.subscribeStatus = body.accepted ? 'ACCEPTED' : 'NONE'
+    return o
   },
 
   async listMyOrders(): Promise<Order[]> {
@@ -191,6 +199,7 @@ export const mockApi = {
     o.status = 'PENDING_PREPARE'
     o.pickupCode = genPickupCode()
     o.payExpireAt = null
+    if (o.subscribeStatus === undefined) o.subscribeStatus = 'NONE'
     return o
   },
 
@@ -261,6 +270,9 @@ export const mockApi = {
     const o = orders.find((x) => x.id === id)
     if (!o) throw new Error('订单不存在')
     o.status = 'PREPARED'
+    if (o.subscribeStatus === 'ACCEPTED') {
+      o.subscribeStatus = 'SENT'
+    }
     return o
   },
 

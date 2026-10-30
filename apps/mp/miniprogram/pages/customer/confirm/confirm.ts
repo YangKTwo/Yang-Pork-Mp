@@ -9,6 +9,7 @@ import {
   type PickupSlot,
   type PickupSlotMeta,
 } from '../../../utils/pickupSlot'
+import { runPreparedSubscribeFlow } from '../../../utils/subscribeReady'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
 Page({
@@ -119,6 +120,7 @@ Page({
       if (order.depositRequired && order.status === 'PENDING_PAY') {
         wx.redirectTo({ url: `/pages/customer/pay-pending/pay-pending?id=${order.id}` })
       } else {
+        await runPreparedSubscribeFlow(order.id)
         wx.redirectTo({ url: `/pages/customer/order-detail/order-detail?id=${order.id}` })
       }
     } catch (e: any) {

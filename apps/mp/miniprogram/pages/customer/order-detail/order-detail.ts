@@ -1,6 +1,12 @@
 import { api } from '../../../services/api'
 import { fenToYuan, lineItemYuan, statusLabel } from '../../../utils/money'
 import { formatPickupSlotDisplay, resolvePickupSlots } from '../../../utils/pickupSlot'
+import {
+  canOfferPreparedSubscribe,
+  isSubscribeReminderActive,
+  runPreparedSubscribeFlow,
+  subscribeReminderCopy,
+} from '../../../utils/subscribeReady'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
 Page({
@@ -14,6 +20,11 @@ Page({
     canCancel: false,
     showCancel: false,
     cancelling: false,
+    subscribeReminderOn: false,
+    subscribeBadge: '',
+    subscribeHint: '',
+    showSubscribeOffer: false,
+    subscribing: false,
   },
   onLoad(q: Record<string, string | undefined>) {
     this.setData({ id: q.id || '' })
@@ -40,6 +51,13 @@ Page({
             ? `待付 ¥${fenToYuan(order.depositFen)}`
             : `已付 ¥${fenToYuan(order.depositFen)}`
       }
+      const reminderOn = isSubscribeReminderActive(order.subscribeStatus)
+      const copy = subscribeReminderCopy(order.subscribeStatus)
+      const offerSubscribe =
+        order.status === 'PENDING_PREPARE' &&
+        !reminderOn &&
+        (order.subscribeStatus === 'NONE' || order.subscribeStatus == null) &&
+        (await canOfferPreparedSubscribe())
       this.setData({
         order: { ...order, items },
         statusText: statusLabel(order.status),
@@ -47,6 +65,10 @@ Page({
         depositText,
         pickupSlotText: formatPickupSlotDisplay(order.pickupDate, order.pickupSlot, slotMeta),
         canCancel,
+        subscribeReminderOn: reminderOn,
+        subscribeBadge: copy.badge,
+        subscribeHint: copy.hint,
+        showSubscribeOffer: offerSubscribe,
       })
       track(TrackEvents.ORDER_DETAIL_VIEW, {
         order_id: order.id,
@@ -54,9 +76,20 @@ Page({
         has_pickup_code: !!order.pickupCode,
         need_deposit: order.depositRequired,
         source: order.source,
+        subscribe_status: order.subscribeStatus || 'NONE',
       }, 'C-DETAIL-01')
     } catch (e: any) {
       wx.showToast({ title: e.message || '加载失败', icon: 'none' })
+    }
+  },
+  async onEnableSubscribe() {
+    if (this.data.subscribing) return
+    this.setData({ subscribing: true })
+    try {
+      await runPreparedSubscribeFlow(this.data.id)
+      await this.load()
+    } finally {
+      this.setData({ subscribing: false })
     }
   },
   openCancel() {

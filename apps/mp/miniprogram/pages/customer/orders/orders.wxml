@@ -4,7 +4,7 @@
       <van-cell
         is-link
         title="{{item.statusText}} · {{item.pickupSlotText}}"
-        label="{{item.summary}}"
+        label="{{item.subscribeReminderOn ? item.subscribeBadge + ' · ' + item.summary : item.summary}}"
         value="¥{{item.totalYuan}}{{item.pickupCode ? ' · 码 ' + item.pickupCode : ''}}"
         bind:click="goDetail"
         data-id="{{item.id}}"
