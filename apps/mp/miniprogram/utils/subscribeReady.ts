@@ -55,10 +55,19 @@ function isMockMode(): boolean {
   }
 }
 
-function trackAuthPrompt(orderId: string, tmplId: string) {
+/** T21/T22 scene：入口场景（模板仍为备货完成 subscribePreparedTmplId） */
+export type SubscribeTrackScene = 'after_order' | 'order_detail'
+
+function subscribeAuthResultFromWxStatus(wxStatus: string): 'accept' | 'reject' {
+  if (wxStatus === 'accept') return 'accept'
+  // reject / ban 等同桶（docs/08 §3.3）
+  return 'reject'
+}
+
+function trackAuthPrompt(orderId: string, tmplId: string, scene: SubscribeTrackScene) {
   track(
     TrackEvents.SUBSCRIBE_AUTH_PROMPT,
-    { order_id: orderId, tmpl_id: tmplId, scene: 'prepared' },
+    { order_id: orderId, tmpl_id: tmplId, scene },
     'T21'
   )
 }
@@ -66,6 +75,7 @@ function trackAuthPrompt(orderId: string, tmplId: string) {
 function trackAuthResult(
   orderId: string,
   tmplId: string,
+  scene: SubscribeTrackScene,
   result: 'accept' | 'reject' | 'fail' | 'mock_accept',
   wxStatus?: string
 ) {
@@ -74,7 +84,7 @@ function trackAuthResult(
     {
       order_id: orderId,
       tmpl_id: tmplId,
-      scene: 'prepared',
+      scene,
       result,
       ...(wxStatus ? { wx_status: wxStatus } : {}),
     },
@@ -82,29 +92,57 @@ function trackAuthResult(
   )
 }
 
-/** 用户点击链路内：结账成功后拉起授权并 POST /orders/{id}/subscribe */
-export async function runPreparedSubscribeFlow(orderId: string): Promise<Order | null> {
+/** 详情页「开启提醒」CTA 曝光（view），不含授权弹窗 */
+export async function trackSubscribeOfferExposure(
+  orderId: string,
+  scene: SubscribeTrackScene = 'order_detail'
+): Promise<void> {
+  const tmplId = await loadPreparedTmplId()
+  if (!tmplId) return
+  trackAuthPrompt(orderId, tmplId, scene)
+}
+
+export function isSubscribeOfferRetryable(status: SubscribeStatus | undefined | null): boolean {
+  return (
+    status === 'NONE' ||
+    status == null ||
+    status === 'FAILED' ||
+    status === 'SKIPPED_NO_AUTH'
+  )
+}
+
+/** 用户点击链路内：拉起授权并 POST /orders/{id}/subscribe */
+export async function runPreparedSubscribeFlow(
+  orderId: string,
+  scene: SubscribeTrackScene = 'after_order'
+): Promise<Order | null> {
   const tmplId = await loadPreparedTmplId()
   if (!tmplId) return null
 
-  trackAuthPrompt(orderId, tmplId)
+  trackAuthPrompt(orderId, tmplId, scene)
 
   let accepted = false
   if (isMockMode()) {
     accepted = true
-    trackAuthResult(orderId, tmplId, 'mock_accept', 'accept')
+    trackAuthResult(orderId, tmplId, scene, 'mock_accept', 'accept')
   } else {
     accepted = await new Promise<boolean>((resolve) => {
       ;(wx as WxWithSubscribe).requestSubscribeMessage({
         tmplIds: [tmplId],
         success: (res) => {
           const wxStatus = String(res[tmplId] || '')
-          const ok = res[tmplId] === 'accept'
-          trackAuthResult(orderId, tmplId, ok ? 'accept' : 'reject', wxStatus)
+          const ok = wxStatus === 'accept'
+          trackAuthResult(
+            orderId,
+            tmplId,
+            scene,
+            subscribeAuthResultFromWxStatus(wxStatus),
+            wxStatus
+          )
           resolve(ok)
         },
         fail: (err) => {
-          trackAuthResult(orderId, tmplId, 'fail', err.errMsg || 'wx_fail')
+          trackAuthResult(orderId, tmplId, scene, 'fail', err.errMsg || 'wx_fail')
           resolve(false)
         },
       })

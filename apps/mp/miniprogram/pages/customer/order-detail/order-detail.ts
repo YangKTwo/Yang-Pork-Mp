@@ -4,8 +4,10 @@ import { formatPickupSlotDisplay, resolvePickupSlots } from '../../../utils/pick
 import {
   canOfferPreparedSubscribe,
   isSubscribeReminderActive,
+  isSubscribeOfferRetryable,
   runPreparedSubscribeFlow,
   subscribeReminderCopy,
+  trackSubscribeOfferExposure,
 } from '../../../utils/subscribeReady'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
@@ -56,7 +58,7 @@ Page({
       const offerSubscribe =
         order.status === 'PENDING_PREPARE' &&
         !reminderOn &&
-        (order.subscribeStatus === 'NONE' || order.subscribeStatus == null) &&
+        isSubscribeOfferRetryable(order.subscribeStatus) &&
         (await canOfferPreparedSubscribe())
       this.setData({
         order: { ...order, items },
@@ -70,6 +72,9 @@ Page({
         subscribeHint: copy.hint,
         showSubscribeOffer: offerSubscribe,
       })
+      if (offerSubscribe) {
+        await trackSubscribeOfferExposure(order.id, 'order_detail')
+      }
       track(TrackEvents.ORDER_DETAIL_VIEW, {
         order_id: order.id,
         status: order.status,
@@ -86,7 +91,7 @@ Page({
     if (this.data.subscribing) return
     this.setData({ subscribing: true })
     try {
-      await runPreparedSubscribeFlow(this.data.id)
+      await runPreparedSubscribeFlow(this.data.id, 'order_detail')
       await this.load()
     } finally {
       this.setData({ subscribing: false })
