@@ -97,9 +97,10 @@ Page({
     const full = !!e.currentTarget.dataset.full
     if (full) {
       showPickupSlotFullFeedback({
-        source: 'shop_manual',
+        source: 'manual',
         pickup_slot: slot,
         pickup_date: this.data.pickupDate,
+        slotMeta: findSlotMeta(this.data.slotOptions, slot),
       })
       return
     }
@@ -122,9 +123,10 @@ Page({
     const slotMeta = findSlotMeta(this.data.slotOptions, pickupSlot)
     if (slotMeta?.full) {
       showPickupSlotFullFeedback({
-        source: 'shop_manual',
+        source: 'manual',
         pickup_slot: pickupSlot,
         pickup_date: pickupDate,
+        slotMeta,
       })
       return
     }
@@ -161,10 +163,11 @@ Page({
     } catch (e: any) {
       if (isSlotFullBizError(e)) {
         showPickupSlotFullFeedback({
-          source: 'shop_manual',
+          source: 'manual',
           pickup_slot: pickupSlot,
           pickup_date: pickupDate,
           message: slotFullUserMessage(e),
+          slotMeta,
         })
       } else {
         wx.showToast({ title: e.message || '创建失败', icon: 'none' })

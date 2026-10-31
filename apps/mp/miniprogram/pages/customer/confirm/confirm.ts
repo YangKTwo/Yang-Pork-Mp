@@ -108,9 +108,10 @@ Page({
     const full = !!e.currentTarget.dataset.full
     if (full) {
       showPickupSlotFullFeedback({
-        source: 'customer_confirm',
+        source: 'confirm',
         pickup_slot: slot,
         pickup_date: this.data.pickupDate,
+        slotMeta: findSlotMeta(this.data.slotOptions, slot),
       })
       return
     }
@@ -135,9 +136,10 @@ Page({
     const slotMeta = findSlotMeta(this.data.slotOptions, this.data.pickupSlot)
     if (slotMeta?.full) {
       showPickupSlotFullFeedback({
-        source: 'customer_confirm',
+        source: 'submit',
         pickup_slot: this.data.pickupSlot,
         pickup_date: this.data.pickupDate,
+        slotMeta,
       })
       return
     }
@@ -178,10 +180,11 @@ Page({
       const failReason = isSlotFullBizError(e) ? 'slot_full' : e.message || 'submit_fail'
       if (isSlotFullBizError(e)) {
         showPickupSlotFullFeedback({
-          source: 'customer_confirm',
+          source: 'submit',
           pickup_slot: this.data.pickupSlot,
           pickup_date: this.data.pickupDate,
           message: slotFullUserMessage(e),
+          slotMeta,
         })
       } else {
         wx.showToast({ title: e.message || '下单失败', icon: 'none' })
