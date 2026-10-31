@@ -14,6 +14,7 @@ export const TrackEvents = {
   // P1
   PAY_MOCK_FAIL: 'pay_mock_fail',
   ORDER_CLOSED_TIMEOUT: 'order_closed_timeout',
+  ORDER_CLOSED_NO_PICKUP: 'order_closed_no_pickup',
   ORDER_CANCEL: 'order_cancel',
   SHOP_PREPARE: 'shop_prepare',
   PICKUP_VERIFY_FAIL: 'pickup_verify_fail',
