@@ -1,7 +1,8 @@
 import { api } from '../../../services/api'
 import {
   isNoPickupClosed,
-  orderStatusDisplayText,
+  orderClosedDetailNote,
+  orderDetailStatusTag,
   trackOrderClosedNoPickupOnce,
 } from '../../../utils/orderClose'
 import { fenToYuan, lineItemYuan } from '../../../utils/money'
@@ -21,6 +22,7 @@ Page({
     id: '',
     order: null as any,
     statusText: '',
+    closedDetailNote: '',
     totalYuan: '0.00',
     depositText: '',
     pickupSlotText: '',
@@ -67,7 +69,8 @@ Page({
         (await canOfferPreparedSubscribe())
       this.setData({
         order: { ...order, items },
-        statusText: orderStatusDisplayText(order),
+        statusText: orderDetailStatusTag(order),
+        closedDetailNote: orderClosedDetailNote(order),
         totalYuan: fenToYuan(order.totalFen),
         depositText,
         pickupSlotText: formatPickupSlotDisplay(order.pickupDate, order.pickupSlot, slotMeta),
