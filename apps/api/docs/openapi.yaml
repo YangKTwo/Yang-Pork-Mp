@@ -61,13 +61,38 @@ paths:
   /api/v1/config/ordering:
     get:
       security: [{ bearerAuth: [] }]
+      summary: Ordering config; pickupSlots include capacity/occupied/remaining/full
+      parameters:
+        - in: query
+          name: pickupDate
+          required: false
+          description: YYYY-MM-DD used for remaining/full. Default is nextPickupDate. Echoed as pickupDateForSlots.
+          schema: { type: string, format: date }
       responses:
-        "200": { description: ordering config }
+        "200":
+          description: ordering config plus defaultSlotCapacity and per-slot capacity fields
   /api/v1/admin/config/ordering:
     put:
       security: [{ bearerAuth: [] }]
+      summary: Partial update. defaultSlotCapacity keys are optional positive ints (MORNING/NOON/EVENING).
       responses:
-        "200": { description: updated }
+        "200": { description: updated ordering view }
+  /api/v1/admin/config/slot-capacity:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: ADMIN day overrides and effective remaining
+      parameters:
+        - in: query
+          name: pickupDate
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        "200": { description: pickupDate, defaultSlotCapacity, overrides, effective }
+    put:
+      security: [{ bearerAuth: [] }]
+      summary: ADMIN upsert day overrides. Null capacity deletes one slot. clearAll true wipes the day.
+      responses:
+        "200": { description: same shape as GET }
   /api/v1/products:
     get:
       security: [{ bearerAuth: [] }]
@@ -119,9 +144,9 @@ paths:
         "200": { description: my orders }
     post:
       security: [{ bearerAuth: [] }]
-      summary: Create PREORDER (window 12:00-22:00 Asia/Shanghai)
+      summary: Create PREORDER (window 12:00-22:00 Asia/Shanghai). No-deposit path rejects code 40013 when the slot is full.
       responses:
-        "200": { description: order }
+        "200": { description: order, or code 40013 该时段已约满 }
   /api/v1/orders/{id}:
     get:
       security: [{ bearerAuth: [] }]
@@ -161,7 +186,8 @@ paths:
           required: true
           schema: { type: string }
       responses:
-        "200": { description: paid -> PENDING_PREPARE }
+        "200":
+          description: paid -> PENDING_PREPARE, or code 40013 with the order CLOSED and closeReason SLOT_FULL_ON_PAY
   /api/v1/shop/orders/preorder:
     get:
       security: [{ bearerAuth: [] }]
@@ -175,7 +201,7 @@ paths:
     post:
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: created manual }
+        "200": { description: created manual, or code 40013 when the slot is full }
   /api/v1/shop/orders/{id}/prepare:
     post:
       security: [{ bearerAuth: [] }]

@@ -40,4 +40,7 @@ public interface OrderRepository extends JpaRepository<OrderEntity, String> {
     List<OrderEntity> findByStatusInAndPickupDateBefore(Collection<OrderStatus> statuses, LocalDate pickupDate);
 
     List<OrderEntity> findByStatusInAndPickupDateLessThanEqual(Collection<OrderStatus> statuses, LocalDate pickupDate);
+
+    long countByPickupDateAndPickupSlotAndStatusIn(LocalDate pickupDate, PickupSlot pickupSlot,
+                                                    Collection<OrderStatus> statuses);
 }

@@ -6,6 +6,7 @@ public final class ErrorCodes {
     public static final int OUTSIDE_WINDOW = 40010;
     public static final int CANNOT_CANCEL = 40011;
     public static final int BAD_STATUS = 40012;
+    public static final int SLOT_FULL = 40013;
     public static final int UNAUTH = 40101;
     public static final int FORBIDDEN = 40301;
     public static final int PAY_FAIL = 40201;

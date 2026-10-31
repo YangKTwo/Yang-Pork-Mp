@@ -15,7 +15,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -42,12 +45,14 @@ public class OrderService {
     private final AppProperties props;
     private final UserRepository userRepository;
     private final WeChatSubscribeMessageService subscribeMessageService;
+    private final TransactionTemplate slotPayTx;
 
     public OrderService(OrderRepository orderRepository, RefundLedgerRepository refundLedgerRepository,
                         OrderItemRepository orderItemRepository,
                         ProductService productService, ConfigService configService, AuthService authService,
                         TimeSupport timeSupport, IdGenerator idGenerator, AppProperties props,
-                        UserRepository userRepository, WeChatSubscribeMessageService subscribeMessageService) {
+                        UserRepository userRepository, WeChatSubscribeMessageService subscribeMessageService,
+                        PlatformTransactionManager transactionManager) {
         this.orderRepository = orderRepository;
         this.refundLedgerRepository = refundLedgerRepository;
         this.orderItemRepository = orderItemRepository;
@@ -59,6 +64,8 @@ public class OrderService {
         this.props = props;
         this.userRepository = userRepository;
         this.subscribeMessageService = subscribeMessageService;
+        this.slotPayTx = new TransactionTemplate(transactionManager);
+        this.slotPayTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 
     @Transactional
@@ -104,6 +111,9 @@ public class OrderService {
         long total = lines.stream().mapToLong(OrderItemEntity::getLineTotalFen).sum();
         order.setTotalFen(total);
         applyDeposit(order, cfg, total, now.toInstant());
+        if (order.getStatus() == OrderStatus.PENDING_PREPARE) {
+            configService.assertSlotAvailable(order.getPickupDate(), order.getPickupSlot());
+        }
 
         orderRepository.save(order);
         orderItemRepository.saveAll(lines);
@@ -234,8 +244,15 @@ public class OrderService {
         return data;
     }
 
-    @Transactional
     public Map<String, Object> mockPaySuccess(AuthUser auth, String id) {
+        PayOutcome outcome = slotPayTx.execute(status -> applyMockPaySuccess(auth, id));
+        if (outcome != null && outcome.slotFull()) {
+            throw new BizException(ErrorCodes.SLOT_FULL, "该时段已约满");
+        }
+        return outcome == null ? null : outcome.view();
+    }
+
+    private PayOutcome applyMockPaySuccess(AuthUser auth, String id) {
         if (!"mock".equalsIgnoreCase(props.getPayMode())) {
             throw new BizException(ErrorCodes.PAY_FAIL, "仅 mock 模式可用");
         }
@@ -243,13 +260,26 @@ public class OrderService {
         if (o.getStatus() != OrderStatus.PENDING_PAY) {
             throw new BizException(ErrorCodes.BAD_STATUS, "非待支付状态");
         }
+        if (configService.isSlotFull(o.getPickupDate(), o.getPickupSlot())) {
+            closeSlotFullOnPay(o);
+            return PayOutcome.full();
+        }
         o.setStatus(OrderStatus.PENDING_PREPARE);
         o.setDepositPaid(true);
         o.setPickupCode(idGenerator.pickupCode());
         o.setPayExpireAt(null);
         o.setUpdatedAt(Instant.now());
         orderRepository.save(o);
-        return toView(o, true);
+        return PayOutcome.ok(toView(o, true));
+    }
+
+    private void closeSlotFullOnPay(OrderEntity o) {
+        Instant now = Instant.now();
+        if (o.getDepositFen() > 0) {
+            o.setDepositPaid(true);
+        }
+        o.setPayExpireAt(null);
+        closeWithReason(o, CloseReason.SLOT_FULL_ON_PAY, now);
     }
 
     @Transactional
@@ -294,6 +324,7 @@ public class OrderService {
         order.setUpdatedAt(Instant.now());
         List<OrderItemEntity> lines = buildLines(order.getId(), items);
         order.setTotalFen(lines.stream().mapToLong(OrderItemEntity::getLineTotalFen).sum());
+        configService.assertSlotAvailable(order.getPickupDate(), order.getPickupSlot());
         orderRepository.save(order);
         orderItemRepository.saveAll(lines);
         return toView(order, true);
@@ -600,6 +631,11 @@ public class OrderService {
             return null;
         }
         return instant.atZone(ZoneIdShanghai()).toOffsetDateTime().toString();
+    }
+
+    private record PayOutcome(boolean slotFull, Map<String, Object> view) {
+        static PayOutcome full() { return new PayOutcome(true, null); }
+        static PayOutcome ok(Map<String, Object> view) { return new PayOutcome(false, view); }
     }
 
     private java.time.ZoneId ZoneIdShanghai() {
