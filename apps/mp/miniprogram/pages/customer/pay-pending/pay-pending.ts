@@ -1,5 +1,12 @@
 import { api } from '../../../services/api'
 import { fenToYuan } from '../../../utils/money'
+import { pickupSlotTrackValue, resolvePickupSlots, type PickupSlotMeta } from '../../../utils/pickupSlot'
+import {
+  findSlotMeta,
+  isSlotFullBizError,
+  showPickupSlotFullFeedback,
+  slotFullUserMessage,
+} from '../../../utils/slotCapacity'
 import { runPreparedSubscribeFlow } from '../../../utils/subscribeReady'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
@@ -13,8 +20,11 @@ Page({
     loading: false,
     depositFen: 0,
     amountFen: 0,
+    pickupDate: '',
+    pickupSlot: '' as PickupSlot | '',
   },
   _timer: 0 as any,
+  _paySlotMeta: null as PickupSlotMeta | null | undefined,
   async onLoad(q: Record<string, string | undefined>) {
     this.setData({ id: q.id || '' })
   },
@@ -28,7 +38,18 @@ Page({
         formulaText: order.depositFormulaText,
         depositFen: order.depositFen,
         amountFen: order.totalFen,
+        pickupDate: order.pickupDate,
+        pickupSlot: order.pickupSlot || '',
       })
+      if (order.pickupDate && order.pickupSlot) {
+        try {
+          const cfg = await api.orderingConfig(order.pickupDate)
+          const slots = resolvePickupSlots(cfg)
+          this._paySlotMeta = findSlotMeta(slots, order.pickupSlot) || null
+        } catch (_e) {
+          this._paySlotMeta = null
+        }
+      }
       track(TrackEvents.PAY_PAGE_VIEW, {
         order_id: order.id,
         deposit_fen: order.depositFen,
@@ -84,13 +105,28 @@ Page({
       await runPreparedSubscribeFlow(order.id)
       wx.redirectTo({ url: `/pages/customer/order-detail/order-detail?id=${order.id}` })
     } catch (e: any) {
-      track(TrackEvents.PAY_MOCK_FAIL, {
-        order_id: this.data.id,
-        result: 'fail',
-        fail_reason: e.message || 'pay_fail',
-        deposit_fen: this.data.depositFen,
-      }, 'C-PAY-02')
-      wx.showToast({ title: e.message || '支付失败', icon: 'none' })
+      if (isSlotFullBizError(e)) {
+        showPickupSlotFullFeedback({
+          source: 'pay',
+          pickup_slot: this.data.pickupSlot,
+          pickup_date: this.data.pickupDate,
+          message: slotFullUserMessage(e),
+          slotMeta: this._paySlotMeta,
+        })
+      } else {
+        wx.showToast({ title: e.message || '支付失败', icon: 'none' })
+        track(
+          TrackEvents.PAY_MOCK_FAIL,
+          {
+            order_id: this.data.id,
+            result: 'fail',
+            fail_reason: e.message || 'pay_fail',
+            deposit_fen: this.data.depositFen,
+            pickup_slot: pickupSlotTrackValue(this.data.pickupSlot),
+          },
+          'C-PAY-02'
+        )
+      }
     } finally {
       this.setData({ loading: false })
     }

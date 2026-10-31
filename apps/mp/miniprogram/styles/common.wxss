@@ -211,6 +211,26 @@
   color: #C62828;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
 }
+.seg .seg-item.disabled {
+  opacity: 0.45;
+  color: #999;
+}
+.seg .seg-item.disabled.on {
+  background: transparent;
+  color: #999;
+  box-shadow: none;
+}
+.slot-full-tag {
+  margin-left: 8rpx;
+  vertical-align: middle;
+}
+.slot-filter-seg .seg-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4rpx;
+}
 .slot-seg {
   margin-top: 8rpx;
 }
