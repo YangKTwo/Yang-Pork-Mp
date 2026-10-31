@@ -1,5 +1,6 @@
 import { api } from '../../../services/api'
-import { fenToYuan, lineItemYuan, statusLabel } from '../../../utils/money'
+import { orderStatusDisplayText } from '../../../utils/orderClose'
+import { fenToYuan, lineItemYuan } from '../../../utils/money'
 import { formatPickupSlotDisplay, resolvePickupSlots } from '../../../utils/pickupSlot'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
@@ -45,7 +46,7 @@ Page({
       }
       this.setData({
         order: { ...order, items },
-        statusText: statusLabel(order.status),
+        statusText: orderStatusDisplayText(order),
         depositText,
         pickupSlotText: formatPickupSlotDisplay(order.pickupDate, order.pickupSlot, slotMeta),
         canShopCancel,

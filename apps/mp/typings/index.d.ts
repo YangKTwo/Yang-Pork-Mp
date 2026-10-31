@@ -114,6 +114,9 @@ interface Order {
   remark?: string
   cancelReason?: string
   depositOffline?: string
+  /** F-NOSHOW-01：CLOSED 时关单原因 */
+  closeReason?: 'PAY_TIMEOUT' | 'NO_PICKUP' | 'SLOT_FULL_ON_PAY' | null
+  closedAt?: string | null
 }
 
 interface CartLine {
