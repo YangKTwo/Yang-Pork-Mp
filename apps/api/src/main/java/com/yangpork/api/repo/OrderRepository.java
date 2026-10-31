@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,4 +36,8 @@ public interface OrderRepository extends JpaRepository<OrderEntity, String> {
                                  Pageable pageable);
 
     List<OrderEntity> findByStatusAndPayExpireAtBefore(OrderStatus status, Instant before);
+
+    List<OrderEntity> findByStatusInAndPickupDateBefore(Collection<OrderStatus> statuses, LocalDate pickupDate);
+
+    List<OrderEntity> findByStatusInAndPickupDateLessThanEqual(Collection<OrderStatus> statuses, LocalDate pickupDate);
 }

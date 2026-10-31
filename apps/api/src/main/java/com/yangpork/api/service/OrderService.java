@@ -6,6 +6,7 @@ import com.yangpork.api.config.AppProperties;
 import com.yangpork.api.domain.*;
 import com.yangpork.api.repo.OrderItemRepository;
 import com.yangpork.api.repo.OrderRepository;
+import com.yangpork.api.repo.RefundLedgerRepository;
 import com.yangpork.api.repo.UserRepository;
 import com.yangpork.api.security.AuthUser;
 import org.slf4j.Logger;
@@ -27,8 +28,11 @@ import java.util.*;
 @Service
 public class OrderService {
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
+    private static final List<OrderStatus> NO_PICKUP_STATUSES = List.of(
+            OrderStatus.PENDING_PREPARE, OrderStatus.PREPARED);
 
     private final OrderRepository orderRepository;
+    private final RefundLedgerRepository refundLedgerRepository;
     private final OrderItemRepository orderItemRepository;
     private final ProductService productService;
     private final ConfigService configService;
@@ -39,11 +43,13 @@ public class OrderService {
     private final UserRepository userRepository;
     private final WeChatSubscribeMessageService subscribeMessageService;
 
-    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository,
+    public OrderService(OrderRepository orderRepository, RefundLedgerRepository refundLedgerRepository,
+                        OrderItemRepository orderItemRepository,
                         ProductService productService, ConfigService configService, AuthService authService,
                         TimeSupport timeSupport, IdGenerator idGenerator, AppProperties props,
                         UserRepository userRepository, WeChatSubscribeMessageService subscribeMessageService) {
         this.orderRepository = orderRepository;
+        this.refundLedgerRepository = refundLedgerRepository;
         this.orderItemRepository = orderItemRepository;
         this.productService = productService;
         this.configService = configService;
@@ -438,16 +444,92 @@ public class OrderService {
         return toView(o, true);
     }
 
+    /**
+     * 每 15 秒扫一次。时区取 ordering_config（默认 Asia/Shanghai）：
+     * 待支付且 payExpireAt 已过 → CLOSED / PAY_TIMEOUT；
+     * 取货日早于今天，或今天本地时间 ≥ 22:00，且仍为待备货/已备货 → CLOSED / NO_PICKUP。
+     */
     @Scheduled(fixedDelay = 15000)
     @Transactional
     public void closeExpired() {
+        OrderingConfigEntity cfg = configService.getOrInit();
+        closeExpired(timeSupport.now(cfg));
+    }
+
+    @Transactional
+    public void closeExpired(ZonedDateTime now) {
+        closePayTimeouts(now.toInstant());
+        closeNoPickups(now);
+    }
+
+    private void closePayTimeouts(Instant now) {
         List<OrderEntity> list = orderRepository.findByStatusAndPayExpireAtBefore(
-                OrderStatus.PENDING_PAY, Instant.now());
-        for (OrderEntity o : list) {
-            o.setStatus(OrderStatus.CLOSED);
-            o.setUpdatedAt(Instant.now());
-            orderRepository.save(o);
+                OrderStatus.PENDING_PAY, now);
+        for (OrderEntity order : list) {
+            closeWithReason(order, CloseReason.PAY_TIMEOUT, now);
         }
+    }
+
+    private void closeNoPickups(ZonedDateTime now) {
+        LocalDate today = now.toLocalDate();
+        List<OrderEntity> list = timeSupport.isAtOrAfterNoPickupCutoff(now)
+                ? orderRepository.findByStatusInAndPickupDateLessThanEqual(NO_PICKUP_STATUSES, today)
+                : orderRepository.findByStatusInAndPickupDateBefore(NO_PICKUP_STATUSES, today);
+        Instant closedAt = now.toInstant();
+        for (OrderEntity order : list) {
+            if (!timeSupport.isNoPickupDue(order.getPickupDate(), now)) {
+                continue;
+            }
+            closeWithReason(order, CloseReason.NO_PICKUP, closedAt);
+        }
+    }
+
+    /**
+     * 关单并写 closedAt。NO_PICKUP / SLOT_FULL_ON_PAY 且已付定金时只记 mock 应退台账，不调用微信退款。
+     * 时段容量在支付成功挤不进时调用本方法（CloseReason.SLOT_FULL_ON_PAY）。
+     */
+    @Transactional
+    public void closeWithReason(OrderEntity order, CloseReason reason, Instant closedAt) {
+        if (order.getStatus() == OrderStatus.CLOSED) {
+            return;
+        }
+        if (reason == CloseReason.NO_PICKUP || reason == CloseReason.SLOT_FULL_ON_PAY) {
+            recordMockDepositRefund(order, ledgerReason(reason), closedAt);
+        }
+        order.setStatus(OrderStatus.CLOSED);
+        order.setCloseReason(reason);
+        order.setClosedAt(closedAt);
+        order.setUpdatedAt(closedAt);
+        orderRepository.save(order);
+        log.info("closed order id={} reason={}", order.getId(), reason);
+    }
+
+    private static RefundLedgerReason ledgerReason(CloseReason reason) {
+        return switch (reason) {
+            case NO_PICKUP -> RefundLedgerReason.NO_PICKUP;
+            case SLOT_FULL_ON_PAY -> RefundLedgerReason.SLOT_FULL_ON_PAY;
+            case PAY_TIMEOUT -> throw new IllegalArgumentException("PAY_TIMEOUT 无定金应退");
+        };
+    }
+
+    /** 已付定金置 depositPaid=false，并落一条 RECORDED 台账。不调用微信退款。 */
+    private void recordMockDepositRefund(OrderEntity order, RefundLedgerReason reason, Instant at) {
+        if (!order.isDepositPaid()) {
+            return;
+        }
+        long amountFen = order.getDepositFen();
+        order.setDepositPaid(false);
+        if (amountFen <= 0 || refundLedgerRepository.existsByOrderId(order.getId())) {
+            return;
+        }
+        RefundLedgerEntity row = new RefundLedgerEntity();
+        row.setId(idGenerator.refundLedgerId());
+        row.setOrderId(order.getId());
+        row.setAmountFen(amountFen);
+        row.setReason(reason);
+        row.setStatus(RefundLedgerStatus.RECORDED);
+        row.setCreatedAt(at);
+        refundLedgerRepository.save(row);
     }
 
     private OrderEntity require(String id) {
@@ -486,6 +568,10 @@ public class OrderService {
         m.put("depositPaid", o.isDepositPaid());
         m.put("cancelSource", o.getCancelSource());
         m.put("cancelReason", o.getCancelReason());
+        boolean closed = o.getStatus() == OrderStatus.CLOSED;
+        m.put("closeReason", closed && o.getCloseReason() != null ? o.getCloseReason().name() : null);
+        m.put("closedAt", closed ? formatOffset(o.getClosedAt()) : null);
+        m.put("refundLedgerStatus", refundLedgerStatus(o.getId()));
         if (o.getDepositOffline() != null) m.put("depositOffline", o.getDepositOffline().name());
         if (withItems) {
             m.put("items", orderItemRepository.findByOrderId(o.getId()).stream().map(li -> {
@@ -501,6 +587,19 @@ public class OrderService {
             }).toList());
         }
         return m;
+    }
+
+    private String refundLedgerStatus(String orderId) {
+        return refundLedgerRepository.findByOrderId(orderId)
+                .map(row -> row.getStatus().name())
+                .orElse(null);
+    }
+
+    private String formatOffset(Instant instant) {
+        if (instant == null) {
+            return null;
+        }
+        return instant.atZone(ZoneIdShanghai()).toOffsetDateTime().toString();
     }
 
     private java.time.ZoneId ZoneIdShanghai() {
