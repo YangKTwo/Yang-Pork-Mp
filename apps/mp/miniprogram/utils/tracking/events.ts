@@ -24,6 +24,8 @@ export const TrackEvents = {
   ORDER_WINDOW_BLOCK: 'order_window_block',
   SUBSCRIBE_AUTH_PROMPT: 'subscribe_auth_prompt',
   SUBSCRIBE_AUTH_RESULT: 'subscribe_auth_result',
+  /** F-SLOT-02 · T24 */
+  PICKUP_SLOT_FULL: 'pickup_slot_full',
 } as const
 
 export type TrackEventName = (typeof TrackEvents)[keyof typeof TrackEvents]

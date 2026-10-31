@@ -63,6 +63,11 @@ interface OrderingPickupSlot {
   code: PickupSlot
   label: string
   hint: string
+  /** F-SLOT-02：默认 30，由服务端计算 */
+  capacity?: number
+  occupied?: number
+  remaining?: number
+  full?: boolean
 }
 
 interface OrderingConfig {
@@ -78,6 +83,8 @@ interface OrderingConfig {
   canOrderNow: boolean
   serverNow: string
   nextPickupDate: string
+  /** F-SLOT-02：与 pickupDate 查询参数一致，用于展示/埋点 */
+  pickupDateForSlots?: string
   pickupSlots?: OrderingPickupSlot[]
   defaultPickupSlot?: PickupSlot
   /** F-SUB-01：空字符串时 FE 跳过订阅授权 */

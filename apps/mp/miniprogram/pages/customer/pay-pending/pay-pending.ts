@@ -1,5 +1,11 @@
 import { api } from '../../../services/api'
 import { fenToYuan } from '../../../utils/money'
+import { pickupSlotTrackValue } from '../../../utils/pickupSlot'
+import {
+  isSlotFullBizError,
+  showPickupSlotFullFeedback,
+  slotFullUserMessage,
+} from '../../../utils/slotCapacity'
 import { runPreparedSubscribeFlow } from '../../../utils/subscribeReady'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
@@ -13,6 +19,8 @@ Page({
     loading: false,
     depositFen: 0,
     amountFen: 0,
+    pickupDate: '',
+    pickupSlot: '' as PickupSlot | '',
   },
   _timer: 0 as any,
   async onLoad(q: Record<string, string | undefined>) {
@@ -28,6 +36,8 @@ Page({
         formulaText: order.depositFormulaText,
         depositFen: order.depositFen,
         amountFen: order.totalFen,
+        pickupDate: order.pickupDate,
+        pickupSlot: order.pickupSlot || '',
       })
       track(TrackEvents.PAY_PAGE_VIEW, {
         order_id: order.id,
@@ -84,13 +94,23 @@ Page({
       await runPreparedSubscribeFlow(order.id)
       wx.redirectTo({ url: `/pages/customer/order-detail/order-detail?id=${order.id}` })
     } catch (e: any) {
+      if (isSlotFullBizError(e)) {
+        showPickupSlotFullFeedback({
+          source: 'customer_pay',
+          pickup_slot: this.data.pickupSlot,
+          pickup_date: this.data.pickupDate,
+          message: slotFullUserMessage(e),
+        })
+      } else {
+        wx.showToast({ title: e.message || '支付失败', icon: 'none' })
+      }
       track(TrackEvents.PAY_MOCK_FAIL, {
         order_id: this.data.id,
         result: 'fail',
-        fail_reason: e.message || 'pay_fail',
+        fail_reason: isSlotFullBizError(e) ? 'slot_full' : e.message || 'pay_fail',
         deposit_fen: this.data.depositFen,
+        pickup_slot: pickupSlotTrackValue(this.data.pickupSlot),
       }, 'C-PAY-02')
-      wx.showToast({ title: e.message || '支付失败', icon: 'none' })
     } finally {
       this.setData({ loading: false })
     }

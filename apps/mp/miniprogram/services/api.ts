@@ -135,9 +135,12 @@ export const api = {
     return request<{ user: UserInfo; profileCompleted: boolean; role: UserRole }>('GET', '/auth/me')
   },
 
-  async orderingConfig() {
-    if (useMock()) return mockApi.orderingConfig()
-    return request<OrderingConfig>('GET', '/config/ordering')
+  async orderingConfig(pickupDate?: string) {
+    if (useMock()) return mockApi.orderingConfig(pickupDate)
+    const qs = pickupDate
+      ? `?pickupDate=${encodeURIComponent(pickupDate)}`
+      : ''
+    return request<OrderingConfig>('GET', `/config/ordering${qs}`)
   },
 
   async listProducts() {
