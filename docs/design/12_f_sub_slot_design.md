@@ -219,3 +219,10 @@ S-PROXY 代录创建：同三档必选
 ## 11. 与开发并行
 
 本批为静态高保真与可开发标注，**不阻塞**接口排期；字段名/枚举以群契约为准，设计只定文案、状态呈现、布局与 Vant 映射。实现时订阅走 `POST /orders/{id}/subscribe`，时段读写 `pickupSlot` 并支持 `?pickupSlot=` 筛选。
+
+
+---
+
+## 12. 后续覆盖（2026-10-31）
+
+F-SLOT-01「无容量、无满档态」口径已由 **F-SLOT-02** 覆盖：见 **`13_f_slot_capacity_noshow_design.md`**（`pickupSlots[]` capacity/occupied/remaining/full、满档禁用、Toast「该时段已约满」/40013）。超时未取 **F-NOSHOW-01**（CLOSED+NO_PICKUP →「超时未取」）同见 13。三档文案/筛选/订阅基线仍以本文为准。

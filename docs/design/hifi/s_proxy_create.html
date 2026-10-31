@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>新建代录单 · S-PROXY-01 · F-SLOT</title>
+<title>新建代录单 · S-PROXY-01 · F-SLOT-02 满档</title>
 <link rel="stylesheet" href="common.css"/>
 <style>
+  .phones{display:flex;flex-wrap:wrap;gap:24px;justify-content:center}
   .slot-grid{display:flex;flex-direction:column;gap:8px;margin-top:8px}
   .slot-opt{
     display:flex;align-items:center;justify-content:space-between;
@@ -22,38 +23,50 @@
     border-color:var(--primary);background:var(--primary);
     box-shadow:inset 0 0 0 3px #fff;
   }
-  .req{color:var(--primary);font-size:12px;font-weight:500}
-  .dep-opt{
-    display:flex;flex-direction:column;gap:8px;margin-top:8px;
+  .slot-opt.disabled{
+    opacity:.55;background:#f5f5f5;border-style:dashed;pointer-events:none;
   }
+  .slot-opt.disabled .radio{border-color:#ccc;background:#eee}
+  .req{color:var(--primary);font-size:12px;font-weight:500}
+  .dep-opt{display:flex;flex-direction:column;gap:8px;margin-top:8px}
   .dep-opt label{
     display:flex;align-items:center;gap:8px;font-size:14px;
     padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:#fff;
   }
   .dep-opt input{accent-color:var(--primary)}
+  .toast-demo{
+    position:absolute;left:50%;bottom:96px;transform:translateX(-50%);
+    background:rgba(0,0,0,.78);color:#fff;font-size:14px;
+    padding:10px 16px;border-radius:8px;white-space:nowrap;z-index:30;
+  }
+  .annot{
+    max-width:375px;margin:8px auto 0;font-size:12px;color:#666;
+    background:#fff8e1;border:1px dashed #ffb74d;border-radius:8px;padding:8px 10px;
+  }
 </style>
 </head>
 <body>
-<p class="page-label">高保真 · S-PROXY-01 · 代录创建 · 时段必选（F-SLOT-01）</p>
+<p class="page-label">高保真 · S-PROXY-01 · 代录 · F-SLOT-02 满档与顾客确认页同步（不可绕过）</p>
+<div class="phones">
+
+<div>
 <div class="phone">
   <div class="status"><span>15:25</span><span>···· Wi‑Fi</span></div>
   <div class="nav"><span class="back">←</span><div class="title">新建代录单</div></div>
   <div class="content">
+    <p class="tiny" style="text-align:center;padding:0 16px 8px">态 · 下午取已约满 · 与 C-ORDER 同一容量池</p>
     <div class="card">
       <div class="field">
         <label>客户姓名</label>
-        <input type="text" placeholder="真实姓名，便于到店核对"/>
+        <input type="text" value="王五" readonly/>
       </div>
       <div class="field">
         <label>手机号</label>
-        <input type="text" inputmode="tel" placeholder="完整手机号"/>
+        <input type="text" value="13766668888" readonly/>
       </div>
       <div class="field">
         <label>取货日</label>
-        <select>
-          <option selected>明天（默认）</option>
-          <option>今天</option>
-        </select>
+        <select><option selected>明天（默认）</option><option>今天</option></select>
       </div>
     </div>
     <div class="card">
@@ -61,26 +74,29 @@
         <div style="font-size:15px;font-weight:500">取货时段</div>
         <span class="req">必选</span>
       </div>
-      <p class="tiny" style="margin-top:4px">pickupSlot · 与顾客确认页同一套三档 · 默认不预选</p>
+      <p class="tiny" style="margin-top:4px">满档禁用 · Toast 同顾客「该时段已约满」</p>
       <div class="slot-grid">
-        <div class="slot-opt" data-slot="MORNING">
+        <div class="slot-opt on" data-slot="MORNING">
           <div>
             <div>上午取</div>
-            <div class="meta">08:00–11:00 · 待 PM 可改</div>
+            <div class="meta">08:00–11:00</div>
           </div>
           <div class="radio"></div>
         </div>
         <div class="slot-opt" data-slot="NOON">
           <div>
             <div>中午取</div>
-            <div class="meta">11:00–14:00 · 待 PM 可改</div>
+            <div class="meta">11:00–14:00</div>
           </div>
           <div class="radio"></div>
         </div>
-        <div class="slot-opt" data-slot="EVENING">
+        <div class="slot-opt disabled" data-slot="EVENING" aria-disabled="true">
           <div>
-            <div>下午取</div>
-            <div class="meta">14:00–18:00 · 待 PM 可改</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span>下午取</span>
+              <span class="badge muted">已约满</span>
+            </div>
+            <div class="meta">14:00–18:00 · remaining=0</div>
           </div>
           <div class="radio"></div>
         </div>
@@ -89,9 +105,8 @@
     <div class="card">
       <div class="field">
         <label>商品 / 数量或备注</label>
-        <textarea placeholder="如：五花肉 2 斤；或选 SKU + 数量"></textarea>
+        <textarea>五花肉 2 斤</textarea>
       </div>
-      <p class="tiny">可简单选 SKU + 数量，或多行备注（与现线框一致）</p>
     </div>
     <div class="card">
       <div style="font-size:15px;font-weight:500;margin-bottom:4px">定金</div>
@@ -100,26 +115,17 @@
         <label><input type="radio" name="dep"/> 线下已收</label>
         <label><input type="radio" name="dep"/> 未收 / 无需</label>
       </div>
-    </div>
-    <div class="card">
-      <p class="tiny">未选时段不可保存。保存成功建议进入待备货并生成取货码，便于核销。</p>
+      <p class="tiny" style="margin-top:8px">【满档】full 档禁用；保存遇 40013 → Toast「该时段已约满」· 埋点满额拦截</p>
     </div>
   </div>
   <div class="foot-safe">
-    <button class="btn-primary disabled" type="button" id="saveBtn" disabled>保存并进入待备货</button>
+    <button class="btn-primary" type="button">保存并进入待备货</button>
   </div>
+  <div class="toast-demo">该时段已约满</div>
 </div>
-<script>
-  const opts=document.querySelectorAll('.slot-opt');
-  const btn=document.getElementById('saveBtn');
-  opts.forEach(el=>{
-    el.onclick=()=>{
-      opts.forEach(o=>o.classList.remove('on'));
-      el.classList.add('on');
-      btn.disabled=false;
-      btn.classList.remove('disabled');
-    };
-  });
-</script>
+<div class="annot">代录不可绕过容量 · 同 pickupSlots[] capacity/occupied/remaining/full · Toast「该时段已约满」· 40013</div>
+</div>
+
+</div>
 </body>
 </html>

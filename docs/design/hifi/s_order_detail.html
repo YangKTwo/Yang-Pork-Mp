@@ -3,19 +3,28 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>店家订单详情 · S-ORDER-01 + S-ACT-03</title>
+<title>店家订单详情 · S-ORDER · F-NOSHOW-01</title>
 <link rel="stylesheet" href="common.css"/>
 <style>
+  .phones{display:flex;flex-wrap:wrap;gap:24px;justify-content:center}
   .req{color:var(--danger)}
   .reason-err{font-size:12px;color:var(--danger);margin-top:4px;display:none}
+  .annot{
+    max-width:375px;margin:8px auto 0;font-size:12px;color:#666;
+    background:#fff8e1;border:1px dashed #ffb74d;border-radius:8px;padding:8px 10px;
+  }
 </style>
 </head>
 <body>
-<p class="page-label">高保真 · S-ORDER-01 + S-ACT-03 · 完整手机号 / 备货核销 / 代取消</p>
+<p class="page-label">高保真 · S-ORDER · 正常操作态 + 超时未取关闭态（F-NOSHOW-01）</p>
+<div class="phones">
+
+<!-- 正常：待备货 + 代取消 -->
 <div class="phone">
   <div class="status"><span>15:25</span><span>···· Wi‑Fi</span></div>
   <div class="nav"><span class="back">←</span><div class="title">订单详情</div><span class="badge">预定</span></div>
   <div class="content">
+    <p class="tiny" style="text-align:center;padding:0 16px 8px">态 A · 待备货（窗内可备货/核销/代取消）</p>
     <div class="card" style="text-align:center">
       <span class="badge">待备货</span>
       <div class="pickup-code">
@@ -26,7 +35,7 @@
     <div class="card">
       <div class="row"><span class="muted">姓名</span><strong>张三</strong></div>
       <div class="row"><span class="muted">手机</span><strong style="font-size:17px;letter-spacing:.5px">13812345678</strong></div>
-      <div class="row"><span class="muted">取货日</span><span>10月24日</span></div>
+      <div class="row"><span class="muted">取货日</span><span>10月31日</span></div>
       <div class="row"><span class="muted">取货时段</span><span class="badge">中午取 · 11:00–14:00</span></div>
       <div class="row"><span class="muted">定金</span><span>已付 ¥9.40</span></div>
       <div class="row"><span class="muted">备注</span><span>少放花椒</span></div>
@@ -38,7 +47,7 @@
     </div>
     <div style="padding:0 16px 8px">
       <button class="btn-primary" type="button">标记已备货</button>
-      <p class="tiny" style="text-align:center;margin:10px 0">已备货后主按钮变为「确认核销（已取货）」</p>
+      <p class="tiny" style="text-align:center;margin:10px 0">取货日 22:00 前仍可核销（F-NOSHOW 窗外才关单）</p>
       <button class="btn-ghost-danger" type="button">取消订单</button>
       <p class="tiny" style="text-align:center">店家代取消 · 不受顾客 22:00 窗限制 · 仅待备货/已备货</p>
     </div>
@@ -53,16 +62,57 @@
       </p>
       <div class="field">
         <label>取消原因 <span class="req">*</span>（必填）</label>
-        <textarea placeholder="请填写取消原因，例如：顾客电话要求取消 / 缺货无法履约"></textarea>
+        <textarea placeholder="请填写取消原因"></textarea>
         <div class="reason-err" style="display:block">请填写取消原因后再确认</div>
       </div>
       <div class="btn-row">
         <button class="btn-secondary" type="button">再想想</button>
         <button class="btn-primary disabled" type="button" style="background:var(--disabled)" disabled>确认取消</button>
       </div>
-      <p class="tiny" style="text-align:center;margin-top:10px">原因为空时「确认取消」不可点（S-ACT-03）</p>
     </div>
   </div>
+</div>
+
+<!-- 超时未取 -->
+<div>
+<div class="phone">
+  <div class="status"><span>22:10</span><span>···· Wi‑Fi</span></div>
+  <div class="nav"><span class="back">←</span><div class="title">订单详情</div><span class="badge">预定</span></div>
+  <div class="content">
+    <p class="tiny" style="text-align:center;padding:0 16px 8px">态 B · F-NOSHOW-01 · 超时未取关闭</p>
+    <div class="card" style="text-align:center">
+      <span class="badge warn">超时未取</span>
+      <div class="pickup-code" style="opacity:.55">
+        <div class="lbl">取货码（已失效）</div>
+        <div class="code">382915</div>
+      </div>
+    </div>
+    <div class="card">
+      <p class="muted" style="margin-bottom:8px">取货日 22:00 后仍未核销，系统已关闭（超时未取）</p>
+      <div class="row"><span class="muted">状态</span><span>CLOSED</span></div>
+      <div class="row"><span class="muted">closeReason</span><span>NO_PICKUP</span></div>
+      <div class="row"><span class="muted">姓名</span><strong>张三</strong></div>
+      <div class="row"><span class="muted">手机</span><strong style="font-size:17px;letter-spacing:.5px">13812345678</strong></div>
+      <div class="row"><span class="muted">取货日</span><span>10月31日</span></div>
+      <div class="row"><span class="muted">取货时段</span><span class="badge">中午取 · 11:00–14:00</span></div>
+      <div class="row"><span class="muted">定金</span><span>已付 ¥9.40（应退流水已记 · mock）</span></div>
+      <div class="row"><span class="muted">备注</span><span>少放花椒</span></div>
+      <p class="tiny" style="margin-top:8px">
+        文案「超时未取」≠「已取消」(CANCELLED) ≠ 未付「已关闭」。<br/>
+        无备货 / 核销 / 代取消 · 不做退款流程 UI
+      </p>
+    </div>
+    <div class="card">
+      <div style="font-weight:500;margin-bottom:6px">明细</div>
+      <div class="row"><span>精瘦肉 ×1 斤</span><span>¥15.00</span></div>
+      <div class="row"><span>肋排 ×1 条</span><span>¥32.00</span></div>
+    </div>
+    <p class="tiny" style="text-align:center;padding:8px 16px 20px">终态只读</p>
+  </div>
+</div>
+<div class="annot">与顾客详情同一主文案「超时未取」· mock 定金仅说明行</div>
+</div>
+
 </div>
 </body>
 </html>
