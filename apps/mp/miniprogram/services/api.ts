@@ -268,6 +268,21 @@ export const api = {
     return request<OrderingConfig>('PUT', '/admin/config/ordering', body)
   },
 
+  async getAdminSlotCapacity(pickupDate: string) {
+    if (useMock()) return mockApi.getAdminSlotCapacity(pickupDate)
+    const qs = `?pickupDate=${encodeURIComponent(pickupDate)}`
+    return request<AdminSlotCapacityView>('GET', `/admin/config/slot-capacity${qs}`)
+  },
+
+  async updateAdminSlotCapacity(body: {
+    pickupDate: string
+    capacities: Partial<Record<PickupSlot, number | null>>
+    clearAll?: boolean
+  }) {
+    if (useMock()) return mockApi.updateAdminSlotCapacity(body)
+    return request<AdminSlotCapacityView>('PUT', '/admin/config/slot-capacity', body)
+  },
+
   async setShelf(id: string, status: 'ON_SHELF' | 'OFF_SHELF') {
     if (useMock()) return mockApi.setShelf(id, status)
     return request<Product>('PATCH', `/admin/products/${id}/shelf`, { status })

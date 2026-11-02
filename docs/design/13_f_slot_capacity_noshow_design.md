@@ -14,7 +14,7 @@
 
 1. **F-SLOT-02 时段容量**：每档按取货日可配 capacity（全局默认 + 按日覆盖）；`GET /config/ordering` → `pickupSlots[]` 下发 `capacity/occupied/remaining/full`；满档档位 **禁用不可选**；拦截 Toast / 错误文案 **「该时段已约满」**（API `SLOT_FULL=40013`）；店家工作台 Tag「已约满」；埋点只标触发点。
 2. **F-NOSHOW-01 超时未取**：取货日 Asia/Shanghai **当日 22:00 后**仍 `PENDING_PREPARE`/`PREPARED` → `CLOSED` + `closeReason=NO_PICKUP`；展示 **「超时未取」**；窗内仍可核销；mock 定金只记应退流水 —— **不做退款流程 UI**。
-3. **本周无超管容量配置页**（P1 备注，不挡交付）。
+3. **超管容量配置页**已落地 → `14_admin_slot_capacity_design.md` / A-CFG-02（原 P1 备注）。
 4. **支付瞬间满档**（后端 `CLOSED` + `closeReason=SLOT_FULL_ON_PAY`）：顾客侧若需展示，用关闭文案 **「时段已约满」**（短注即可，本批不单独做支付失败整页）。
 
 **不在本批**：改业务代码、真退款 UI、超管配置 hifi、埋点字段明细。
@@ -53,7 +53,7 @@
 | `remaining` | 余量 | 可选缀「余 N」（见决策 D3） |
 | `full` | 是否满档（`remaining<=0`） | `full===true` → **禁用 + Tag「已约满」** |
 
-维度：每个 `pickupSlot` × **取货日**；全局默认 capacity=30 + 按日覆盖（本周无超管配置 UI）。
+维度：每个 `pickupSlot` × **取货日**；全局默认 capacity=30 + 按日覆盖（超管 UI 见 `14_admin_slot_capacity_design.md`）。
 
 ### 3.2 满档错误
 
@@ -104,7 +104,7 @@ S-WORK
     → 状态筛可含「超时未取」；卡片 Tag；终态无核销
 ```
 
-P1：超管容量默认/按日覆盖入口（挂 A-CFG，本周不做页）。
+P1：超管容量默认/按日覆盖 → **已落地** `14_admin_slot_capacity_design.md` / `a_slot_capacity.html`。
 
 ---
 
@@ -174,7 +174,7 @@ P1：超管容量默认/按日覆盖入口（挂 A-CFG，本周不做页）。
 |----|------|
 | `12_*.md` | F-SLOT-01 三档/文案/筛选仍有效；「无容量」**由本批覆盖** |
 | 确认 / 代录 / 工作台 / 两端详情 | 见 §2 文件清单与 hifi 多态注释 |
-| `a_config.html` | 本周不改；P1 容量配置 |
+| `a_config.html` | 保留窗/定金；**入口「时段容量」** → A-CFG-02（见 `14_*.md`） |
 
 ---
 
@@ -190,7 +190,7 @@ P1：超管容量默认/按日覆盖入口（挂 A-CFG，本周不做页）。
 | D4 | 代录不可绕过满档 |
 | D5 | `NO_PICKUP` 主文案「超时未取」；与 PAY_TIMEOUT / CANCELLED / SLOT_FULL_ON_PAY 分文案 |
 | D6 | 无退款 UI；mock 应退仅一行说明 |
-| D7 | 无超管配置页（P1） |
+| D7 | 超管配置页见 `14_*.md`（A-CFG-02） |
 | D8 | `SLOT_FULL_ON_PAY`：详情短文案「时段已约满」，不做独立支付失败整页 |
 | D9 | 默认 capacity=30（展示层可不强调数字） |
 

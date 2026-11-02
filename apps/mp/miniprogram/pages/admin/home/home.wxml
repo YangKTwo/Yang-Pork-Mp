@@ -7,6 +7,10 @@
     <view style="font-weight:600;font-size:32rpx">业务配置</view>
     <view class="muted">下单窗、定金门槛与比例</view>
   </view>
+  <view class="card" bindtap="goSlotCapacity">
+    <view style="font-weight:600;font-size:32rpx">时段容量</view>
+    <view class="muted">全局默认与按日覆盖</view>
+  </view>
   <view class="card" bindtap="goWorkbench">
     <view style="font-weight:600;font-size:32rpx">返回工作台</view>
     <view class="muted">预定 / 代录订单</view>

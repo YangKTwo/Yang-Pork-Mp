@@ -26,6 +26,9 @@ export const TrackEvents = {
   SUBSCRIBE_AUTH_RESULT: 'subscribe_auth_result',
   /** F-SLOT-02 · T24 */
   PICKUP_SLOT_FULL: 'pickup_slot_full',
+  /** A-CFG-02 · §3.5 T26/T27 */
+  ADMIN_SLOT_CAPACITY_VIEW: 'admin_slot_capacity_view',
+  ADMIN_SLOT_CAPACITY_SAVE: 'admin_slot_capacity_save',
 } as const
 
 export type TrackEventName = (typeof TrackEvents)[keyof typeof TrackEvents]

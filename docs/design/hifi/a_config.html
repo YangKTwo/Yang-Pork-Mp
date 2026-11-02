@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>业务配置 · A-CFG-01</title>
+<link rel="stylesheet" href="common.css"/>
+<style>
+  .preview{
+    background:var(--bg);border-radius:8px;padding:12px;margin-top:8px;
+    border:1px dashed var(--border);
+  }
+</style>
+</head>
+<body>
+<p class="page-label">高保真 · A-CFG-01 · 下单窗 / 定金规则 · 入口含时段容量（A-CFG-02）</p>
+<div class="phone">
+  <div class="status"><span>16:05</span><span>···· Wi‑Fi</span></div>
+  <div class="nav"><span class="back">←</span><div class="title">业务配置</div></div>
+  <div class="content">
+    <div class="card" style="padding:12px 16px">
+      <div class="row" style="padding:4px 0">
+        <div>
+          <div style="font-size:15px;font-weight:600">时段容量</div>
+          <div class="tiny">全局默认与按日覆盖 · A-CFG-02</div>
+        </div>
+        <span style="color:var(--text-3)">›</span>
+      </div>
+      <p class="tiny" style="margin-top:6px">高保真见 a_slot_capacity.html；契约 08 §1.6</p>
+    </div>
+    <div class="card">
+      <div class="field">
+        <label>下单窗口开始</label>
+        <input type="text" value="12:00"/>
+      </div>
+      <div class="field">
+        <label>下单窗口结束（含）</label>
+        <input type="text" value="22:00"/>
+      </div>
+      <p class="muted">时区 Asia/Shanghai。取消截止与下单窗结束为同一时刻（当日 22:00）。</p>
+    </div>
+    <div class="card">
+      <div class="field">
+        <label>定金比例（%）</label>
+        <input type="text" value="20"/>
+      </div>
+      <div class="field">
+        <label>满额起收门槛（元）</label>
+        <input type="text" value="10"/>
+      </div>
+      <p class="muted">须保持合理。顾客端以低干扰灰字展示公式。</p>
+      <div class="preview">
+        <div class="tiny">顾客端公式预览</div>
+        <div class="muted" style="margin-top:4px">定金 = 订单金额 × 20%（订单满 10 元收取）</div>
+      </div>
+    </div>
+    <div class="card">
+      <p class="tiny">待支付超时：固定 10 分钟（本屏可不改，实现侧常量）。账号角色绑定见 A-ACC-01（本高保真交付未做单独页）。</p>
+    </div>
+  </div>
+  <div class="foot-safe">
+    <button class="btn-primary" type="button">保存配置</button>
+  </div>
+</div>
+</body>
+</html>

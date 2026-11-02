@@ -89,6 +89,24 @@ interface OrderingConfig {
   defaultPickupSlot?: PickupSlot
   /** F-SUB-01：空字符串时 FE 跳过订阅授权 */
   subscribePreparedTmplId?: string
+  /** F-SLOT-02：全局默认每档容量 */
+  defaultSlotCapacity?: SlotCapacityMap
+}
+
+type SlotCapacityMap = Partial<Record<PickupSlot, number>>
+
+interface SlotEffectiveDetail {
+  capacity: number
+  occupied: number
+  remaining: number
+  full: boolean
+}
+
+interface AdminSlotCapacityView {
+  pickupDate: string
+  defaultSlotCapacity: Record<PickupSlot, number>
+  overrides: SlotCapacityMap
+  effective: Record<PickupSlot, SlotEffectiveDetail>
 }
 
 interface OrderItem {
