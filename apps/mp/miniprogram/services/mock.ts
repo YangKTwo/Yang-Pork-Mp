@@ -47,7 +47,21 @@ let profileCompleted = false
 let accessToken = 'mock_token_customer'
 const orders: Order[] = []
 
-const MOCK_SLOT_CAPACITY = 30
+const ALL_SLOTS: PickupSlot[] = ['MORNING', 'NOON', 'EVENING']
+
+let mockDefaultSlotCapacity: Record<PickupSlot, number> = {
+  MORNING: 30,
+  NOON: 30,
+  EVENING: 30,
+}
+
+const mockDayOverrides: Record<string, Partial<Record<PickupSlot, number>>> = {}
+
+function effectiveCapacity(pickupDate: string, slot: PickupSlot): number {
+  const ov = mockDayOverrides[pickupDate]?.[slot]
+  if (typeof ov === 'number') return ov
+  return mockDefaultSlotCapacity[slot] ?? 30
+}
 
 function slotOccupied(pickupDate: string, slot: PickupSlot): number {
   return orders.filter(
@@ -61,7 +75,7 @@ function slotOccupied(pickupDate: string, slot: PickupSlot): number {
 function buildPickupSlotsForDate(pickupDate: string): OrderingPickupSlot[] {
   return FALLBACK_PICKUP_SLOTS.map((s) => {
     const occupied = slotOccupied(pickupDate, s.code)
-    const capacity = MOCK_SLOT_CAPACITY
+    const capacity = effectiveCapacity(pickupDate, s.code)
     const remaining = Math.max(0, capacity - occupied)
     return {
       code: s.code,
@@ -151,6 +165,7 @@ export const mockApi = {
       pickupSlots: buildPickupSlotsForDate(slotDate),
       defaultPickupSlot: 'MORNING',
       subscribePreparedTmplId: 'mock-config-subscribe-prepared-tmpl',
+      defaultSlotCapacity: { ...mockDefaultSlotCapacity },
     }
   },
 
@@ -238,8 +253,9 @@ export const mockApi = {
     const o = orders.find((x) => x.id === id)
     if (!o) throw new Error('订单不存在')
     if (o.pickupSlot && o.pickupDate) {
+      const cap = effectiveCapacity(o.pickupDate, o.pickupSlot)
       const occ = slotOccupied(o.pickupDate, o.pickupSlot)
-      if (occ >= MOCK_SLOT_CAPACITY) {
+      if (occ >= cap) {
         throw new ApiBizError(SLOT_FULL_BIZ_CODE, SLOT_FULL_TOAST)
       }
     }
@@ -341,8 +357,74 @@ export const mockApi = {
   },
 
   async updateConfig(partial: Partial<OrderingConfig>): Promise<OrderingConfig> {
+    if (partial.defaultSlotCapacity) {
+      for (const slot of ALL_SLOTS) {
+        const v = partial.defaultSlotCapacity[slot]
+        if (v === undefined) continue
+        if (!Number.isInteger(v) || v < 1) {
+          throw new ApiBizError(40001, '参数错误')
+        }
+        mockDefaultSlotCapacity[slot] = v
+      }
+    }
     const base = await this.orderingConfig()
-    return { ...base, ...partial }
+    return {
+      ...base,
+      ...partial,
+      defaultSlotCapacity: { ...mockDefaultSlotCapacity },
+    }
+  },
+
+  async getAdminSlotCapacity(pickupDate: string): Promise<AdminSlotCapacityView> {
+    const date = (pickupDate && String(pickupDate).trim()) || tomorrowDate()
+    const overrides = { ...(mockDayOverrides[date] || {}) }
+    const effective = {} as Record<PickupSlot, SlotEffectiveDetail>
+    for (const slot of ALL_SLOTS) {
+      const capacity = effectiveCapacity(date, slot)
+      const occupied = slotOccupied(date, slot)
+      const remaining = Math.max(0, capacity - occupied)
+      effective[slot] = {
+        capacity,
+        occupied,
+        remaining,
+        full: remaining === 0,
+      }
+    }
+    return {
+      pickupDate: date,
+      defaultSlotCapacity: { ...mockDefaultSlotCapacity },
+      overrides,
+      effective,
+    }
+  },
+
+  async updateAdminSlotCapacity(body: {
+    pickupDate: string
+    capacities: Partial<Record<PickupSlot, number | null>>
+    clearAll?: boolean
+  }): Promise<AdminSlotCapacityView> {
+    const date = (body.pickupDate && String(body.pickupDate).trim()) || tomorrowDate()
+    if (body.clearAll) {
+      delete mockDayOverrides[date]
+    } else {
+      for (const slot of ALL_SLOTS) {
+        if (!(slot in body.capacities)) continue
+        const v = body.capacities[slot]
+        if (!mockDayOverrides[date]) mockDayOverrides[date] = {}
+        if (v === null || v === undefined) {
+          delete mockDayOverrides[date]![slot]
+          if (Object.keys(mockDayOverrides[date]!).length === 0) {
+            delete mockDayOverrides[date]
+          }
+        } else {
+          if (!Number.isInteger(v) || v < 1) {
+            throw new ApiBizError(40001, '参数错误')
+          }
+          mockDayOverrides[date]![slot] = v
+        }
+      }
+    }
+    return this.getAdminSlotCapacity(date)
   },
 
   async setShelf(id: string, status: 'ON_SHELF' | 'OFF_SHELF'): Promise<Product> {

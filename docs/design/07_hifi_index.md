@@ -3,7 +3,7 @@
 | 字段 | 内容 |
 |------|------|
 | 日期 | 2026-10-23（Asia/Shanghai） |
-| 修订 | 2026-10-30：F-SUB-01 / F-SLOT-01（`12_*.md`）；**2026-10-31**：F-SLOT-02 满档容量 + F-NOSHOW-01 超时未取（`13_f_slot_capacity_noshow_design.md`） |
+| 修订 | 2026-10-30：F-SUB-01 / F-SLOT-01（`12_*.md`）；**2026-10-31**：F-SLOT-02 满档容量 + F-NOSHOW-01 超时未取（`13_f_slot_capacity_noshow_design.md`）；**2026-11-02**：超管 A-CFG-02 时段容量（`14_admin_slot_capacity_design.md`） |
 | 目录 | `docs/design/hifi/` |
 | 依据 | 线框通过（含 S-ACT-03）；需求 v1.1+v1.2；设计系统 `01_design_system.md`；群契约 F-SUB / F-SLOT |
 | 规格 | 375px 静态 HTML；暖红 `#C62828`；大触控；中文；实操肉铺风 |
@@ -40,7 +40,8 @@
 |------|---------|------|
 | `hifi/a_sku_list.html` | A-SKU-01 | 商品列表、上下架开关、编辑/新建入口；底栏含「管理」 |
 | `hifi/a_sku_edit.html` | A-SKU-02 | 新建/编辑同一页；名称/单位/标价/商品备注/上架；**删=下架** |
-| `hifi/a_config.html` | A-CFG-01 | 下单窗、定金比例、满额门槛、公式预览 |
+| `hifi/a_config.html` | A-CFG-01 | 下单窗、定金比例、满额门槛、公式预览；**入口「时段容量」→ A-CFG-02** |
+| `hifi/a_slot_capacity.html` | A-CFG-02 | 全局默认三档 + 按日覆盖；只读占用/余量/已约满（08 §1.6） |
 | — | A-ACC-01 | **本交付省略**（评审允许少做账号页） |
 
 ---

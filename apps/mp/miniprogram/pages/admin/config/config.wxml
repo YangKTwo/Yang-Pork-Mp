@@ -1,4 +1,13 @@
 <view class="page" style="padding:24rpx 0 160rpx">
+  <view class="card" bindtap="goSlotCapacity" style="padding:24rpx 32rpx">
+    <view class="row" style="padding:0">
+      <view>
+        <view style="font-size:30rpx;font-weight:600">时段容量</view>
+        <view class="tiny">全局默认与按日覆盖</view>
+      </view>
+      <text class="muted">›</text>
+    </view>
+  </view>
   <view class="card">
     <view class="field">
       <label>下单开始（HH:mm）</label>

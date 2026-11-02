@@ -1,0 +1,61 @@
+<view class="page" style="padding:24rpx 0 320rpx">
+  <view class="card card-gap">
+    <view class="sec-title">全局默认容量</view>
+    <view class="muted">未做按日覆盖的日期，均使用此处默认。默认每档 30。</view>
+    <block wx:for="{{slotRows}}" wx:key="code">
+      <view class="slot-row">
+        <view class="slot-meta">
+          <view class="slot-name">{{item.label}}</view>
+          <view class="tiny">{{item.hint}} · {{item.code}}</view>
+        </view>
+        <input
+          class="cap-input"
+          type="number"
+          value="{{defaultCaps[item.code]}}"
+          bindinput="onDefaultField"
+          data-slot="{{item.code}}"
+        />
+        <text class="cap-unit">单</text>
+      </view>
+    </block>
+    <view class="hint-box">
+      <button class="btn-primary" bindtap="onSaveDefault" loading="{{savingDefault}}">保存默认容量</button>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="sec-title">按日覆盖</view>
+    <view class="muted" style="margin-bottom:12rpx">留空并保存 = 该档回退默认（传 null）。</view>
+    <view class="tiny" style="margin-bottom:8rpx">取货日</view>
+    <picker mode="date" value="{{pickupDate}}" bindchange="onPickDate">
+      <view class="date-row">
+        <text class="muted">选择日期</text>
+        <text class="val">{{pickupDate}} ▾</text>
+      </view>
+    </picker>
+    <block wx:for="{{slotRows}}" wx:key="code">
+      <view class="slot-row">
+        <view class="slot-meta">
+          <view class="slot-name">{{item.label}}</view>
+          <view class="slot-eff" wx:if="{{effective[item.code]}}">
+            <text>占用 {{effective[item.code].occupied}} · 余 {{effective[item.code].remaining}}</text>
+            <text wx:if="{{effective[item.code].full}}" class="badge muted">已约满</text>
+          </view>
+        </view>
+        <input
+          class="cap-input"
+          type="number"
+          placeholder="默认 {{dayDefaults[item.code] || 30}}"
+          value="{{dayInputs[item.code]}}"
+          bindinput="onDayField"
+          data-slot="{{item.code}}"
+        />
+        <text class="cap-unit">单</text>
+      </view>
+    </block>
+    <view class="hint-box">
+      <button class="btn-primary" bindtap="onSaveDay" loading="{{savingDay || loadingDay}}">保存本日覆盖</button>
+      <button class="link-danger" bindtap="onClearDay">清除本日覆盖</button>
+    </view>
+  </view>
+</view>

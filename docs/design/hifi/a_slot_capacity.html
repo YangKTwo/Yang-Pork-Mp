@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>时段容量 · A-CFG-02</title>
+<link rel="stylesheet" href="common.css"/>
+<style>
+  .sec-title{font-size:15px;font-weight:600;margin-bottom:8px}
+  .slot-row{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 0;border-bottom:1px solid var(--border);
+  }
+  .slot-row:last-child{border-bottom:none}
+  .slot-row .meta{flex:1;min-width:0}
+  .slot-row .name{font-size:15px;font-weight:500}
+  .slot-row input{
+    width:88px;height:40px;text-align:center;
+    border:1px solid var(--border);border-radius:8px;
+    font-size:16px;background:#fff;
+  }
+  .slot-row input::placeholder{font-size:13px;color:var(--text-3)}
+  .eff{
+    margin-top:4px;font-size:12px;color:var(--text-3);
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  }
+  .date-row{
+    display:flex;align-items:center;justify-content:space-between;
+    height:44px;padding:0 12px;border:1px solid var(--border);
+    border-radius:8px;background:#fff;font-size:15px;margin-bottom:8px;
+  }
+  .date-row .val{font-weight:500}
+  .link-danger{
+    display:block;width:100%;margin-top:8px;padding:12px;
+    border:none;background:transparent;color:var(--danger);
+    font-size:14px;text-align:center;
+  }
+  .toast{
+    position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);
+    background:rgba(0,0,0,.78);color:#fff;padding:10px 16px;border-radius:8px;
+    font-size:14px;z-index:30;white-space:nowrap;
+  }
+  .hint-box{margin-top:8px}
+  .unit{font-size:13px;color:var(--text-2);width:24px}
+</style>
+</head>
+<body>
+<p class="page-label">高保真 · A-CFG-02 · 全局默认 + 按日覆盖（08 §1.6）· 多态见页内注释</p>
+
+<!-- 主态：编辑 + 只读占用 -->
+<div class="phone">
+  <div class="status"><span>10:18</span><span>···· Wi‑Fi</span></div>
+  <div class="nav"><span class="back">←</span><div class="title">时段容量</div></div>
+  <div class="content">
+    <div class="card">
+      <div class="sec-title">全局默认容量</div>
+      <p class="muted">未做按日覆盖的日期，均使用此处默认。默认每档 30。</p>
+      <div class="slot-row">
+        <div class="meta">
+          <div class="name">上午取</div>
+          <div class="tiny">08:00–11:00 · MORNING</div>
+        </div>
+        <input type="text" inputmode="numeric" value="30" aria-label="上午默认容量"/>
+        <span class="unit">单</span>
+      </div>
+      <div class="slot-row">
+        <div class="meta">
+          <div class="name">中午取</div>
+          <div class="tiny">11:00–14:00 · NOON</div>
+        </div>
+        <input type="text" inputmode="numeric" value="30" aria-label="中午默认容量"/>
+        <span class="unit">单</span>
+      </div>
+      <div class="slot-row">
+        <div class="meta">
+          <div class="name">下午取</div>
+          <div class="tiny">14:00–18:00 · EVENING</div>
+        </div>
+        <input type="text" inputmode="numeric" value="30" aria-label="下午默认容量"/>
+        <span class="unit">单</span>
+      </div>
+      <div class="hint-box">
+        <button class="btn-primary" type="button">保存默认容量</button>
+        <p class="tiny" style="margin-top:8px">API：PUT /admin/config/ordering · partial defaultSlotCapacity · 正整数 ≥1</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec-title">按日覆盖</div>
+      <p class="muted" style="margin-bottom:8px">留空并保存 = 该档回退默认（传 null）。</p>
+      <label class="tiny" style="display:block;margin-bottom:6px">取货日</label>
+      <div class="date-row">
+        <span class="muted">选择日期</span>
+        <span class="val">2026-11-03 ▾</span>
+      </div>
+      <div class="slot-row">
+        <div class="meta">
+          <div class="name">上午取</div>
+          <div class="eff">占用 12 · 余 8</div>
+        </div>
+        <input type="text" inputmode="numeric" value="20" aria-label="上午覆盖"/>
+        <span class="unit">单</span>
+      </div>
+      <div class="slot-row">
+        <div class="meta">
+          <div class="name">中午取</div>
+          <div class="eff">占用 30 · 余 0 <span class="badge muted">已约满</span></div>
+        </div>
+        <input type="text" inputmode="numeric" placeholder="默认 30" value="" aria-label="中午覆盖（空=默认）"/>
+        <span class="unit">单</span>
+      </div>
+      <div class="slot-row">
+        <div class="meta">
+          <div class="name">下午取</div>
+          <div class="eff">占用 5 · 余 35</div>
+        </div>
+        <input type="text" inputmode="numeric" value="40" aria-label="下午覆盖"/>
+        <span class="unit">单</span>
+      </div>
+      <div class="hint-box">
+        <button class="btn-primary" type="button">保存本日覆盖</button>
+        <button class="link-danger" type="button">清除本日覆盖</button>
+        <p class="tiny">API：GET/PUT /admin/config/slot-capacity · null 删档 · clearAll 清空日 · effective 只读</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="page-label" style="margin-top:28px">多态 · Toast 保存成功</p>
+<div class="phone" style="min-height:420px">
+  <div class="status"><span>10:19</span><span>···· Wi‑Fi</span></div>
+  <div class="nav"><span class="back">←</span><div class="title">时段容量</div></div>
+  <div class="content">
+    <div class="card">
+      <div class="sec-title">全局默认容量</div>
+      <p class="muted">示意：保存后 Toast。</p>
+      <button class="btn-primary" type="button">保存默认容量</button>
+    </div>
+  </div>
+  <div class="toast">默认容量已保存</div>
+</div>
+
+<p class="page-label" style="margin-top:28px">多态 · 清除本日确认</p>
+<div class="phone" style="min-height:480px">
+  <div class="status"><span>10:20</span><span>···· Wi‑Fi</span></div>
+  <div class="nav"><span class="back">←</span><div class="title">时段容量</div></div>
+  <div class="content" style="opacity:.35;pointer-events:none">
+    <div class="card"><div class="sec-title">按日覆盖</div><p class="muted">2026-11-03</p></div>
+  </div>
+  <div class="mask" style="align-items:center">
+    <div class="dialog">
+      <h3>清除本日覆盖？</h3>
+      <p>该日三档将全部恢复为全局默认。</p>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn-secondary" type="button">取消</button>
+        <button class="btn-primary" type="button">确定清除</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--
+  设计注（FE）：
+  - 契约 docs/08_f_slot02_noshow_contract_v0.1.md §1.6
+  - 保存默认 → PUT /admin/config/ordering { defaultSlotCapacity }
+  - 保存本日 → PUT /admin/config/slot-capacity；空输入 → null；清除 → clearAll:true
+  - 只读占用来自 GET effective；满档 Tag「已约满」
+  - Toast：默认容量已保存 / 本日覆盖已保存 / 已清除本日覆盖 / 保存失败
+  - 校验：正整数 ≥1；埋点仅 save_ok / save_fail
+  - 标注见 docs/design/14_admin_slot_capacity_design.md
+-->
+</body>
+</html>

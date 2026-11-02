@@ -33,7 +33,8 @@
       "pages": [
         "home/home",
         "products/products",
-        "config/config"
+        "config/config",
+        "slot-capacity/slot-capacity"
       ]
     }
   ],

@@ -9,6 +9,9 @@ Page({
     const cfg = await api.orderingConfig()
     this.setData({ form: { ...cfg } })
   },
+  goSlotCapacity() {
+    wx.navigateTo({ url: '/pages/admin/slot-capacity/slot-capacity?entry=config' })
+  },
   onField(e: any) {
     const k = e.currentTarget.dataset.k
     let v: any = e.detail.value
