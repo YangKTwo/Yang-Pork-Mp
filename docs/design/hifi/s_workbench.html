@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>店家工作台 · S-WORK</title>
+<title>店家工作台 · S-WORK · F-SLOT-02 / F-NOSHOW-01</title>
 <link rel="stylesheet" href="common.css"/>
 <style>
   .tools{padding:0 16px 10px;display:flex;flex-wrap:wrap;gap:8px}
@@ -17,15 +17,21 @@
     background:var(--primary);color:#fff;font-size:13px;font-weight:500;
   }
   .slot-filter{
-    display:flex;gap:6px;padding:0 16px 10px;flex-wrap:wrap;
+    display:flex;gap:6px;padding:0 16px 10px;flex-wrap:wrap;align-items:center;
   }
   .slot-filter button{
-    height:32px;padding:0 12px;border-radius:16px;font-size:13px;font-weight:500;
+    height:32px;padding:0 10px;border-radius:16px;font-size:13px;font-weight:500;
     border:1px solid var(--border);background:#fff;color:var(--text-2);
+    display:inline-flex;align-items:center;gap:4px;
   }
   .slot-filter button.on{
     background:var(--primary);color:#fff;border-color:var(--primary);
   }
+  .slot-filter button .mini{
+    font-size:10px;padding:1px 5px;border-radius:4px;
+    background:#eee;color:var(--text-3);font-weight:600;
+  }
+  .slot-filter button.on .mini{background:rgba(255,255,255,.25);color:#fff}
   .zone-tag{
     margin:0 16px 8px;font-size:12px;color:var(--text-2);
     display:flex;align-items:center;gap:6px;
@@ -51,12 +57,16 @@
   .panel{display:none}
   .panel.show{display:block}
   .tag-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px}
+  .annot{
+    max-width:375px;margin:12px auto 0;font-size:12px;color:#666;
+    background:#fff8e1;border:1px dashed #ffb74d;border-radius:8px;padding:8px 10px;
+  }
 </style>
 </head>
 <body>
-<p class="page-label">高保真 · S-WORK · 预定区时段筛选 + 卡片 Tag（F-SLOT-01）· 双分区 P0 保留</p>
+<p class="page-label">高保真 · S-WORK · 满档 Tag（F-SLOT-02）+ 超时未取 Tag/筛选（F-NOSHOW-01）</p>
 <div class="phone">
-  <div class="status"><span>15:20</span><span>···· Wi‑Fi</span></div>
+  <div class="status"><span>22:05</span><span>···· Wi‑Fi</span></div>
   <div class="nav"><div class="title">工作台</div></div>
   <div class="seg">
     <button type="button" class="on" id="tabPred">预定订单</button>
@@ -66,34 +76,42 @@
     <div class="panel show" id="panelPred">
       <div class="zone-tag"><i></i>顾客自助预定 · 与代录分开展示</div>
       <div class="tools">
-        <select><option>取货日：明天</option><option>取货日：今天</option></select>
-        <select><option>状态：全部</option><option>待备货</option><option>已备货</option></select>
+        <select><option>取货日：今天</option><option>取货日：明天</option></select>
+        <select title="状态筛选含超时未取">
+          <option>状态：全部</option>
+          <option>待备货</option>
+          <option>已备货</option>
+          <option selected>超时未取</option>
+          <option>已取消</option>
+          <option>已关闭</option>
+        </select>
         <input placeholder="搜取货码" inputmode="numeric"/>
         <button class="search-btn" type="button">搜索</button>
       </div>
-      <div class="slot-filter" id="slotFilter" title="?pickupSlot= MORNING|NOON|EVENING">
+      <div class="slot-filter" id="slotFilter" title="满档仍显示 chip，旁挂已约满">
         <button type="button" class="on" data-slot="">全部</button>
         <button type="button" data-slot="MORNING">早</button>
-        <button type="button" data-slot="NOON">午</button>
+        <button type="button" data-slot="NOON">午 <span class="mini">已约满</span></button>
         <button type="button" data-slot="EVENING">晚</button>
       </div>
-      <p class="tiny" style="padding:0 16px 8px">筛选对应 ?pickupSlot=；卡片 Tag 用完整 label（上午取等）</p>
+      <p class="tiny" style="padding:0 16px 8px">
+        【F-SLOT-02】取货日维度余量；「午」chip 满档 Tag「已约满」，chip 不隐藏（可筛已有单）。<br/>
+        【F-NOSHOW-01】状态筛「超时未取」· CLOSED+NO_PICKUP · 取货日 22:00 前仍可核销
+      </p>
       <div class="oc">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <span class="code">382915</span>
-          <span class="badge">待备货</span>
+          <span class="badge warn">超时未取</span>
         </div>
         <div class="tag-row">
           <span class="badge">中午取</span>
-          <span class="tiny">11:00–14:00 · NOON</span>
+          <span class="tiny">11:00–14:00 · NOON · closeReason=NO_PICKUP</span>
         </div>
         <div style="margin-top:6px">张三</div>
         <div class="phone">13812345678</div>
         <div class="muted">精瘦肉 1 斤 + 肋排 1 条 · 定金已付</div>
-        <div class="muted">备注：少放花椒</div>
-        <div class="actions">
-          <button class="pri" type="button">备货</button>
-        </div>
+        <div class="muted">取货日 22:00 后未核销 · 系统已关闭</div>
+        <p class="tiny" style="margin-top:6px">终态：无备货/核销按钮 · 与「已取消」文案区分</p>
       </div>
       <div class="oc">
         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -106,7 +124,7 @@
         </div>
         <div style="margin-top:6px">李四</div>
         <div class="phone">13900001111</div>
-        <div class="muted">五花肉 2 斤</div>
+        <div class="muted">五花肉 2 斤 · 窗内仍可核销</div>
         <div class="actions">
           <button class="pri" type="button">核销</button>
         </div>
@@ -117,8 +135,9 @@
           <span class="badge">待备货</span>
         </div>
         <div class="tag-row">
-          <span class="badge">下午取</span>
-          <span class="tiny">14:00–18:00 · EVENING</span>
+          <span class="badge">中午取</span>
+          <span class="badge muted">档位已约满</span>
+          <span class="tiny">示意：列表侧满档信息可挂在筛选，卡片以时段 Tag 为主</span>
         </div>
         <div style="margin-top:6px">赵六</div>
         <div class="phone">13688889999</div>
@@ -153,6 +172,10 @@
     <div class="on"><span class="ico">◼</span>工作台</div>
     <div><span class="ico">○</span>我的</div>
   </div>
+</div>
+<div class="annot">
+  满档 Tag 对齐早/午/晚筛选视觉；超时未取用 badge.warn。<br/>
+  埋点触发点：满档 chip/档位曝光、满额拦截（设计不写 schema）。
 </div>
 <script>
   const pred=document.getElementById('tabPred'), proxy=document.getElementById('tabProxy');

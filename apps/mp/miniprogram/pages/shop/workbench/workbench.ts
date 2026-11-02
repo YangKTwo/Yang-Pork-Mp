@@ -1,5 +1,6 @@
 import { api } from '../../../services/api'
-import { fenToYuan, statusLabel } from '../../../utils/money'
+import { fenToYuan } from '../../../utils/money'
+import { orderStatusDisplayText } from '../../../utils/orderClose'
 import {
   formatPickupSlotDisplay,
   pickupSlotLabel,
@@ -18,7 +19,7 @@ function itemSummary(items: OrderItem[] | undefined): string {
 function mapList(orders: Order[], slotMeta: ReturnType<typeof resolvePickupSlots>) {
   return orders.map((o) => ({
     id: o.id,
-    statusText: statusLabel(o.status),
+    statusText: orderStatusDisplayText(o),
     pickupCode: o.pickupCode,
     pickupSlotText: formatPickupSlotDisplay(o.pickupDate, o.pickupSlot, slotMeta),
     pickupSlotLabel: pickupSlotLabel(o.pickupSlot, slotMeta),

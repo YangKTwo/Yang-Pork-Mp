@@ -1,6 +1,8 @@
 /** 本地假数据：无后端时可点通主路径。金额单位：分。 */
 
+import { ApiBizError } from '../utils/apiEnvelope'
 import { FALLBACK_PICKUP_SLOTS, type PickupSlot } from '../utils/pickupSlot'
+import { SLOT_FULL_BIZ_CODE, SLOT_FULL_TOAST } from '../utils/slotCapacity'
 
 const PRODUCTS: Product[] = [
   { id: 'prod_p01', skuCode: 'P01', name: '精瘦肉', unit: '斤', priceFen: 1500, status: 'ON_SHELF', remark: '炒菜常用', sort: 10 },
@@ -44,6 +46,41 @@ let mockUser: UserInfo = {
 let profileCompleted = false
 let accessToken = 'mock_token_customer'
 const orders: Order[] = []
+
+const MOCK_SLOT_CAPACITY = 30
+
+function slotOccupied(pickupDate: string, slot: PickupSlot): number {
+  return orders.filter(
+    (o) =>
+      o.pickupDate === pickupDate &&
+      o.pickupSlot === slot &&
+      (o.status === 'PENDING_PREPARE' || o.status === 'PREPARED')
+  ).length
+}
+
+function buildPickupSlotsForDate(pickupDate: string): OrderingPickupSlot[] {
+  return FALLBACK_PICKUP_SLOTS.map((s) => {
+    const occupied = slotOccupied(pickupDate, s.code)
+    const capacity = MOCK_SLOT_CAPACITY
+    const remaining = Math.max(0, capacity - occupied)
+    return {
+      code: s.code,
+      label: s.label,
+      hint: s.hint,
+      capacity,
+      occupied,
+      remaining,
+      full: remaining === 0,
+    }
+  })
+}
+
+function assertSlotAvailable(pickupDate: string, slot: PickupSlot): void {
+  const hit = buildPickupSlotsForDate(pickupDate).find((s) => s.code === slot)
+  if (hit && hit.full) {
+    throw new ApiBizError(SLOT_FULL_BIZ_CODE, SLOT_FULL_TOAST)
+  }
+}
 
 export function mockResetRole(role: UserRole) {
   mockUser = {
@@ -92,9 +129,11 @@ export const mockApi = {
     return { user: { ...mockUser }, profileCompleted, role: mockUser.role }
   },
 
-  async orderingConfig(): Promise<OrderingConfig> {
+  async orderingConfig(pickupDate?: string): Promise<OrderingConfig> {
     const hour = new Date().getHours()
     const canOrderNow = hour >= 12 && hour < 22
+    const nextPickupDate = tomorrowDate()
+    const slotDate = (pickupDate && String(pickupDate).trim()) || nextPickupDate
     return {
       timezone: 'Asia/Shanghai',
       orderWindowStart: '12:00',
@@ -107,8 +146,9 @@ export const mockApi = {
       depositFormulaText: '定金 = 订单金额 × 20%（订单满 10 元收取）',
       canOrderNow,
       serverNow: nowIso(),
-      nextPickupDate: tomorrowDate(),
-      pickupSlots: FALLBACK_PICKUP_SLOTS.map((s) => ({ ...s })),
+      nextPickupDate,
+      pickupDateForSlots: slotDate,
+      pickupSlots: buildPickupSlotsForDate(slotDate),
       defaultPickupSlot: 'MORNING',
       subscribePreparedTmplId: 'mock-config-subscribe-prepared-tmpl',
     }
@@ -129,6 +169,7 @@ export const mockApi = {
   ): Promise<Order> {
     if (!pickupSlot) throw new Error('请选择取货时段')
     const cfg = await this.orderingConfig()
+    assertSlotAvailable(cfg.nextPickupDate, pickupSlot)
     const lines: OrderItem[] = items.map((it) => {
       const p = PRODUCTS.find((x) => x.id === it.productId)!
       const q = parseFloat(it.quantity)
@@ -196,6 +237,12 @@ export const mockApi = {
   async payMockSuccess(id: string): Promise<Order> {
     const o = orders.find((x) => x.id === id)
     if (!o) throw new Error('订单不存在')
+    if (o.pickupSlot && o.pickupDate) {
+      const occ = slotOccupied(o.pickupDate, o.pickupSlot)
+      if (occ >= MOCK_SLOT_CAPACITY) {
+        throw new ApiBizError(SLOT_FULL_BIZ_CODE, SLOT_FULL_TOAST)
+      }
+    }
     o.status = 'PENDING_PREPARE'
     o.pickupCode = genPickupCode()
     o.payExpireAt = null
@@ -231,6 +278,7 @@ export const mockApi = {
     depositOffline: string
   }): Promise<Order> {
     if (!body.pickupSlot) throw new Error('请选择取货时段')
+    assertSlotAvailable(body.pickupDate, body.pickupSlot)
     const lines: OrderItem[] = body.items.map((it) => {
       const p = PRODUCTS.find((x) => x.id === it.productId)!
       const q = parseFloat(it.quantity)

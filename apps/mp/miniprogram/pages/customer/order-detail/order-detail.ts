@@ -1,5 +1,11 @@
 import { api } from '../../../services/api'
-import { fenToYuan, lineItemYuan, statusLabel } from '../../../utils/money'
+import {
+  isNoPickupClosed,
+  orderClosedDetailNote,
+  orderDetailStatusTag,
+  trackOrderClosedNoPickupOnce,
+} from '../../../utils/orderClose'
+import { fenToYuan, lineItemYuan } from '../../../utils/money'
 import { formatPickupSlotDisplay, resolvePickupSlots } from '../../../utils/pickupSlot'
 import {
   canOfferPreparedSubscribe,
@@ -16,6 +22,7 @@ Page({
     id: '',
     order: null as any,
     statusText: '',
+    closedDetailNote: '',
     totalYuan: '0.00',
     depositText: '',
     pickupSlotText: '',
@@ -62,7 +69,8 @@ Page({
         (await canOfferPreparedSubscribe())
       this.setData({
         order: { ...order, items },
-        statusText: statusLabel(order.status),
+        statusText: orderDetailStatusTag(order),
+        closedDetailNote: orderClosedDetailNote(order),
         totalYuan: fenToYuan(order.totalFen),
         depositText,
         pickupSlotText: formatPickupSlotDisplay(order.pickupDate, order.pickupSlot, slotMeta),
@@ -74,6 +82,9 @@ Page({
       })
       if (offerSubscribe) {
         await trackSubscribeOfferExposure(order.id, 'order_detail')
+      }
+      if (isNoPickupClosed(order)) {
+        trackOrderClosedNoPickupOnce(order.id)
       }
       track(TrackEvents.ORDER_DETAIL_VIEW, {
         order_id: order.id,

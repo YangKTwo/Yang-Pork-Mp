@@ -8,8 +8,9 @@
       <view
         wx:for="{{slotOptions}}"
         wx:key="code"
-        class="seg-item {{pickupSlot===item.code?'on':''}}"
+        class="seg-item {{pickupSlot===item.code?'on':''}} {{item.full?'disabled':''}}"
         data-slot="{{item.code}}"
+        data-full="{{item.full}}"
         bindtap="onPickSlot"
       >{{item.label}}</view>
     </view>

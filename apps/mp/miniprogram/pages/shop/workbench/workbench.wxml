@@ -13,7 +13,16 @@
         class="seg-item {{slotFilter===item.code?'on':''}}"
         data-slot="{{item.code}}"
         bindtap="switchSlotFilter"
-      >{{item.label}}</view>
+      >
+        <text>{{item.label}}</text>
+        <van-tag
+          wx:if="{{item.full && item.code !== 'all'}}"
+          type="primary"
+          plain
+          size="medium"
+          custom-class="slot-full-tag"
+        >已约满</van-tag>
+      </view>
     </view>
   </scroll-view>
 

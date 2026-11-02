@@ -199,6 +199,14 @@
 
 ---
 
+## 修订补丁（2026-10-31 · F-SLOT-02 / F-NOSHOW-01）
+
+- **C-ORDER-01**：`pickupSlots[]` 含 `capacity/occupied/remaining/full`（默认每档 capacity=30）；`full` 档 **禁用** + Tag「已约满」；Toast/40013「该时段已约满」。
+- **关闭态**：取货日 Asia/Shanghai 22:00 后未取 → `CLOSED`+`NO_PICKUP`，详情展示 **「超时未取」**；窗内仍可核销。`PAY_TIMEOUT`→「已关闭」；支付瞬间满档 `SLOT_FULL_ON_PAY`→短文案「时段已约满」。
+- 与 `CANCELLED`（已取消）分文案；不做退款流程 UI。完整标注见 **`13_f_slot_capacity_noshow_design.md`**。
+
+---
+
 ## 关键规则对照（设计验收）
 
 | 规则 | 线框体现 |

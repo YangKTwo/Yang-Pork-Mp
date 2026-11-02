@@ -3,7 +3,7 @@
 | 字段 | 内容 |
 |------|------|
 | 日期 | 2026-10-23（Asia/Shanghai） |
-| 修订 | 2026-10-30：交付 F-SUB-01 订阅引导、F-SLOT-01 三档取货时段（见 `12_f_sub_slot_design.md`） |
+| 修订 | 2026-10-30：F-SUB-01 / F-SLOT-01（`12_*.md`）；**2026-10-31**：F-SLOT-02 满档容量 + F-NOSHOW-01 超时未取（`13_f_slot_capacity_noshow_design.md`） |
 | 目录 | `docs/design/hifi/` |
 | 依据 | 线框通过（含 S-ACT-03）；需求 v1.1+v1.2；设计系统 `01_design_system.md`；群契约 F-SUB / F-SLOT |
 | 规格 | 375px 静态 HTML；暖红 `#C62828`；大触控；中文；实操肉铺风 |
@@ -21,18 +21,18 @@
 |------|---------|------|
 | `hifi/c_auth.html` | C-AUTH-01 / C-AUTH-02 | 微信登录 + 姓名手机注册补全 |
 | `hifi/c_home.html` | C-HOME-01 + C-HOME-02 | 商品列表 + **列表内加购底栏**（无独立详情） |
-| `hifi/c_order_confirm.html` | C-ORDER-01 | 下单确认；定金公式低干扰；备注选填（O-REM）；**三档取货时段必选、不预选**（F-SLOT-01 · `pickupSlot`） |
+| `hifi/c_order_confirm.html` | C-ORDER-01 | 下单确认；三档必选（F-SLOT-01）；**满档禁用 + Toast「该时段已约满」/40013**（F-SLOT-02） |
 | `hifi/c_pay_pending.html` | C-PAY-01 | 待支付；**10 分钟**倒计时强调 |
 | `hifi/c_order_success.html` | C-SUCCESS | **新建** · 下单成功轻量帧 + 订阅引导未开/已开（F-SUB-01）；非整页设置 |
-| `hifi/c_order_detail.html` | C-DETAIL-01 + C-DETAIL-02 | **6 位**取货码大号；取消弹层；备注回显；**时段 Tag** + **订阅未开/已开两帧**（F-SLOT / F-SUB） |
+| `hifi/c_order_detail.html` | C-DETAIL | 取货码；时段 Tag；订阅两态；**超时未取关闭态**（CLOSED+NO_PICKUP）；短注 SLOT_FULL_ON_PAY「时段已约满」 |
 
 ### 店家端
 
 | 文件 | 页面 ID | 说明 |
 |------|---------|------|
-| `hifi/s_workbench.html` | S-WORK-01 / S-WORK-02 | 预定 / 代录 **分区 Tab**；搜码；预定区 **时段筛选 全部/早/午/晚** + 卡片时段 Tag（F-SLOT-01）；双分区 P0 保留 |
-| `hifi/s_proxy_create.html` | S-PROXY-01 | **新建** · 代录创建；字段含 **取货时段必选**（同三档） |
-| `hifi/s_order_detail.html` | S-ORDER-01 + **S-ACT-03** | 完整手机号；备货；代取消；备注完整展示（O-REM） |
+| `hifi/s_workbench.html` | S-WORK | 双分区；时段筛选+Tag；**满档 Tag「已约满」**；**超时未取** Tag/筛选项（F-SLOT-02 / F-NOSHOW-01） |
+| `hifi/s_proxy_create.html` | S-PROXY-01 | 代录创建；时段必选；**满档禁用同步确认页**（F-SLOT-02） |
+| `hifi/s_order_detail.html` | S-ORDER + S-ACT-03 | 备货/核销/代取消；时段行；**超时未取关闭态**（F-NOSHOW-01） |
 
 ### 超管端
 
@@ -57,10 +57,12 @@
 | 加购 | 底栏规格条 | 蒙层 + 规格条；首页保留底部购物车条 |
 | 取货时段 | 本批新增 | 确认/代录三档必选；详情 Tag；工作台筛选（F-SLOT-01） |
 | 订阅引导 | 本批新增 | 成功帧 + 详情内嵌；无独立设置页（F-SUB-01） |
+| 时段容量满档 | 2026-10-31 | 确认/代录禁用 + Toast「该时段已约满」；工作台 Tag「已约满」（F-SLOT-02 · `13_*.md`） |
+| 超时未取 | 2026-10-31 | 详情/工作台「超时未取」；与 CANCELLED / PAY_TIMEOUT / SLOT_FULL_ON_PAY 分文案（F-NOSHOW-01） |
 | `html/` 旧示意 | 线框期 | **仍保留**；评审与对外以 **`hifi/`** 为准 |
 | 账号页 | P1 | 未做单独高保真页 |
 
-无业务规则变更超出本批 F-SUB / F-SLOT；**不做开发决策**。字段与群契约一致，详见 `12_f_sub_slot_design.md`。
+本批增量含 F-SLOT-02 / F-NOSHOW-01；字段与**已冻结契约**一致，详见 `12_*.md`、`13_f_slot_capacity_noshow_design.md`。
 
 ---
 
@@ -77,6 +79,8 @@
 | O-REM 订单备注两端同一 `remark` | **是** · 确认选填；详情/工作台有则展示 |
 | F-SLOT-01 三档取货时段 | **是** · 确认必选；详情 Tag；工作台筛选+Tag；代录必选 · `12_f_sub_slot_design.md` |
 | F-SUB-01 订阅授权引导 | **是** · 成功帧 + 详情两态；无独立订阅页 · `c_order_success.html` / `c_order_detail.html` |
+| F-SLOT-02 时段容量满档 | **是** · 确认/代录禁用+Toast「该时段已约满」/40013；工作台「已约满」· `13_*.md` |
+| F-NOSHOW-01 超时未取 | **是** · 两端详情「超时未取」+ 工作台 Tag/筛选 · `13_*.md` |
 
 ---
 
@@ -85,6 +89,7 @@
 - C-LIST-01 订单列表、C-ME-01 / S-ME-01、C-PAY-02、C-CART-01 独立全页  
 - S-ACT-01/02 独立弹层（备货/核销在详情主按钮已表达）  
 - 店家详情同步展示时段行（建议后续，非本批阻塞）  
-- A-MGMT-01 管理首页、A-ACC-01  
+- A-MGMT-01 管理首页、A-ACC-01
+- **超管时段容量配置页**（F-SLOT-02 P1，本周不做）  
 
-主路径顾客下单→时段确认→支付/取码→订阅引导→取消；店家分区管单→时段筛选→代录含时段→代取消；超管商品与配置 — 已覆盖可评审。详见 `10_iter2_hifi_supplement.md`、`12_f_sub_slot_design.md`。
+主路径含时段确认/满档禁用、订阅引导、超时未取关闭态；店家含满档 Tag 与超时未取筛选。详见 `12_f_sub_slot_design.md`、`13_f_slot_capacity_noshow_design.md`。

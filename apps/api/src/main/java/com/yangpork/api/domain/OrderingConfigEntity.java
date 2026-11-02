@@ -32,6 +32,13 @@ public class OrderingConfigEntity {
     @Column(nullable = false)
     private int payTimeoutSec = 600;
 
+    /** 为空时按 30 解释，便于 ddl-auto 给已有行加可空列。 */
+    private Integer defaultCapacityMorning;
+
+    private Integer defaultCapacityNoon;
+
+    private Integer defaultCapacityEvening;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getTimezone() { return timezone; }
@@ -50,4 +57,10 @@ public class OrderingConfigEntity {
     public void setDepositRateBps(int depositRateBps) { this.depositRateBps = depositRateBps; }
     public int getPayTimeoutSec() { return payTimeoutSec; }
     public void setPayTimeoutSec(int payTimeoutSec) { this.payTimeoutSec = payTimeoutSec; }
+    public Integer getDefaultCapacityMorning() { return defaultCapacityMorning; }
+    public void setDefaultCapacityMorning(Integer defaultCapacityMorning) { this.defaultCapacityMorning = defaultCapacityMorning; }
+    public Integer getDefaultCapacityNoon() { return defaultCapacityNoon; }
+    public void setDefaultCapacityNoon(Integer defaultCapacityNoon) { this.defaultCapacityNoon = defaultCapacityNoon; }
+    public Integer getDefaultCapacityEvening() { return defaultCapacityEvening; }
+    public void setDefaultCapacityEvening(Integer defaultCapacityEvening) { this.defaultCapacityEvening = defaultCapacityEvening; }
 }

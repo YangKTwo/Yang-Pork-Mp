@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>订单详情 · C-DETAIL · F-SUB / F-SLOT</title>
+<title>订单详情 · C-DETAIL · F-SUB / F-SLOT / F-NOSHOW</title>
 <link rel="stylesheet" href="common.css"/>
 <style>
   .phones{display:flex;flex-wrap:wrap;gap:24px;justify-content:center}
@@ -13,10 +13,14 @@
   }
   .sub-inline .btn-primary{height:40px;font-size:14px;margin-top:10px}
   .mask{display:none}
+  .annot{
+    max-width:375px;margin:8px auto 0;font-size:12px;color:#666;
+    background:#fff8e1;border:1px dashed #ffb74d;border-radius:8px;padding:8px 10px;
+  }
 </style>
 </head>
 <body>
-<p class="page-label">高保真 · C-DETAIL · 时段展示 + 订阅未开/已开两态（F-SLOT-01 / F-SUB-01）</p>
+<p class="page-label">高保真 · C-DETAIL · 订阅两态（F-SUB）+ 超时未取关闭态（F-NOSHOW-01）</p>
 <div class="phones">
 
 <!-- 未开启订阅 -->
@@ -24,7 +28,7 @@
   <div class="status"><span>12:20</span><span>···· Wi‑Fi</span></div>
   <div class="nav"><span class="back">←</span><div class="title">订单详情</div></div>
   <div class="content">
-    <p class="tiny" style="text-align:center;padding:0 16px 8px">态 A · subscribeStatus 未开（NONE / SKIPPED_NO_AUTH 等）</p>
+    <p class="tiny" style="text-align:center;padding:0 16px 8px">态 A · 订阅未开（继承 12）</p>
     <div class="card" style="text-align:center">
       <span class="badge">待备货</span>
       <div class="pickup-code">
@@ -39,12 +43,11 @@
       <button class="btn-primary" type="button">开启取货提醒</button>
     </div>
     <div class="card">
-      <div class="row"><span class="muted">取货日</span><strong>10月24日</strong></div>
+      <div class="row"><span class="muted">取货日</span><strong>10月31日</strong></div>
       <div class="row"><span class="muted">取货时段</span><span class="badge">中午取 · 11:00–14:00</span></div>
       <div class="row"><span class="muted">取货方式</span><span>到店自取</span></div>
       <div class="row"><span class="muted">定金</span><span>已付 ¥9.40</span></div>
       <div class="row"><span class="muted">备注</span><span>少放花椒</span></div>
-      <p class="muted">定金 = 订单金额 × 20%（订单满 10 元收取）</p>
     </div>
     <div class="card">
       <div style="font-weight:500;margin-bottom:6px">明细</div>
@@ -62,7 +65,7 @@
   <div class="status"><span>12:20</span><span>···· Wi‑Fi</span></div>
   <div class="nav"><span class="back">←</span><div class="title">订单详情</div></div>
   <div class="content">
-    <p class="tiny" style="text-align:center;padding:0 16px 8px">态 B · 已开启（ACCEPTED / SENT）· 弱化打扰</p>
+    <p class="tiny" style="text-align:center;padding:0 16px 8px">态 B · 订阅已开（继承 12）</p>
     <div class="card" style="text-align:center">
       <span class="badge">待备货</span>
       <div class="pickup-code">
@@ -76,12 +79,11 @@
       <span class="badge ok">✓ 已开启提醒</span>
     </div>
     <div class="card">
-      <div class="row"><span class="muted">取货日</span><strong>10月24日</strong></div>
+      <div class="row"><span class="muted">取货日</span><strong>10月31日</strong></div>
       <div class="row"><span class="muted">取货时段</span><span class="badge">中午取 · 11:00–14:00</span></div>
       <div class="row"><span class="muted">取货方式</span><span>到店自取</span></div>
       <div class="row"><span class="muted">定金</span><span>已付 ¥9.40</span></div>
       <div class="row"><span class="muted">备注</span><span>少放花椒</span></div>
-      <p class="muted">定金 = 订单金额 × 20%（订单满 10 元收取）</p>
     </div>
     <div class="card">
       <div style="font-weight:500;margin-bottom:6px">明细</div>
@@ -92,6 +94,41 @@
     <button class="btn-ghost-danger" type="button">取消订单</button>
     <p class="tiny" style="text-align:center;padding:0 24px 16px">仅下单当日 22:00（含）前可自助取消</p>
   </div>
+</div>
+
+<!-- 超时未取 -->
+<div>
+<div class="phone">
+  <div class="status"><span>22:08</span><span>···· Wi‑Fi</span></div>
+  <div class="nav"><span class="back">←</span><div class="title">订单详情</div></div>
+  <div class="content">
+    <p class="tiny" style="text-align:center;padding:0 16px 8px">态 C · F-NOSHOW-01 · CLOSED + closeReason=NO_PICKUP</p>
+    <div class="card" style="text-align:center">
+      <span class="badge warn">超时未取</span>
+      <div class="pickup-code" style="opacity:.55">
+        <div class="lbl">取货码（已失效）</div>
+        <div class="code">382915</div>
+        <p class="tiny" style="margin-top:8px">订单已关闭，无法再核销</p>
+      </div>
+    </div>
+    <div class="card">
+      <p class="muted" style="margin-bottom:8px">已过取货日当日 22:00，订单已关闭</p>
+      <div class="row"><span class="muted">关闭原因</span><span>超时未取</span></div>
+      <div class="row"><span class="muted">取货日</span><strong>10月31日</strong></div>
+      <div class="row"><span class="muted">取货时段</span><span class="badge">中午取 · 11:00–14:00</span></div>
+      <div class="row"><span class="muted">定金</span><span>已付 ¥9.40（应退流水已记 · mock）</span></div>
+      <p class="tiny" style="margin-top:8px">与「已取消」(CANCELLED)、未付「已关闭」文案区分 · 不做退款流程 UI</p>
+    </div>
+    <div class="card">
+      <div style="font-weight:500;margin-bottom:6px">明细</div>
+      <div class="row"><span>精瘦肉 ×1 斤</span><span>¥15.00</span></div>
+      <div class="row"><span>肋排 ×1 条</span><span>¥32.00</span></div>
+      <div class="row"><span>订单金额</span><span class="price">¥47.00</span></div>
+    </div>
+    <p class="tiny" style="text-align:center;padding:8px 24px 16px">无取消入口 · 无订阅强 CTA</p>
+  </div>
+</div>
+<div class="annot">主徽章「超时未取」= CLOSED+NO_PICKUP · 取货日 Asia/Shanghai 22:00 前可核销 · 另：SLOT_FULL_ON_PAY 关闭文案「时段已约满」（支付瞬间满档，后端态，短注不单独做页）· PAY_TIMEOUT→「已关闭」</div>
 </div>
 
 </div>

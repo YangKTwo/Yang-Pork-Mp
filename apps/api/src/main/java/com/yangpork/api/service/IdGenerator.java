@@ -10,6 +10,7 @@ public class IdGenerator {
     public String userId() { return "u_" + shortUuid(); }
     public String productId() { return "prod_" + shortUuid(); }
     public String orderId() { return "ord_" + shortUuid(); }
+    public String refundLedgerId() { return "rfd_" + shortUuid(); }
 
     public String pickupCode() {
         int n = ThreadLocalRandom.current().nextInt(100000, 1000000);

@@ -1,5 +1,20 @@
 /** 统一解析 / 解包 API 响应（供 request 与 applyAuthResponse 共用） */
 
+/** 业务错误（含 code，如 F-SLOT-02 的 40013） */
+export class ApiBizError extends Error {
+  readonly code: number
+
+  constructor(code: number, message: string) {
+    super(message)
+    this.name = 'ApiBizError'
+    this.code = code
+  }
+}
+
+export function isApiBizError(e: unknown): e is ApiBizError {
+  return e instanceof ApiBizError
+}
+
 export function isBizSuccessCode(code: unknown): boolean {
   return code === 0 || code === '0'
 }
@@ -74,7 +89,8 @@ export function unwrapApiSuccessBody<T>(body: unknown): T {
     if (env.code !== undefined && env.code !== null) {
       const message =
         typeof env.message === 'string' ? env.message : `业务错误 ${String(env.code)}`
-      throw new Error(message)
+      const numericCode = Number(env.code)
+      throw new ApiBizError(Number.isFinite(numericCode) ? numericCode : -1, message)
     }
   }
   return parsed as T

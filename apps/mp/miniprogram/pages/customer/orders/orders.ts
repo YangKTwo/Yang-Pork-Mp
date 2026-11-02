@@ -1,5 +1,6 @@
 import { api } from '../../../services/api'
-import { fenToYuan, statusLabel } from '../../../utils/money'
+import { fenToYuan } from '../../../utils/money'
+import { orderStatusDisplayText } from '../../../utils/orderClose'
 import { formatPickupSlotDisplay, resolvePickupSlots } from '../../../utils/pickupSlot'
 import { isSubscribeReminderActive, subscribeReminderCopy } from '../../../utils/subscribeReady'
 
@@ -15,7 +16,7 @@ Page({
           const copy = subscribeReminderCopy(o.subscribeStatus)
           return {
             id: o.id,
-            statusText: statusLabel(o.status),
+            statusText: orderStatusDisplayText(o),
             pickupDate: o.pickupDate,
             pickupSlotText: formatPickupSlotDisplay(o.pickupDate, o.pickupSlot, slotMeta),
             totalYuan: fenToYuan(o.totalFen),

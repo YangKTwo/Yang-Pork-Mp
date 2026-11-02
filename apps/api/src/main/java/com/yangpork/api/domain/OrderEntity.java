@@ -88,6 +88,12 @@ public class OrderEntity {
 
     private Instant cancelledAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 32)
+    private CloseReason closeReason;
+
+    private Instant closedAt;
+
     @Version
     private long version;
 
@@ -147,6 +153,10 @@ public class OrderEntity {
     public void setCancelOperatorRole(String cancelOperatorRole) { this.cancelOperatorRole = cancelOperatorRole; }
     public Instant getCancelledAt() { return cancelledAt; }
     public void setCancelledAt(Instant cancelledAt) { this.cancelledAt = cancelledAt; }
+    public CloseReason getCloseReason() { return closeReason; }
+    public void setCloseReason(CloseReason closeReason) { this.closeReason = closeReason; }
+    public Instant getClosedAt() { return closedAt; }
+    public void setClosedAt(Instant closedAt) { this.closedAt = closedAt; }
     public long getVersion() { return version; }
     public void setVersion(long version) { this.version = version; }
     public Instant getCreatedAt() { return createdAt; }

@@ -1,5 +1,6 @@
 import { api } from '../../../services/api'
-import { fenToYuan, lineItemYuan, statusLabel } from '../../../utils/money'
+import { orderClosedDetailNote, orderDetailStatusTag } from '../../../utils/orderClose'
+import { fenToYuan, lineItemYuan } from '../../../utils/money'
 import { formatPickupSlotDisplay, resolvePickupSlots } from '../../../utils/pickupSlot'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
@@ -8,6 +9,7 @@ Page({
     id: '',
     order: null as any,
     statusText: '',
+    closedDetailNote: '',
     depositText: '',
     pickupSlotText: '',
     canShopCancel: false,
@@ -45,7 +47,8 @@ Page({
       }
       this.setData({
         order: { ...order, items },
-        statusText: statusLabel(order.status),
+        statusText: orderDetailStatusTag(order),
+        closedDetailNote: orderClosedDetailNote(order),
         depositText,
         pickupSlotText: formatPickupSlotDisplay(order.pickupDate, order.pickupSlot, slotMeta),
         canShopCancel,
