@@ -3,9 +3,10 @@
   <view class="title">提前一天预定猪肉</view>
   <view class="tiny">正在进入…</view>
   <view class="dev card" wx:if="{{showDev}}">
-    <view class="muted">开发：Mock 角色快捷入口</view>
-    <van-button type="primary" size="small" round data-role="CUSTOMER" bind:click="goAs">顾客</van-button>
-    <van-button type="default" size="small" plain hairline data-role="SHOP" bind:click="goAs">店家</van-button>
-    <van-button type="default" size="small" plain hairline data-role="ADMIN" bind:click="goAs">超管</van-button>
+    <view class="muted">开发：Mock 角色快捷入口（各身份独立 devKey）</view>
+    <van-button type="primary" size="small" round data-role="CUSTOMER" data-dev-key="dev_customer_a" bind:click="goAs">顾客 A</van-button>
+    <van-button type="primary" size="small" plain hairline data-role="CUSTOMER" data-dev-key="dev_customer_b" bind:click="goAs">顾客 B</van-button>
+    <van-button type="default" size="small" plain hairline data-role="SHOP" data-dev-key="dev_shop" bind:click="goAs">店家</van-button>
+    <van-button type="default" size="small" plain hairline data-role="ADMIN" data-dev-key="dev_admin" bind:click="goAs">超管</van-button>
   </view>
 </view>

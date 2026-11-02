@@ -1,4 +1,5 @@
 import { api } from '../../services/api'
+import { DEV_QA_KEYS, loginWithDevKey } from '../../utils/devLogin'
 
 Page({
   data: { showDev: true },
@@ -10,14 +11,17 @@ Page({
   },
   async goAs(e: WechatMiniprogram.IAnyObject) {
     const role = (e.currentTarget.dataset.role || 'CUSTOMER') as UserRole
-    api.mockSwitchRole(role)
-    api.setUseMock(true)
-    const app = getApp<IAppOption>()
-    app.clearSession()
+    const devKey = String(
+      e.currentTarget.dataset.devKey ||
+        (role === 'SHOP'
+          ? DEV_QA_KEYS.shop
+          : role === 'ADMIN'
+            ? DEV_QA_KEYS.admin
+            : DEV_QA_KEYS.customerA)
+    )
     try {
-      const data = await api.wxLogin('dev_switch')
-      app.applyAuthResponse(data)
-      app.routeByRole()
+      await loginWithDevKey(devKey, { useMock: true, role })
+      getApp<IAppOption>().routeByRole()
     } catch (err: any) {
       wx.showToast({ title: err.message || '进入失败', icon: 'none' })
     }
