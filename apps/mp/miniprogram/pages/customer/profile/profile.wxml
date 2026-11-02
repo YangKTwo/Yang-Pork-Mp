@@ -17,7 +17,7 @@
       bind:change="onPhone"
     />
   </van-cell-group>
-  <view class="mp-page-foot">
+  <page-foot>
     <van-button type="primary" block round disabled="{{!canSubmit}}" loading="{{loading}}" bind:click="onSubmit">提交并进入</van-button>
-  </view>
+  </page-foot>
 </view>

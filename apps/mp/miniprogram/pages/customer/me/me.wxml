@@ -1,18 +1,14 @@
 <view class="page" style="padding-top:24rpx;padding-bottom:140rpx">
-  <view class="card">
-    <view class="row"><text class="muted">姓名</text><text>{{user.realName || '—'}}</text></view>
-    <view class="row"><text class="muted">手机</text><text>{{user.phone || '—'}}</text></view>
-    <view class="row"><text class="muted">角色</text><text>{{user.role || '—'}}</text></view>
-    <view class="row"><text class="muted">API</text><text class="tiny">{{baseURL}}</text></view>
-    <view class="row"><text class="muted">Mock</text><text>{{useMock ? '开' : '关'}}</text></view>
-  </view>
-  <view style="padding:0 32rpx">
-    <button class="btn-secondary" bindtap="toggleMock">切换 Mock {{useMock ? '关' : '开'}}</button>
-    <button class="btn-ghost-danger" bindtap="logout" style="margin-top:16rpx">退出登录</button>
+  <van-cell-group inset>
+    <van-cell title="姓名" value="{{user.realName || '—'}}" />
+    <van-cell title="手机" value="{{user.phone || '—'}}" />
+    <van-cell title="角色" value="{{user.role || '—'}}" />
+    <van-cell title="API" value="{{baseURL}}" />
+    <van-cell title="Mock" value="{{useMock ? '开' : '关'}}" />
+  </van-cell-group>
+  <view style="padding:24rpx 32rpx 0">
+    <van-button plain hairline block bind:click="toggleMock">切换 Mock {{useMock ? '关' : '开'}}</van-button>
+    <van-button type="danger" plain block custom-style="margin-top:16rpx" bind:click="logout">退出登录</van-button>
   </view>
 </view>
-<view class="tabbar-mock">
-  <view class="tab" bindtap="goHome"><text class="ico">⌂</text>商品</view>
-  <view class="tab" bindtap="goOrders"><text class="ico">☰</text>订单</view>
-  <view class="tab on"><text class="ico">☺</text>我的</view>
-</view>
+<role-tabbar tabs="{{tabs}}" bind:select="onTab" />

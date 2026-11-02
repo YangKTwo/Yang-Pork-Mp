@@ -2,7 +2,13 @@
 
 /* Vant Weapp 主题 · 对齐 docs/design/11_vant_weapp_design_align.md · primary #C62828（内联，避免 Win DevTools 相对 @import miss） */
 page {
-  --button-primary-background-color: #C62828;
+  --mp-primary: #C62828;
+  --mp-success: #2E7D32;
+  --mp-warning: #ED6C02;
+  --mp-danger: #D32F2F;
+  --mp-bg: #FAF7F5;
+  --mp-card: #FFFFFF;
+  --button-primary-background-color: var(--mp-primary);
   --button-primary-border-color: #C62828;
   --button-danger-background-color: #D32F2F;
   --button-danger-border-color: #D32F2F;

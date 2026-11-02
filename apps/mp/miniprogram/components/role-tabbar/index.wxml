@@ -1,0 +1,11 @@
+<view class="tabbar-mock">
+  <view
+    wx:for="{{tabs}}"
+    wx:key="key"
+    class="tab {{item.on ? 'on' : ''}}"
+    data-key="{{item.key}}"
+    bindtap="onTap"
+  >
+    <text class="ico">{{item.icon}}</text>{{item.label}}
+  </view>
+</view>

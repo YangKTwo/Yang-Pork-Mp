@@ -5,7 +5,8 @@ import {
   orderDetailStatusTag,
   trackOrderClosedNoPickupOnce,
 } from '../../../utils/orderClose'
-import { fenToYuan, lineItemYuan } from '../../../utils/money'
+import { fenToYuan } from '../../../utils/money'
+import { customerDepositText, statusTagType, withLineYuan } from '../../../utils/orderView'
 import { formatPickupSlotDisplay, resolvePickupSlots } from '../../../utils/pickupSlot'
 import {
   canOfferPreparedSubscribe,
@@ -22,6 +23,7 @@ Page({
     id: '',
     order: null as any,
     statusText: '',
+    statusTagType: 'primary',
     closedDetailNote: '',
     totalYuan: '0.00',
     depositText: '',
@@ -47,19 +49,10 @@ Page({
       const order = await api.getOrder(this.data.id)
       const config = await api.orderingConfig()
       const slotMeta = resolvePickupSlots(config)
-      const items = (order.items || []).map((it) => ({
-        ...it,
-        lineYuan: lineItemYuan(it),
-      }))
+      const items = withLineYuan(order.items)
       const canCancel =
         order.status === 'PENDING_PREPARE' || order.status === 'PREPARED'
-      let depositText = '免定金'
-      if (order.depositRequired) {
-        depositText =
-          order.status === 'PENDING_PAY'
-            ? `待付 ¥${fenToYuan(order.depositFen)}`
-            : `已付 ¥${fenToYuan(order.depositFen)}`
-      }
+      const depositText = customerDepositText(order)
       const reminderOn = isSubscribeReminderActive(order.subscribeStatus)
       const copy = subscribeReminderCopy(order.subscribeStatus)
       const offerSubscribe =
@@ -70,6 +63,7 @@ Page({
       this.setData({
         order: { ...order, items },
         statusText: orderDetailStatusTag(order),
+        statusTagType: statusTagType(order.status, order.closeReason),
         closedDetailNote: orderClosedDetailNote(order),
         totalYuan: fenToYuan(order.totalFen),
         depositText,

@@ -1,10 +1,12 @@
 import { api } from '../../../services/api'
+import { customerTabs } from '../../../utils/roleTabs'
 
 Page({
   data: {
     user: {} as any,
     baseURL: '',
     useMock: false,
+    tabs: customerTabs('me'),
   },
   onShow() {
     const app = getApp<IAppOption>()
@@ -24,6 +26,11 @@ Page({
   logout() {
     getApp<IAppOption>().clearSession()
     wx.reLaunch({ url: '/pages/customer/auth/auth' })
+  },
+  onTab(e: any) {
+    const key = e.detail && e.detail.key
+    if (key === 'home') this.goHome()
+    if (key === 'orders') this.goOrders()
   },
   goHome() {
     wx.reLaunch({ url: '/pages/customer/home/home' })

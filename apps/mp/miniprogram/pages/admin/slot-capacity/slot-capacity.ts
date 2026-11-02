@@ -7,6 +7,7 @@ import {
   trackAdminSlotCapacityView,
 } from '../../../utils/adminSlotCapacityTrack'
 import { isApiBizError } from '../../../utils/apiEnvelope'
+import { readField } from '../../../utils/orderView'
 import { FALLBACK_PICKUP_SLOTS, type PickupSlot } from '../../../utils/pickupSlot'
 
 const SLOTS: PickupSlot[] = ['MORNING', 'NOON', 'EVENING']
@@ -75,12 +76,12 @@ Page({
 
   onDefaultField(e: any) {
     const slot = e.currentTarget.dataset.slot as PickupSlot
-    this.setData({ [`defaultCaps.${slot}`]: e.detail.value })
+    this.setData({ [`defaultCaps.${slot}`]: readField(e) })
   },
 
   onDayField(e: any) {
     const slot = e.currentTarget.dataset.slot as PickupSlot
-    this.setData({ [`dayInputs.${slot}`]: e.detail.value, dayDirty: true })
+    this.setData({ [`dayInputs.${slot}`]: readField(e), dayDirty: true })
   },
 
   validateDefaultCaps(): Record<PickupSlot, number> | null {

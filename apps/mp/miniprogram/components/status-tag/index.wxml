@@ -1,0 +1,1 @@
+<van-tag wx:if="{{text}}" type="{{type}}" plain="{{plain}}" size="{{size}}" custom-class="{{gap ? 'tag-gap' : ''}}">{{text}}</van-tag>

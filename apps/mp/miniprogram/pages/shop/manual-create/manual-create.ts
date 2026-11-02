@@ -1,4 +1,5 @@
 import { api } from '../../../services/api'
+import { readField, readSlotPick } from '../../../utils/orderView'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 import {
   defaultPickupSlotFromConfig,
@@ -76,10 +77,10 @@ Page({
     }
     this.setData(patch)
   },
-  onName(e: any) { this.setData({ realName: e.detail.value }) },
-  onPhone(e: any) { this.setData({ phone: e.detail.value }) },
+  onName(e: any) { this.setData({ realName: readField(e) }) },
+  onPhone(e: any) { this.setData({ phone: readField(e) }) },
   async onDate(e: any) {
-    const pickupDate = String(e.detail.value || '').trim()
+    const pickupDate = readField(e).trim()
     this.setData({ pickupDate })
     if (!pickupDate) return
     try {
@@ -89,12 +90,13 @@ Page({
       wx.showToast({ title: err.message || '加载时段失败', icon: 'none' })
     }
   },
-  onRemark(e: any) { this.setData({ remark: e.detail.value }) },
-  onPick(e: any) { this.setData({ productIndex: Number(e.detail.value) }) },
-  onDeposit(e: any) { this.setData({ depositIndex: Number(e.detail.value) }) },
+  onRemark(e: any) { this.setData({ remark: readField(e) }) },
+  onPick(e: any) { this.setData({ productIndex: Number(readField(e)) }) },
+  onDeposit(e: any) { this.setData({ depositIndex: Number(readField(e)) }) },
   onPickSlot(e: any) {
-    const slot = e.currentTarget.dataset.slot as PickupSlot
-    const full = !!e.currentTarget.dataset.full
+    const picked = readSlotPick(e)
+    const slot = picked.slot as PickupSlot
+    const full = picked.full
     if (full) {
       showPickupSlotFullFeedback({
         source: 'manual',

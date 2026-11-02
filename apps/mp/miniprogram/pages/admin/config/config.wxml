@@ -1,41 +1,17 @@
 <view class="page" style="padding:24rpx 0 160rpx">
-  <view class="card" bindtap="goSlotCapacity" style="padding:24rpx 32rpx">
-    <view class="row" style="padding:0">
-      <view>
-        <view style="font-size:30rpx;font-weight:600">时段容量</view>
-        <view class="tiny">全局默认与按日覆盖</view>
-      </view>
-      <text class="muted">›</text>
-    </view>
-  </view>
-  <view class="card">
-    <view class="field">
-      <label>下单开始（HH:mm）</label>
-      <input value="{{form.orderWindowStart}}" bindinput="onField" data-k="orderWindowStart" />
-    </view>
-    <view class="field">
-      <label>下单结束（HH:mm）</label>
-      <input value="{{form.orderWindowEnd}}" bindinput="onField" data-k="orderWindowEnd" />
-    </view>
-    <view class="field">
-      <label>取消截止（HH:mm）</label>
-      <input value="{{form.cancelDeadline}}" bindinput="onField" data-k="cancelDeadline" />
-    </view>
-    <view class="field">
-      <label>定金门槛（分）</label>
-      <input type="number" value="{{form.depositThresholdFen}}" bindinput="onField" data-k="depositThresholdFen" />
-    </view>
-    <view class="field">
-      <label>定金比例（bps，2000=20%）</label>
-      <input type="number" value="{{form.depositRateBps}}" bindinput="onField" data-k="depositRateBps" />
-    </view>
-    <view class="field">
-      <label>支付超时（秒）</label>
-      <input type="number" value="{{form.payTimeoutSec}}" bindinput="onField" data-k="payTimeoutSec" />
-    </view>
-    <view class="formula-hint">{{form.depositFormulaText}}</view>
-  </view>
+  <van-cell-group inset>
+    <van-cell title="时段容量" label="全局默认与按日覆盖" is-link bind:click="goSlotCapacity" />
+  </van-cell-group>
+  <van-cell-group inset title="下单与定金">
+    <van-field label="下单开始" placeholder="HH:mm" value="{{form.orderWindowStart}}" data-k="orderWindowStart" bind:change="onField" />
+    <van-field label="下单结束" placeholder="HH:mm" value="{{form.orderWindowEnd}}" data-k="orderWindowEnd" bind:change="onField" />
+    <van-field label="取消截止" placeholder="HH:mm" value="{{form.cancelDeadline}}" data-k="cancelDeadline" bind:change="onField" />
+    <van-field label="定金门槛（分）" type="number" value="{{form.depositThresholdFen}}" data-k="depositThresholdFen" bind:change="onField" />
+    <van-field label="定金比例（bps）" type="number" value="{{form.depositRateBps}}" data-k="depositRateBps" bind:change="onField" />
+    <van-field label="支付超时（秒）" type="number" value="{{form.payTimeoutSec}}" data-k="payTimeoutSec" bind:change="onField" />
+  </van-cell-group>
+  <view class="formula-hint" style="margin:0 32rpx 16rpx">{{form.depositFormulaText}}</view>
 </view>
-<view class="foot-safe">
-  <button class="btn-primary" bindtap="onSave" loading="{{loading}}">保存（Mock 本地生效示意）</button>
-</view>
+<page-foot>
+  <van-button type="primary" block round loading="{{loading}}" bind:click="onSave">保存（Mock 本地生效示意）</van-button>
+</page-foot>

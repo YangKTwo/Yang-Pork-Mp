@@ -19,7 +19,7 @@
       </view>
     </block>
     <view class="hint-box">
-      <button class="btn-primary" bindtap="onSaveDefault" loading="{{savingDefault}}">保存默认容量</button>
+      <van-button type="primary" block round loading="{{savingDefault}}" bind:click="onSaveDefault">保存默认容量</van-button>
     </view>
   </view>
 
@@ -39,7 +39,7 @@
           <view class="slot-name">{{item.label}}</view>
           <view class="slot-eff" wx:if="{{effective[item.code]}}">
             <text>占用 {{effective[item.code].occupied}} · 余 {{effective[item.code].remaining}}</text>
-            <text wx:if="{{effective[item.code].full}}" class="badge muted">已约满</text>
+            <status-tag wx:if="{{effective[item.code].full}}" text="已约满" type="primary" />
           </view>
         </view>
         <input
@@ -54,8 +54,8 @@
       </view>
     </block>
     <view class="hint-box">
-      <button class="btn-primary" bindtap="onSaveDay" loading="{{savingDay || loadingDay}}">保存本日覆盖</button>
-      <button class="link-danger" bindtap="onClearDay">清除本日覆盖</button>
+      <van-button type="primary" block round loading="{{savingDay || loadingDay}}" bind:click="onSaveDay">保存本日覆盖</van-button>
+      <van-button type="danger" plain block custom-style="margin-top:16rpx" bind:click="onClearDay">清除本日覆盖</van-button>
     </view>
   </view>
 </view>

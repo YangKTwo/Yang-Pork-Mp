@@ -9,6 +9,7 @@
     <view>当前不在下单窗口（{{config.orderWindowStart}}–{{config.orderWindowEnd}}），暂不可下单</view>
   </view>
 
+  <page-empty wx:if="{{!products.length}}" description="暂无在售商品" />
   <view class="item" wx:for="{{products}}" wx:key="id">
     <view class="thumb">{{item.name[0]}}</view>
     <view class="info">
@@ -62,8 +63,4 @@
   bind:submit="goConfirm"
 />
 
-<view class="tabbar-mock">
-  <view class="tab on"><text class="ico">⌂</text>商品</view>
-  <view class="tab" bindtap="goOrders"><text class="ico">☰</text>订单</view>
-  <view class="tab" bindtap="goMe"><text class="ico">☺</text>我的</view>
-</view>
+<role-tabbar tabs="{{tabs}}" bind:select="onTab" />

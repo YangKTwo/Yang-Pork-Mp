@@ -18,6 +18,7 @@ import {
   slotFullUserMessage,
 } from '../../../utils/slotCapacity'
 import { runPreparedSubscribeFlow } from '../../../utils/subscribeReady'
+import { readSlotPick } from '../../../utils/orderView'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
 function reconcileSlot(
@@ -104,8 +105,9 @@ Page({
     )
   },
   onPickSlot(e: any) {
-    const slot = e.currentTarget.dataset.slot as PickupSlot
-    const full = !!e.currentTarget.dataset.full
+    const picked = readSlotPick(e)
+    const slot = picked.slot as PickupSlot
+    const full = picked.full
     if (full) {
       showPickupSlotFullFeedback({
         source: 'confirm',

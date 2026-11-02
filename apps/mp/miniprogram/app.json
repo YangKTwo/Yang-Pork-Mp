@@ -58,6 +58,12 @@
     "van-empty": "@vant/weapp/empty/index",
     "van-stepper": "@vant/weapp/stepper/index",
     "van-switch": "@vant/weapp/switch/index",
-    "van-tag": "@vant/weapp/tag/index"
+    "van-tag": "@vant/weapp/tag/index",
+    "status-tag": "/components/status-tag/index",
+    "pickup-code": "/components/pickup-code/index",
+    "slot-picker": "/components/slot-picker/index",
+    "page-empty": "/components/page-empty/index",
+    "page-foot": "/components/page-foot/index",
+    "role-tabbar": "/components/role-tabbar/index"
   }
 }
