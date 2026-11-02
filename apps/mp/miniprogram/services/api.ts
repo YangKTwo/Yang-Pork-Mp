@@ -6,7 +6,7 @@
  * - App.globalData.useMock=true 时走 mock（默认 false，联调本地 8082；可在「我的」开启 Mock）
  */
 import { parseApiBody, unwrapApiSuccessBody } from '../utils/apiEnvelope'
-import { getStableDevKey } from '../utils/devKey'
+import { getStableDevKey, setDevKey as persistDevKey } from '../utils/devKey'
 import { mockApi, mockResetRole } from './mock'
 
 const DEFAULT_BASE = 'http://127.0.0.1:8082/api/v1'
@@ -93,9 +93,16 @@ export const api = {
       /* ignore */
     }
   },
-  /** 开发辅助：切换 mock 角色 */
-  mockSwitchRole(role: UserRole) {
-    mockResetRole(role)
+  /** 开发辅助：切换 mock 角色（须与 setDevKey 后的 wxLogin 同一 devKey） */
+  mockSwitchRole(role: UserRole, devKey: string) {
+    mockResetRole(role, devKey)
+  },
+  /** 本地 QA：切换 devKey，下次 wx-login 映射到新 mock 用户 */
+  setDevKey(key: string) {
+    persistDevKey(key)
+  },
+  getDevKey() {
+    return getStableDevKey()
   },
 
   /**

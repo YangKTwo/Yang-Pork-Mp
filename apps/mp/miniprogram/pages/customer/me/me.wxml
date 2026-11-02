@@ -5,9 +5,13 @@
     <van-cell title="角色" value="{{user.role || '—'}}" />
     <van-cell title="API" value="{{baseURL}}" />
     <van-cell title="Mock" value="{{useMock ? '开' : '关'}}" />
+    <van-cell title="devKey" value="{{devKey || '—'}}" />
   </van-cell-group>
   <view style="padding:24rpx 32rpx 0">
-    <van-button plain hairline block bind:click="toggleMock">切换 Mock {{useMock ? '关' : '开'}}</van-button>
+    <view class="tiny muted" style="margin-bottom:12rpx">联调：切换顾客身份后重新登录</view>
+    <van-button plain hairline block size="small" data-dev-key="dev_customer_a" bind:click="switchDevCustomer">切换为顾客 A</van-button>
+    <van-button plain hairline block size="small" custom-style="margin-top:12rpx" data-dev-key="dev_customer_b" bind:click="switchDevCustomer">切换为顾客 B</van-button>
+    <van-button plain hairline block bind:click="toggleMock" custom-style="margin-top:16rpx">切换 Mock {{useMock ? '关' : '开'}}</van-button>
     <van-button type="danger" plain block custom-style="margin-top:16rpx" bind:click="logout">退出登录</van-button>
   </view>
 </view>

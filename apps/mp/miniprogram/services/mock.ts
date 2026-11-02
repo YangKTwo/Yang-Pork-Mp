@@ -36,16 +36,55 @@ function genPickupCode(): string {
   return String(Math.floor(100000 + Math.random() * 900000))
 }
 
-let mockUser: UserInfo = {
-  id: 'u_mock_customer',
-  role: 'CUSTOMER',
-  nickname: null,
-  phone: null,
-  realName: null,
+type MockSession = {
+  mockUser: UserInfo
+  profileCompleted: boolean
+  accessToken: string
+  orders: Order[]
 }
-let profileCompleted = false
-let accessToken = 'mock_token_customer'
-const orders: Order[] = []
+
+const sessions: Record<string, MockSession> = {}
+/** 最近一次 wxLogin 使用的 devKey，供无参 mock API 路由到对应会话 */
+let activeDevKey = ''
+
+function sessionStorageKey(devKey: string): string {
+  const trimmed = String(devKey || '').trim()
+  return trimmed ? trimmed.slice(0, 32) : 'default'
+}
+
+function createDefaultCustomerSession(key: string): MockSession {
+  return {
+    mockUser: {
+      id: `u_mock_dev_${key}`,
+      role: 'CUSTOMER',
+      nickname: null,
+      phone: null,
+      realName: null,
+    },
+    profileCompleted: false,
+    accessToken: `mock_token_${key}`,
+    orders: [],
+  }
+}
+
+function getOrCreateSession(devKey: string): MockSession {
+  const key = sessionStorageKey(devKey)
+  if (!sessions[key]) {
+    sessions[key] = createDefaultCustomerSession(key)
+  }
+  return sessions[key]
+}
+
+function currentSession(): MockSession {
+  if (activeDevKey) {
+    return getOrCreateSession(activeDevKey)
+  }
+  return getOrCreateSession('default')
+}
+
+function allMockOrders(): Order[] {
+  return Object.values(sessions).flatMap((s) => s.orders)
+}
 
 const ALL_SLOTS: PickupSlot[] = ['MORNING', 'NOON', 'EVENING']
 
@@ -64,7 +103,7 @@ function effectiveCapacity(pickupDate: string, slot: PickupSlot): number {
 }
 
 function slotOccupied(pickupDate: string, slot: PickupSlot): number {
-  return orders.filter(
+  return allMockOrders().filter(
     (o) =>
       o.pickupDate === pickupDate &&
       o.pickupSlot === slot &&
@@ -96,16 +135,19 @@ function assertSlotAvailable(pickupDate: string, slot: PickupSlot): void {
   }
 }
 
-export function mockResetRole(role: UserRole) {
-  mockUser = {
-    id: `u_mock_${role.toLowerCase()}`,
+export function mockResetRole(role: UserRole, devKey: string) {
+  const key = sessionStorageKey(devKey)
+  activeDevKey = key
+  const session = getOrCreateSession(key)
+  session.mockUser = {
+    id: `u_mock_dev_${key}`,
     role,
     nickname: role === 'CUSTOMER' ? null : `${role}演示`,
     phone: role === 'CUSTOMER' ? null : '13800000000',
     realName: role === 'CUSTOMER' ? null : '演示账号',
   }
-  profileCompleted = role !== 'CUSTOMER'
-  accessToken = `mock_token_${role.toLowerCase()}`
+  session.profileCompleted = role !== 'CUSTOMER'
+  session.accessToken = `mock_token_${role.toLowerCase()}_${key}`
 }
 
 export const mockApi = {
@@ -114,33 +156,42 @@ export const mockApi = {
       throw new Error('devKey 必填（40001）')
     }
     void _code
+    const key = sessionStorageKey(devKey)
+    activeDevKey = key
+    const session = getOrCreateSession(key)
     return {
-      accessToken,
+      accessToken: session.accessToken,
       expiresIn: 7200,
-      profileCompleted,
-      user: { ...mockUser, id: `u_mock_dev_${String(devKey).slice(0, 32)}` },
+      profileCompleted: session.profileCompleted,
+      user: { ...session.mockUser },
     }
   },
 
   async completeProfile(realName: string, phone: string) {
-    mockUser = {
-      ...mockUser,
+    const session = currentSession()
+    session.mockUser = {
+      ...session.mockUser,
       realName,
       phone,
       nickname: `${realName}${phone}`,
     }
-    profileCompleted = true
-    accessToken = `mock_token_${mockUser.role.toLowerCase()}_profile`
+    session.profileCompleted = true
+    session.accessToken = `mock_token_${session.mockUser.role.toLowerCase()}_profile_${sessionStorageKey(activeDevKey)}`
     return {
-      accessToken,
+      accessToken: session.accessToken,
       expiresIn: 7200,
-      user: { ...mockUser },
+      user: { ...session.mockUser },
       profileCompleted: true,
     }
   },
 
   async me() {
-    return { user: { ...mockUser }, profileCompleted, role: mockUser.role }
+    const session = currentSession()
+    return {
+      user: { ...session.mockUser },
+      profileCompleted: session.profileCompleted,
+      role: session.mockUser.role,
+    }
   },
 
   async orderingConfig(pickupDate?: string): Promise<OrderingConfig> {
@@ -205,6 +256,7 @@ export const mockApi = {
       : 0
     const status = depositRequired ? 'PENDING_PAY' : 'PENDING_PREPARE'
     const expire = new Date(Date.now() + cfg.payTimeoutSec * 1000)
+    const session = currentSession()
     const order: Order = {
       id: `ord_mock_${Date.now()}`,
       source: 'PREORDER',
@@ -218,39 +270,39 @@ export const mockApi = {
       payExpireAt: depositRequired ? expire.toISOString() : null,
       pickupCode: depositRequired ? null : genPickupCode(),
       items: lines,
-      realName: mockUser.realName || undefined,
-      phone: mockUser.phone || undefined,
+      realName: session.mockUser.realName || undefined,
+      phone: session.mockUser.phone || undefined,
       remark,
       subscribeStatus: 'NONE',
     }
-    orders.unshift(order)
+    session.orders.unshift(order)
     return order
   },
 
   async orderSubscribe(id: string, body: { accepted: boolean }): Promise<Order> {
-    const o = orders.find((x) => x.id === id)
+    const o = allMockOrders().find((x) => x.id === id)
     if (!o) throw new Error('订单不存在')
     o.subscribeStatus = body.accepted ? 'ACCEPTED' : 'NONE'
     return o
   },
 
   async listMyOrders(): Promise<Order[]> {
-    return orders.filter((o) => o.source === 'PREORDER')
+    return currentSession().orders.filter((o) => o.source === 'PREORDER')
   },
 
   async getOrder(id: string): Promise<Order | null> {
-    return orders.find((o) => o.id === id) || null
+    return allMockOrders().find((o) => o.id === id) || null
   },
 
   async cancelOrder(id: string): Promise<Order> {
-    const o = orders.find((x) => x.id === id)
+    const o = allMockOrders().find((x) => x.id === id)
     if (!o) throw new Error('订单不存在')
     o.status = 'CANCELLED'
     return o
   },
 
   async payMockSuccess(id: string): Promise<Order> {
-    const o = orders.find((x) => x.id === id)
+    const o = allMockOrders().find((x) => x.id === id)
     if (!o) throw new Error('订单不存在')
     if (o.pickupSlot && o.pickupDate) {
       const cap = effectiveCapacity(o.pickupDate, o.pickupSlot)
@@ -267,7 +319,7 @@ export const mockApi = {
   },
 
   async shopPreorderOrders(query?: Record<string, string>): Promise<Order[]> {
-    let list = orders.filter((o) => o.source === 'PREORDER')
+    let list = allMockOrders().filter((o) => o.source === 'PREORDER')
     const slot = query && query.pickupSlot
     if (slot) {
       list = list.filter((o) => o.pickupSlot === slot)
@@ -276,7 +328,7 @@ export const mockApi = {
   },
 
   async shopManualOrders(query?: Record<string, string>): Promise<Order[]> {
-    let list = orders.filter((o) => o.source === 'MANUAL')
+    let list = allMockOrders().filter((o) => o.source === 'MANUAL')
     const slot = query && query.pickupSlot
     if (slot) {
       list = list.filter((o) => o.pickupSlot === slot)
@@ -326,12 +378,12 @@ export const mockApi = {
       remark: body.remark,
       depositOffline: body.depositOffline,
     }
-    orders.unshift(order)
+    allMockOrders().unshift(order)
     return order
   },
 
   async prepareOrder(id: string): Promise<Order> {
-    const o = orders.find((x) => x.id === id)
+    const o = allMockOrders().find((x) => x.id === id)
     if (!o) throw new Error('订单不存在')
     o.status = 'PREPARED'
     if (o.subscribeStatus === 'ACCEPTED') {
@@ -341,14 +393,14 @@ export const mockApi = {
   },
 
   async pickupOrder(id: string, _code: string): Promise<Order> {
-    const o = orders.find((x) => x.id === id)
+    const o = allMockOrders().find((x) => x.id === id)
     if (!o) throw new Error('订单不存在')
     o.status = 'PICKED_UP'
     return o
   },
 
   async shopCancel(id: string, reason: string): Promise<Order> {
-    const o = orders.find((x) => x.id === id)
+    const o = allMockOrders().find((x) => x.id === id)
     if (!o) throw new Error('订单不存在')
     if (!reason || !reason.trim()) throw new Error('取消原因必填')
     o.status = 'CANCELLED'

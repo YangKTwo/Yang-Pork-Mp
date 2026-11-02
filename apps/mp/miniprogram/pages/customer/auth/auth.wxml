@@ -7,6 +7,11 @@
   <view class="card">
     <view class="tiny" style="text-align:center">登录后需补全姓名与手机号方可下单</view>
   </view>
+  <view class="card" wx:if="{{showDev}}" style="margin-top:24rpx">
+    <view class="tiny muted" style="text-align:center;margin-bottom:16rpx">联调本地 API：切换顾客身份（独立 devKey）</view>
+    <van-button size="small" block plain hairline data-dev-key="dev_customer_a" loading="{{loading}}" bind:click="loginAsDevCustomer">以顾客 A 登录</van-button>
+    <van-button size="small" block plain hairline custom-style="margin-top:12rpx" data-dev-key="dev_customer_b" loading="{{loading}}" bind:click="loginAsDevCustomer">以顾客 B 登录</van-button>
+  </view>
 </view>
 <page-foot>
   <van-button type="primary" block round loading="{{loading}}" bind:click="onLogin">微信一键登录</van-button>
