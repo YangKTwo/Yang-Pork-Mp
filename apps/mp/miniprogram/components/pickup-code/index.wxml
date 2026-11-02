@@ -1,0 +1,6 @@
+<view class="pickup-code" wx:if="{{code}}">
+  <view class="lbl">取货码</view>
+  <view class="code">{{code}}</view>
+  <view class="tiny" wx:if="{{hint}}" style="margin-top:16rpx">{{hint}}</view>
+</view>
+<view class="muted" wx:elif="{{pending}}" style="margin-top:24rpx">支付成功后生成取货码</view>

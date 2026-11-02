@@ -1,0 +1,3 @@
+<view class="foot-safe">
+  <slot />
+</view>

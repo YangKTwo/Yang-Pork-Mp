@@ -1,4 +1,5 @@
 import { api } from '../../../services/api'
+import { readField } from '../../../utils/orderView'
 
 Page({
   data: {
@@ -14,7 +15,7 @@ Page({
   },
   onField(e: any) {
     const k = e.currentTarget.dataset.k
-    let v: any = e.detail.value
+    let v: any = readField(e)
     if (['depositThresholdFen', 'depositRateBps', 'payTimeoutSec'].indexOf(k) >= 0) {
       v = Number(v)
     }

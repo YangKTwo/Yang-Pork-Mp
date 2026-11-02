@@ -5,39 +5,20 @@
     <view class="seg-item {{tab==='manual'?'on':''}}" data-tab="manual" bindtap="switchTab">代录</view>
   </view>
 
-  <scroll-view scroll-x class="slot-filter-scroll" enable-flex>
-    <view class="seg slot-filter-seg">
-      <view
-        wx:for="{{slotFilters}}"
-        wx:key="code"
-        class="seg-item {{slotFilter===item.code?'on':''}}"
-        data-slot="{{item.code}}"
-        bindtap="switchSlotFilter"
-      >
-        <text>{{item.label}}</text>
-        <van-tag
-          wx:if="{{item.full && item.code !== 'all'}}"
-          type="primary"
-          plain
-          size="medium"
-          custom-class="slot-full-tag"
-        >已约满</van-tag>
-      </view>
-    </view>
-  </scroll-view>
+  <slot-picker mode="filter" options="{{slotFilters}}" value="{{slotFilter}}" bind:pick="switchSlotFilter" />
 
   <view wx:if="{{tab==='preorder'}}" class="work-zone preorder-zone">
     <view class="card" wx:for="{{preorderList}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
       <view class="row">
-        <van-tag type="primary" plain size="medium">{{item.statusText}}</van-tag>
-        <van-tag plain size="medium" custom-class="tag-gap">{{item.pickupSlotLabel}}</van-tag>
+        <status-tag text="{{item.statusText}}" type="{{item.statusTagType}}" />
+        <status-tag text="{{item.pickupSlotLabel}}" gap="{{true}}" />
         <text class="tiny">码 {{item.pickupCode || '—'}}</text>
       </view>
       <view class="row"><text>{{item.realName}}</text><text>{{item.phone}}</text></view>
       <view class="muted">{{item.pickupSlotText}} · {{item.summary}} · ¥{{item.totalYuan}}</view>
       <view class="muted" wx:if="{{item.remark}}" style="margin-top:8rpx">备注：{{item.remark}}</view>
     </view>
-    <van-empty wx:if="{{!preorderList.length}}" description="暂无预定订单" />
+    <page-empty wx:if="{{!preorderList.length}}" description="暂无预定订单" />
   </view>
 
   <view wx:else class="work-zone manual-zone">
@@ -46,20 +27,16 @@
     </view>
     <view class="card" wx:for="{{manualList}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
       <view class="row">
-        <van-tag plain size="medium">代录</van-tag>
-        <van-tag type="primary" plain size="medium" custom-class="tag-gap">{{item.statusText}}</van-tag>
-        <van-tag plain size="medium" custom-class="tag-gap">{{item.pickupSlotLabel}}</van-tag>
+        <status-tag text="代录" />
+        <status-tag text="{{item.statusText}}" type="{{item.statusTagType}}" gap="{{true}}" />
+        <status-tag text="{{item.pickupSlotLabel}}" gap="{{true}}" />
       </view>
       <view class="row"><text>{{item.realName}}</text><text>{{item.phone}}</text></view>
       <view class="muted">{{item.pickupSlotText}} · {{item.summary}} · ¥{{item.totalYuan}}</view>
       <view class="muted" wx:if="{{item.remark}}" style="margin-top:8rpx">备注：{{item.remark}}</view>
     </view>
-    <van-empty wx:if="{{!manualList.length}}" description="暂无代录订单" />
+    <page-empty wx:if="{{!manualList.length}}" description="暂无代录订单" />
   </view>
 </view>
 
-<view class="tabbar-mock">
-  <view class="tab on"><text class="ico">▦</text>工作台</view>
-  <view class="tab" wx:if="{{isAdmin}}" bindtap="goAdmin"><text class="ico">⚙</text>管理</view>
-  <view class="tab" bindtap="goMe"><text class="ico">☺</text>我的</view>
-</view>
+<role-tabbar tabs="{{tabs}}" bind:select="onTab" />

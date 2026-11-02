@@ -1,0 +1,3 @@
+Component({
+  options: { multipleSlots: false },
+})

@@ -1,6 +1,6 @@
 import { api } from '../../../services/api'
 import { orderClosedDetailNote, orderDetailStatusTag } from '../../../utils/orderClose'
-import { fenToYuan, lineItemYuan } from '../../../utils/money'
+import { shopDepositText, sourceLabel, statusTagType, withLineYuan } from '../../../utils/orderView'
 import { formatPickupSlotDisplay, resolvePickupSlots } from '../../../utils/pickupSlot'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
@@ -9,6 +9,8 @@ Page({
     id: '',
     order: null as any,
     statusText: '',
+    statusTagType: 'primary',
+    sourceText: '',
     closedDetailNote: '',
     depositText: '',
     pickupSlotText: '',
@@ -31,23 +33,15 @@ Page({
       const order = await api.getOrder(this.data.id)
       const config = await api.orderingConfig()
       const slotMeta = resolvePickupSlots(config)
-      const items = (order.items || []).map((it) => ({
-        ...it,
-        lineYuan: lineItemYuan(it),
-      }))
+      const items = withLineYuan(order.items)
       const canShopCancel =
         order.status === 'PENDING_PREPARE' || order.status === 'PREPARED'
-      let depositText = '—'
-      if (order.source === 'MANUAL') {
-        depositText = order.depositOffline || '线下'
-      } else if (order.depositRequired) {
-        depositText = `已付 ¥${fenToYuan(order.depositFen)}`
-      } else {
-        depositText = '免定金'
-      }
+      const depositText = shopDepositText(order)
       this.setData({
         order: { ...order, items },
         statusText: orderDetailStatusTag(order),
+        statusTagType: statusTagType(order.status, order.closeReason),
+        sourceText: sourceLabel(order.source),
         closedDetailNote: orderClosedDetailNote(order),
         depositText,
         pickupSlotText: formatPickupSlotDisplay(order.pickupDate, order.pickupSlot, slotMeta),

@@ -1,9 +1,7 @@
 import { api } from '../../../services/api'
-import { fenToYuan } from '../../../utils/money'
-import { orderStatusDisplayText } from '../../../utils/orderClose'
+import { mapShopOrderCard } from '../../../utils/orderView'
+import { shopTabs } from '../../../utils/roleTabs'
 import {
-  formatPickupSlotDisplay,
-  pickupSlotLabel,
   resolvePickupSlots,
   slotFilterOptions,
   type PickupSlotMeta,
@@ -11,24 +9,8 @@ import {
 
 let cachedSlotMeta: PickupSlotMeta[] = []
 
-function itemSummary(items: OrderItem[] | undefined): string {
-  if (!items || !items.length) return '订单'
-  return items.map((i) => `${i.name}×${i.quantity}${i.unit || ''}`).join('、')
-}
-
 function mapList(orders: Order[], slotMeta: ReturnType<typeof resolvePickupSlots>) {
-  return orders.map((o) => ({
-    id: o.id,
-    statusText: orderStatusDisplayText(o),
-    pickupCode: o.pickupCode,
-    pickupSlotText: formatPickupSlotDisplay(o.pickupDate, o.pickupSlot, slotMeta),
-    pickupSlotLabel: pickupSlotLabel(o.pickupSlot, slotMeta),
-    realName: o.realName || '—',
-    phone: o.phone || '—',
-    totalYuan: fenToYuan(o.totalFen),
-    summary: itemSummary(o.items),
-    remark: (o.remark || '').trim(),
-  }))
+  return orders.map((order) => mapShopOrderCard(order, slotMeta))
 }
 
 Page({
@@ -39,10 +21,12 @@ Page({
     preorderList: [] as any[],
     manualList: [] as any[],
     isAdmin: false,
+    tabs: shopTabs('workbench', false),
   },
   async onShow() {
     const app = getApp<IAppOption>()
-    this.setData({ isAdmin: app.globalData.role === 'ADMIN' })
+    const isAdmin = app.globalData.role === 'ADMIN'
+    this.setData({ isAdmin, tabs: shopTabs('workbench', isAdmin) })
     const config = await api.orderingConfig()
     cachedSlotMeta = resolvePickupSlots(config)
     this.setData({ slotFilters: slotFilterOptions(cachedSlotMeta) })
@@ -70,7 +54,7 @@ Page({
     this.setData({ tab: e.currentTarget.dataset.tab })
   },
   switchSlotFilter(e: any) {
-    const slotFilter = String(e.currentTarget.dataset.slot || 'all')
+    const slotFilter = String((e.detail && e.detail.slot) || 'all')
     this.setData({ slotFilter }, () => this.reload())
   },
   goDetail(e: any) {
@@ -80,6 +64,11 @@ Page({
   },
   goManualCreate() {
     wx.navigateTo({ url: '/pages/shop/manual-create/manual-create' })
+  },
+  onTab(e: any) {
+    const key = e.detail && e.detail.key
+    if (key === 'admin') this.goAdmin()
+    if (key === 'me') this.goMe()
   },
   goAdmin() {
     wx.navigateTo({ url: '/pages/admin/home/home' })

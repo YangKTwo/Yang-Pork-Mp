@@ -1,0 +1,36 @@
+<view>
+  <scroll-view wx:if="{{mode === 'filter'}}" scroll-x class="slot-filter-scroll" enable-flex>
+    <view class="seg slot-filter-seg">
+      <view
+        wx:for="{{options}}"
+        wx:key="code"
+        class="seg-item {{value === item.code ? 'on' : ''}}"
+        data-slot="{{item.code}}"
+        data-full="{{item.full}}"
+        bindtap="onTap"
+      >
+        <text>{{item.label}}</text>
+        <van-tag
+          wx:if="{{item.full && item.code !== 'all'}}"
+          type="primary"
+          plain
+          size="medium"
+          custom-class="slot-full-tag"
+        >已约满</van-tag>
+      </view>
+    </view>
+  </scroll-view>
+  <block wx:else>
+    <view class="seg slot-seg">
+      <view
+        wx:for="{{options}}"
+        wx:key="code"
+        class="seg-item {{value === item.code ? 'on' : ''}} {{item.full ? 'disabled' : ''}}"
+        data-slot="{{item.code}}"
+        data-full="{{item.full}}"
+        bindtap="onTap"
+      >{{item.label}}</view>
+    </view>
+    <view class="formula-hint slot-hint" wx:if="{{hint}}">{{hint}}</view>
+  </block>
+</view>

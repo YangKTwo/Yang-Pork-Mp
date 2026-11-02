@@ -11,7 +11,7 @@
   width: 100%;
   height: 96rpx;
   line-height: 96rpx;
-  background: #C62828;
+  background: var(--mp-primary, #C62828);
   color: #fff;
   border: none;
   border-radius: 20rpx;
@@ -306,4 +306,10 @@
   font-size: 36rpx;
   line-height: 1.2;
   margin-bottom: 4rpx;
+}
+.tag-gap {
+  margin-left: 8rpx;
+}
+.sheet-inner {
+  padding: 32rpx 32rpx 48rpx;
 }

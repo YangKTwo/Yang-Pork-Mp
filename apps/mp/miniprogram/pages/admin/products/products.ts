@@ -1,5 +1,6 @@
 import { api } from '../../../services/api'
 import { fenToYuan, yuanToFen } from '../../../utils/money'
+import { mapProductRow } from '../../../utils/orderView'
 
 const UNIT_OPTIONS = ['斤', '条', '只', '份']
 
@@ -45,7 +46,7 @@ Page({
   async reload() {
     const products = await api.listAllProducts()
     this.setData({
-      list: products.map((p) => ({ ...p, priceYuan: fenToYuan(p.priceFen) })),
+      list: products.map((p) => mapProductRow(p)),
     })
   },
   openCreate() {

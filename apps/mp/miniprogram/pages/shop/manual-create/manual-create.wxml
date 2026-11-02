@@ -1,49 +1,22 @@
 <view class="page" style="padding:24rpx 0 160rpx">
-  <view class="card">
-    <view class="field">
-      <label>姓名 <text class="req">*</text></label>
-      <input value="{{realName}}" bindinput="onName" placeholder="顾客姓名" />
-    </view>
-    <view class="field">
-      <label>手机 <text class="req">*</text></label>
-      <input type="number" value="{{phone}}" bindinput="onPhone" maxlength="11" placeholder="11 位手机号" />
-    </view>
-    <view class="field">
-      <label>取货日</label>
-      <input value="{{pickupDate}}" bindinput="onDate" placeholder="YYYY-MM-DD" />
-    </view>
-    <view class="field">
-      <label>取货时段 <text class="req">*</text></label>
-      <view class="seg slot-seg manual-slot-seg">
-        <view
-          wx:for="{{slotOptions}}"
-          wx:key="code"
-          class="seg-item {{pickupSlot===item.code?'on':''}} {{item.full?'disabled':''}}"
-          data-slot="{{item.code}}"
-          data-full="{{item.full}}"
-          bindtap="onPickSlot"
-        >{{item.label}}</view>
-      </view>
-      <view class="tiny slot-hint-inline" wx:if="{{slotHint}}">{{slotHint}}</view>
-    </view>
-    <view class="field">
-      <label>商品（简化：选首个上架 SKU ×1）</label>
-      <picker range="{{productNames}}" value="{{productIndex}}" bindchange="onPick">
-        <view class="picker">{{productNames[productIndex] || '选择商品'}}</view>
-      </picker>
-    </view>
-    <view class="field">
-      <label>线下定金</label>
-      <picker range="{{depositOptions}}" value="{{depositIndex}}" bindchange="onDeposit">
-        <view class="picker">{{depositOptions[depositIndex]}}</view>
-      </picker>
-    </view>
-    <view class="field">
-      <label>备注</label>
-      <input value="{{remark}}" bindinput="onRemark" placeholder="电话预定等" />
-    </view>
-  </view>
+  <van-cell-group inset>
+    <van-field label="姓名" required placeholder="顾客姓名" value="{{realName}}" bind:change="onName" />
+    <van-field label="手机" required type="number" maxlength="11" placeholder="11 位手机号" value="{{phone}}" bind:change="onPhone" />
+    <van-field label="取货日" placeholder="YYYY-MM-DD" value="{{pickupDate}}" bind:change="onDate" />
+  </van-cell-group>
+  <van-cell-group inset title="取货时段（必选）">
+    <slot-picker options="{{slotOptions}}" value="{{pickupSlot}}" hint="{{slotHint}}" bind:pick="onPickSlot" />
+  </van-cell-group>
+  <van-cell-group inset>
+    <picker range="{{productNames}}" value="{{productIndex}}" bindchange="onPick">
+      <van-cell title="商品" is-link value="{{productNames[productIndex] || '选择商品'}}" />
+    </picker>
+    <picker range="{{depositOptions}}" value="{{depositIndex}}" bindchange="onDeposit">
+      <van-cell title="线下定金" is-link value="{{depositOptions[depositIndex]}}" />
+    </picker>
+    <van-field label="备注" placeholder="电话预定等" value="{{remark}}" bind:change="onRemark" />
+  </van-cell-group>
 </view>
-<view class="foot-safe">
-  <button class="btn-primary" bindtap="onSubmit" loading="{{loading}}">提交代录</button>
-</view>
+<page-foot>
+  <van-button type="primary" block round loading="{{loading}}" bind:click="onSubmit">提交代录</van-button>
+</page-foot>

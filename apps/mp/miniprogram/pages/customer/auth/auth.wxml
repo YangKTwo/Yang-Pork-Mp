@@ -5,7 +5,9 @@
     <view class="muted">次日到店自取 · 微信快捷登录</view>
   </view>
   <view class="card">
-    <van-button type="primary" block round loading="{{loading}}" bind:click="onLogin">微信一键登录</van-button>
-    <view class="tiny" style="margin-top:16rpx;text-align:center">登录后需补全姓名与手机号方可下单</view>
+    <view class="tiny" style="text-align:center">登录后需补全姓名与手机号方可下单</view>
   </view>
 </view>
+<page-foot>
+  <van-button type="primary" block round loading="{{loading}}" bind:click="onLogin">微信一键登录</van-button>
+</page-foot>

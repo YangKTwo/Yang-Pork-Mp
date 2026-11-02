@@ -4,17 +4,7 @@
     <van-cell title="取货方式" value="到店自取" />
   </van-cell-group>
   <van-cell-group inset title="取货时段（必选）">
-    <view class="seg slot-seg">
-      <view
-        wx:for="{{slotOptions}}"
-        wx:key="code"
-        class="seg-item {{pickupSlot===item.code?'on':''}} {{item.full?'disabled':''}}"
-        data-slot="{{item.code}}"
-        data-full="{{item.full}}"
-        bindtap="onPickSlot"
-      >{{item.label}}</view>
-    </view>
-    <view class="formula-hint slot-hint" wx:if="{{slotHint}}">{{slotHint}}</view>
+    <slot-picker options="{{slotOptions}}" value="{{pickupSlot}}" hint="{{slotHint}}" bind:pick="onPickSlot" />
   </van-cell-group>
   <van-cell-group inset title="明细">
     <van-cell
@@ -39,6 +29,6 @@
     />
   </van-cell-group>
 </view>
-<view class="foot-safe">
+<page-foot>
   <van-button type="primary" block round loading="{{loading}}" disabled="{{!canOrder}}" bind:click="onSubmit">提交订单</van-button>
-</view>
+</page-foot>

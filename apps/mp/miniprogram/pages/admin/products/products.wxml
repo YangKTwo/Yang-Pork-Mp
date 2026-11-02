@@ -2,13 +2,12 @@
   <view style="padding:0 32rpx 24rpx">
     <van-button type="primary" block round bind:click="openCreate">新建商品</van-button>
   </view>
+  <page-empty wx:if="{{!list.length}}" description="暂无商品" />
   <van-cell-group inset wx:for="{{list}}" wx:key="id" custom-class="product-group">
     <van-cell use-label-slot>
       <view slot="title" class="row" style="padding:0">
         <text style="font-weight:500">{{item.name}}</text>
-        <van-tag type="{{item.status==='ON_SHELF'?'success':'default'}}" plain size="medium">
-          {{item.status==='ON_SHELF'?'上架':'下架'}}
-        </van-tag>
+        <status-tag text="{{item.shelfText}}" type="{{item.shelfTagType}}" gap="{{true}}" />
       </view>
       <view slot="label">
         <view class="muted">{{item.skuCode}} · ¥{{item.priceYuan}}/{{item.unit}}</view>

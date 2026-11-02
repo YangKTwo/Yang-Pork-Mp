@@ -3,18 +3,19 @@
     <van-cell-group inset wx:for="{{list}}" wx:key="id" custom-class="order-group">
       <van-cell
         is-link
-        title="{{item.statusText}} · {{item.pickupSlotText}}"
-        label="{{item.subscribeReminderOn ? item.subscribeBadge + ' · ' + item.summary : item.summary}}"
+        use-label-slot
         value="¥{{item.totalYuan}}{{item.pickupCode ? ' · 码 ' + item.pickupCode : ''}}"
         bind:click="goDetail"
         data-id="{{item.id}}"
-      />
+      >
+        <view slot="title">
+          <status-tag text="{{item.statusText}}" type="{{item.statusTagType}}" size="medium" />
+          <text class="muted"> {{item.pickupSlotText}}</text>
+        </view>
+        <view slot="label">{{item.subscribeReminderOn ? item.subscribeBadge + ' · ' + item.summary : item.summary}}</view>
+      </van-cell>
     </van-cell-group>
   </block>
-  <van-empty wx:else description="暂无订单" />
+  <page-empty wx:else description="暂无订单" />
 </view>
-<view class="tabbar-mock">
-  <view class="tab" bindtap="goHome"><text class="ico">⌂</text>商品</view>
-  <view class="tab on"><text class="ico">☰</text>订单</view>
-  <view class="tab" bindtap="goMe"><text class="ico">☺</text>我的</view>
-</view>
+<role-tabbar tabs="{{tabs}}" bind:select="onTab" />

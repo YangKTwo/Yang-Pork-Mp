@@ -4,7 +4,7 @@
     <view class="price" style="font-size:48rpx;margin:24rpx 0">¥{{depositYuan}}</view>
     <view class="muted">Mock 环境可点击下方按钮模拟支付成功</view>
   </view>
-  <view class="mp-page-foot">
+  <page-foot>
     <van-button type="primary" block round loading="{{loading}}" bind:click="onMockPay">模拟支付成功</van-button>
-  </view>
+  </page-foot>
 </view>

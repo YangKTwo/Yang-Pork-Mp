@@ -1,6 +1,8 @@
 import { api } from '../../../services/api'
 import { addToCart, loadCart, cartTotalFen } from '../../../utils/cart'
 import { fenToYuan } from '../../../utils/money'
+import { mapProductRow } from '../../../utils/orderView'
+import { customerTabs } from '../../../utils/roleTabs'
 import { track, TrackEvents } from '../../../utils/tracking/index'
 
 Page({
@@ -17,6 +19,7 @@ Page({
     cartCount: 0,
     cartYuan: '0.00',
     cartPriceFen: 0,
+    tabs: customerTabs('home'),
   },
   _viewed: false,
   async onShow() {
@@ -33,7 +36,7 @@ Page({
   async refresh() {
     try {
       const [products, config] = await Promise.all([api.listProducts(), api.orderingConfig()])
-      const list = products.map((p) => ({ ...p, priceYuan: fenToYuan(p.priceFen) }))
+      const list = products.map((p) => mapProductRow(p))
       const cart = loadCart()
       this.setData({
         products: list,
@@ -112,6 +115,11 @@ Page({
       return
     }
     wx.navigateTo({ url: '/pages/customer/confirm/confirm' })
+  },
+  onTab(e: any) {
+    const key = e.detail && e.detail.key
+    if (key === 'orders') this.goOrders()
+    if (key === 'me') this.goMe()
   },
   goOrders() {
     wx.navigateTo({ url: '/pages/customer/orders/orders' })

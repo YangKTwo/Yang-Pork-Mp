@@ -4,8 +4,8 @@
   <view class="tiny">正在进入…</view>
   <view class="dev card" wx:if="{{showDev}}">
     <view class="muted">开发：Mock 角色快捷入口</view>
-    <button class="btn-primary" size="mini" bindtap="goAs" data-role="CUSTOMER">顾客</button>
-    <button class="btn-secondary" size="mini" bindtap="goAs" data-role="SHOP">店家</button>
-    <button class="btn-secondary" size="mini" bindtap="goAs" data-role="ADMIN">超管</button>
+    <van-button type="primary" size="small" round data-role="CUSTOMER" bind:click="goAs">顾客</van-button>
+    <van-button type="default" size="small" plain hairline data-role="SHOP" bind:click="goAs">店家</van-button>
+    <van-button type="default" size="small" plain hairline data-role="ADMIN" bind:click="goAs">超管</van-button>
   </view>
 </view>
